@@ -14,8 +14,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+/lib/
+/lib64/
 parts/
 sdist/
 var/
@@ -127,3 +127,15 @@ Thumbs.db
 # Database
 *.sqlite3
 *.db
+
+# AI agent docs (never committed)
+AGENTS.md
+CLAUDE.md
+.ai/
+
+# Node / frontend
+node_modules/
+dist/
+.vite/
+*.local
+npm-debug.log*
