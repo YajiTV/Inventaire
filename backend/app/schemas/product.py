@@ -33,3 +33,12 @@ class ProductUpdate(BaseModel):
 class ProductRead(ReadModel, ProductBase):
     id: int
     total_quantity: int = 0
+
+
+class ProductLookup(BaseModel):
+    """Product data fetched from Open Food Facts for a barcode."""
+
+    barcode: str
+    name: str | None = None
+    description: str | None = None
+    image_url: str | None = None
