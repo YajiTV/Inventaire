@@ -6,7 +6,7 @@ type SupplierCreate = components['schemas']['SupplierCreate']
 type SupplierUpdate = components['schemas']['SupplierUpdate']
 
 let suppliers: SupplierRead[] = [
-  { id: 1, name: 'Fournisseur Général', email: 'contact@fournisseur.fr', phone: null, address: null },
+  { id: 1, name: 'Francke', email: 'contact@francke.fr', phone: null, address: null },
 ]
 let nextId = 2
 
