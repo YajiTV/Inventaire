@@ -30,6 +30,24 @@ npm run dev
 
 Application : http://localhost:5173
 
+## Contrat d'interface (openapi.json)
+
+`openapi.json`, à la racine, est la référence partagée entre le back et le front :
+le front en dérive ses types TypeScript et ses mocks.
+
+Après toute modification d'un schéma Pydantic ou d'une route, le régénérer et le
+commiter, depuis `backend/` :
+
+```bash
+.venv/bin/python -m scripts.export_openapi
+```
+
+`backend/tests/test_contract.py` échoue tant que le fichier commité n'est pas à jour.
+
+Les routes déclarées sans implémentation renvoient `501`. Chaque responsable de
+ressource remplace l'appel à `not_implemented()` par le code réel, sans changer la
+signature de la route ni les schémas sans prévenir l'équipe.
+
 ## Migrations (Alembic)
 
 Les modèles sont dans `backend/app/models/` et sont importés dans `backend/alembic/env.py` (via `import app.models`) pour qu'Alembic les détecte à l'autogénération. La connexion utilise `DATABASE_URL` (`backend/.env`), aucune URL en dur dans `alembic.ini`.
