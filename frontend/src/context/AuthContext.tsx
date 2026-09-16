@@ -1,4 +1,4 @@
-import { createContext, useCallback, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { AuthContextValue, User } from '../types/auth'
 import { apiFetch } from '../lib/api'
 import type { components } from '../types/api'
@@ -35,6 +35,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refresh = useCallback(async () => {
     // TODO Axel : POST /auth/refresh avec credentials: include puis setAccessToken(nouveauToken).
   }, [])
+
+  useEffect(() => {
+  refresh().finally(() => setIsLoading(false))
+}, [refresh])
+
 
   const value = useMemo<AuthContextValue>(
     () => ({

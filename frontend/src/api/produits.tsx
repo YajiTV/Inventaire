@@ -1,34 +1,37 @@
-import type { Produit } from "../types/produit";
+import { apiFetch } from "../lib/api";
+import type { Produit, ProduitCreate, ProduitUpdate } from "../types/produit";
 
-const URL = "http://localhost:8000/produits";
+// GET /products renvoie une page ({ items, total, limit, offset }), voir
+// src/api/mocks/handlers/products.ts. On ne récupère que la liste des items.
+interface ProduitsPage {
+    items: Produit[];
+    total: number;
+    limit: number;
+    offset: number;
+}
 
 export async function getProduits(): Promise<Produit[]> {
-    const res = await fetch(URL);
-    if (!res.ok) throw new Error("Erreur chargement produits");
-    return res.json();
+    const res = await apiFetch("/products");
+    const page: ProduitsPage = await res.json();
+    return page.items;
 }
 
-export async function createProduit(data: { nom: string }): Promise<Produit> {
-    const res = await fetch(URL, {
+export async function createProduit(data: ProduitCreate): Promise<Produit> {
+    const res = await apiFetch("/products", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error("Erreur création produit");
     return res.json();
 }
 
-export async function updateProduit(id: number, data: { nom: string }): Promise<Produit> {
-    const res = await fetch(`${URL}/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+export async function updateProduit(id: number, data: ProduitUpdate): Promise<Produit> {
+    const res = await apiFetch(`/products/${id}`, {
+        method: "PATCH",
         body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error("Erreur modification produit");
     return res.json();
 }
 
 export async function deleteProduit(id: number): Promise<void> {
-    const res = await fetch(`${URL}/${id}`, { method: "DELETE" });
-    if (!res.ok) throw new Error("Erreur suppression produit");
+    await apiFetch(`/products/${id}`, { method: "DELETE" });
 }

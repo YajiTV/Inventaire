@@ -1,11 +1,11 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import {
     getProduits,
     createProduit,
     updateProduit,
     deleteProduit,
 } from "../api/produits";
-import type { Produit } from "../types/produit";
+import type { Produit, ProduitCreate, ProduitUpdate } from "../types/produit";
 
 export function useProduits() {
     const [produits, setProduits] = useState<Produit[]>([]);
@@ -19,12 +19,12 @@ export function useProduits() {
             .finally(() => setLoading(false));
     }, []);
 
-    async function addProduit(data: { nom: string }) {
+    async function addProduit(data: ProduitCreate) {
         const nouveau = await createProduit(data);
         setProduits((prev) => [...prev, nouveau]);
     }
 
-    async function editProduit(id: number, data: { nom: string }) {
+    async function editProduit(id: number, data: ProduitUpdate) {
         const maj = await updateProduit(id, data);
         setProduits((prev) => prev.map((p) => (p.id === id ? maj : p)));
     }
