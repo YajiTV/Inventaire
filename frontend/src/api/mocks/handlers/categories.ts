@@ -1,9 +1,5 @@
 import {http, HttpResponse } from 'msw';
-import type { components } from '../../../types/api';
-
-type CategoryRead = components['schemas']['CategoryRead']
-type CategoryCreate = components['schemas']['CategoryCreate']
-type CategoryUpdate = components['schemas']['CategoryUpdate']
+import type { CategoryRead, CategoryCreate, CategoryUpdate } from '../../../types/api';
 
 let categories: CategoryRead[] = [
      {id: 1, name: 'Alimentaire', description: 'Produits Frais'},

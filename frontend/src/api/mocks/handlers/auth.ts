@@ -1,8 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import type { components } from '../../../types/api'
-
-type TokenResponse = components['schemas']['TokenResponse']
-type UserRead = components['schemas']['UserRead']
+import type { TokenResponse, UserRead } from '../../../types/api'
 
 const MOCK_USER: UserRead = {
   id: 1,

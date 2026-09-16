@@ -1,6 +1,6 @@
-import type { components } from './api'
+import type { UserRead } from './api'
 
-export type User = components['schemas']['UserRead']
+export type User = UserRead
 
 export interface AuthContextValue {
   user: User | null

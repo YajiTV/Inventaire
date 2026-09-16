@@ -1,9 +1,7 @@
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { AuthContextValue, User } from '../types/auth'
+import type { TokenResponse } from '../types/api'
 import { apiFetch } from '../lib/api'
-import type { components } from '../types/api'
-
-type TokenResponse = components['schemas']['TokenResponse']
 
 export const AuthContext = createContext<AuthContextValue | null>(null)
 
@@ -39,7 +37,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
   refresh().finally(() => setIsLoading(false))
 }, [refresh])
-
 
   const value = useMemo<AuthContextValue>(
     () => ({

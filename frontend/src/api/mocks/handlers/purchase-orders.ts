@@ -1,12 +1,5 @@
 import {http, HttpResponse} from 'msw';
-import type { components } from '../../../types/api';
-
-type PurchaseOrderRead = components['schemas']['PurchaseOrderRead']
-type PurchaseOrderCreate = components['schemas']['PurchaseOrderCreate']
-type PurchaseOrderUpdate = components['schemas']['PurchaseOrderUpdate']
-type OrderLineRead = components['schemas']['OrderLineRead']
-type OrderLineCreate = components['schemas']['OrderLineCreate']
-type OrderLineUpdate = components['schemas']['OrderLineUpdate']
+import type { PurchaseOrderRead, PurchaseOrderCreate, PurchaseOrderUpdate, OrderLineRead, OrderLineCreate, OrderLineUpdate } from '../../../types/api';
 
 let purchaseOrders: PurchaseOrderRead[] = [
     {

@@ -1,9 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import type { components } from '../../../types/api'
-
-type UserRead = components['schemas']['UserRead']
-type UserCreate = components['schemas']['UserCreate']
-type UserUpdate = components['schemas']['UserUpdate']
+import type { UserRead, UserCreate, UserUpdate } from '../../../types/api'
 
 let users: UserRead[] = [
   {

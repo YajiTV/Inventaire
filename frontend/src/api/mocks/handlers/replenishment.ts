@@ -1,10 +1,5 @@
 import {http, HttpResponse} from 'msw';
-import type { components } from '../../../types/api';
-
-type ReplenishmentSuggestion = components['schemas']['ReplenishmentSuggestion']
-type ReplenishmentRequest = components['schemas']['ReplenishmentRequest']
-type PurchaseOrderRead = components['schemas']['PurchaseOrderRead']
-type OrderLineRead = components['schemas']['OrderLineRead']
+import type { ReplenishmentSuggestion, ReplenishmentRequest, PurchaseOrderRead, OrderLineRead } from '../../../types/api';
 
 // Liste figee, independante du stock dans products.ts : c'est juste une photo
 // de ce que l'ecran Reapprovisionnement doit afficher pour le mock

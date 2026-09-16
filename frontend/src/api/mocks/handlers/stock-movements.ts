@@ -1,8 +1,5 @@
 import {http, HttpResponse} from 'msw';
-import type { components } from '../../../types/api';
-
-type StockMovementRead = components['schemas']['StockMovementRead']
-type StockMovementCreate = components['schemas']['StockMovementCreate']
+import type { StockMovementRead, StockMovementCreate } from '../../../types/api';
 
 let stockMovements: StockMovementRead[] = [
     {

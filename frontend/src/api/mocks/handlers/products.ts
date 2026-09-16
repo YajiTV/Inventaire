@@ -1,10 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import type { components } from '../../../types/api'
-
-type ProductRead = components['schemas']['ProductRead']
-type ProductCreate = components['schemas']['ProductCreate']
-type ProductUpdate = components['schemas']['ProductUpdate']
-type ProductLookup = components['schemas']['ProductLookup']
+import type { ProductRead, ProductCreate, ProductUpdate, ProductLookup } from '../../../types/api'
 
 let products: ProductRead[] = [
   {
@@ -55,6 +50,7 @@ export const productHandlers = [
       barcode: null,
       total_quantity: 0,
       ...payload,
+      reorder_threshold: payload.reorder_threshold ?? 0,
       unit_price: String(payload.unit_price),
     }
     products.push(created)

@@ -1,9 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import type { components } from '../../../types/api'
-
-type SupplierRead = components['schemas']['SupplierRead']
-type SupplierCreate = components['schemas']['SupplierCreate']
-type SupplierUpdate = components['schemas']['SupplierUpdate']
+import type { SupplierRead, SupplierCreate, SupplierUpdate } from '../../../types/api'
 
 let suppliers: SupplierRead[] = [
   { id: 1, name: 'Francke', email: 'contact@francke.fr', phone: null, address: null },

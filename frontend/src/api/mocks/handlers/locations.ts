@@ -1,11 +1,7 @@
 import {http , HttpResponse} from 'msw';
-import type { components } from '../../../types/api';
+import type { LocationRead, LocationCreate, LocationUpdate } from '../../../types/api';
 
-type LocationsRead = components['schemas']['LocationRead']
-type LocationCreate = components['schemas']['LocationCreate']
-type LocationUpdate = components['schemas']['LocationUpdate']
-
-let locations: LocationsRead[] = [
+let locations: LocationRead[] = [
     {id: 1, code: 'Kiosk-01', name: 'Kiosk', description: null}
 ]
 
@@ -16,7 +12,7 @@ export const locationHandlers = [
 
     http.post('*/locations', async ({request}) => {
         const payload = (await request.json()) as LocationCreate
-        const createLocations: LocationsRead = { id: nextId++, description: null, ...payload}
+        const createLocations: LocationRead = { id: nextId++, description: null, ...payload}
         locations.push(createLocations)
         return HttpResponse.json(createLocations, { status : 201})
     }),
@@ -44,8 +40,5 @@ export const locationHandlers = [
     locations = locations.filter((c) => c.id !== Number(params.id))
     return new HttpResponse(null, {status : 204})
 }),
-
-
-
 
 ]
