@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useFournisseurs } from "../hooks/useFournisseurs";
-import type { Fournisseur } from "../types/fournisseur";
+import { useFournisseurs } from "../hooks/useSuppliers";
+import type { Fournisseur } from "../types/supplier";
 
 // Page CRUD fournisseurs : liste + formulaire d'ajout + édition/suppression
 // inline sur chaque ligne. Pas de librairie de formulaire, juste du useState

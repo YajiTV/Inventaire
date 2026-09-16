@@ -1,5 +1,5 @@
 import { apiFetch } from "../lib/api";
-import type { Produit, ProduitCreate, ProduitUpdate } from "../types/produit";
+import type { Produit, ProduitCreate, ProduitUpdate } from "../types/product";
 
 // GET /products renvoie une page ({ items, total, limit, offset }), voir
 // src/api/mocks/handlers/products.ts. On ne récupère que la liste des items.

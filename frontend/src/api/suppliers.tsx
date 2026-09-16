@@ -1,5 +1,5 @@
 import { apiFetch } from "../lib/api";
-import type { Fournisseur, FournisseurCreate, FournisseurUpdate } from "../types/fournisseur";
+import type { Fournisseur, FournisseurCreate, FournisseurUpdate } from "../types/supplier";
 
 export async function getFournisseurs(): Promise<Fournisseur[]> {
     const res = await apiFetch("/suppliers");

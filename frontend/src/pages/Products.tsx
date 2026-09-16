@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useProduits } from "../hooks/useProduits";
-import type { Produit } from "../types/produit";
+import { useProduits } from "../hooks/useProduct";
+import type { Produit } from "../types/product";
 
 // Page CRUD produits : liste + formulaire d'ajout + édition/suppression
 // inline sur chaque ligne. category_id est saisi en brut (id d'une catégorie

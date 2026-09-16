@@ -4,8 +4,8 @@ import {
     createProduit,
     updateProduit,
     deleteProduit,
-} from "../api/produits";
-import type { Produit, ProduitCreate, ProduitUpdate } from "../types/produit";
+} from "../api/products";
+import type { Produit, ProduitCreate, ProduitUpdate } from "../types/product";
 
 export function useProduits() {
     const [produits, setProduits] = useState<Produit[]>([]);

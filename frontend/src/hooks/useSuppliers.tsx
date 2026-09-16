@@ -4,8 +4,8 @@ import {
     createFournisseur,
     updateFournisseur,
     deleteFournisseur,
-} from "../api/fournisseurs";
-import type { Fournisseur, FournisseurCreate, FournisseurUpdate } from "../types/fournisseur";
+} from "../api/suppliers";
+import type { Fournisseur, FournisseurCreate, FournisseurUpdate } from "../types/supplier";
 
 export function useFournisseurs() {
     // La liste des fournisseurs récupérée depuis l'API.
