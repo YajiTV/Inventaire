@@ -3,6 +3,9 @@ import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Home from './pages/Home'
+import Stocks from './pages/Stocks'
+import Movements from './pages/Movements'
+import NewMovement from './pages/NewMovement'
 
 export default function App() {
   return (
@@ -12,6 +15,9 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Home />} />
+            <Route path="/stocks" element={<Stocks />} />
+            <Route path="/movements" element={<Movements />} />
+            <Route path="/movements/new" element={<NewMovement />} />
           </Route>
         </Routes>
       </AuthProvider>

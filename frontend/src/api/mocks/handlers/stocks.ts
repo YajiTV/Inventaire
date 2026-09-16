@@ -6,6 +6,16 @@ let stocks: StockRead[] = [
 ]
 let nextId = 2
 
+// Partage de l'etat avec le handler des mouvements : un mouvement doit deplacer
+// le stock, sinon la demo montre un historique qui ne change rien.
+export function getStocks(): StockRead[] {
+  return stocks
+}
+
+export function setStocks(next: StockRead[]): void {
+  stocks = next
+}
+
 export const stockHandlers = [
   http.get('*/stocks', () => HttpResponse.json(stocks)),
 
