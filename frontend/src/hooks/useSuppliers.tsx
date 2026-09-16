@@ -4,8 +4,8 @@ import {
     createFournisseur,
     updateFournisseur,
     deleteFournisseur,
-} from "../api/fournisseurs";
-import type { Fournisseur } from "../types/fournisseur";
+} from "../api/suppliers";
+import type { Fournisseur, FournisseurCreate, FournisseurUpdate } from "../types/supplier";
 
 export function useFournisseurs() {
     // La liste des fournisseurs récupérée depuis l'API.
@@ -37,7 +37,7 @@ export function useFournisseurs() {
     // Ajoute un nouveau fournisseur : on l'envoie au serveur, puis on
     // récupère l'objet créé (avec son id généré par la base) pour
     // l'ajouter à la liste affichée.
-    async function addFournisseur(data: { nom: string }) {
+    async function addFournisseur(data: FournisseurCreate) {
         const nouveau = await createFournisseur(data);
         setFournisseurs((prev) => [...prev, nouveau]);
     }
@@ -45,7 +45,7 @@ export function useFournisseurs() {
     // Modifie un fournisseur existant : on envoie les nouvelles données,
     // puis on remplace l'ancien objet par le nouveau dans le tableau
     // (on repère l'élément à remplacer grâce à son id).
-    async function editFournisseur(id: number, data: { nom: string }) {
+    async function editFournisseur(id: number, data: FournisseurUpdate) {
         const maj = await updateFournisseur(id, data);
         setFournisseurs((prev) => prev.map((f) => (f.id === id ? maj : f)));
     }
