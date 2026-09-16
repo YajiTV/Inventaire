@@ -1,5 +1,7 @@
 import {http, HttpResponse} from 'msw';
 import type { StockMovementRead, StockMovementCreate } from '../../../types/api';
+import { applyMovement } from '../../../lib/stockMovements';
+import { getStocks, setStocks } from './stocks';
 
 let stockMovements: StockMovementRead[] = [
     {
@@ -45,6 +47,21 @@ export const stockMovementHandlers = [
     http.post('*/stock-movements', async ({request}) => {
         const payload = (await request.json()) as StockMovementCreate
 
+        // Une sortie ou un transfert ne peut pas prendre plus que ce qui est en rayon :
+        // le backend repond 409 dans ce cas, le mock doit faire pareil.
+        if (payload.type !== 'in') {
+            const line = getStocks().find(
+                (s) => s.product_id === payload.product_id
+                    && s.location_id === payload.source_location_id
+            )
+            if (!line || line.quantity < payload.quantity) {
+                return HttpResponse.json(
+                    {detail: "Stock insuffisant sur l'emplacement d'origine."},
+                    {status: 409}
+                )
+            }
+        }
+
         const created: StockMovementRead = {
             id: nextId++,
             product_id: payload.product_id,
@@ -57,6 +74,7 @@ export const stockMovementHandlers = [
             created_at: new Date().toISOString()
         }
         stockMovements.push(created)
+        setStocks(applyMovement(getStocks(), payload))
         return HttpResponse.json(created, {status: 201})
     })
 ]
