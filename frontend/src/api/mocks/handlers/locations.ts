@@ -25,6 +25,7 @@ export const locationHandlers = [
         const location = locations.find((l) => l.id === Number(params.id))
         if (!location)
             return new HttpResponse(null, {status: 404})
+        return HttpResponse.json(location)
     }),
 
     http.patch('*/locations/:id', async ({params, request}) => {
