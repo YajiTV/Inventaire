@@ -9,6 +9,7 @@ export interface AuthContextValue {
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
-  // Implémenté par Axel : relit le cookie refresh (httpOnly) et pose un nouveau access_token.
-  refresh: () => Promise<void>
+  // Appelle POST /auth/refresh (route implémentée par Axel côté backend) et pose un
+  // nouveau access_token. Renvoie le token pour permettre un retry immédiat après un 401.
+  refresh: () => Promise<string | null>
 }
