@@ -106,6 +106,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 .dmypy.json
+CLAUDE.md
 dmypy.json
 
 # Pyre type checker
