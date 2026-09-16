@@ -7,8 +7,11 @@ export default function Home() {
   return (
     <div className="p-8">
       <p>Connecté en tant que {user?.full_name}</p>
-      <nav>
-        <Link to="/stocks">Stocks</Link> — <Link to="/movements">Mouvements de stock</Link>
+      <nav style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+        <Link to="/stocks">Stocks</Link>
+        <Link to="/movements">Mouvements de stock</Link>
+        <Link to="/products">Produits</Link>
+        <Link to="/suppliers">Fournisseurs</Link>
       </nav>
       <button onClick={() => logout()}>Se déconnecter</button>
     </div>
