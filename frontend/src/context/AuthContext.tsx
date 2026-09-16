@@ -25,6 +25,14 @@ export function AuthProvider({children}: {children: ReactNode}) {
         setUser(await meResponse.json())
     }
 
+    async function register(pseudo: string, email: string, password: string) {
+        await apiFetch('/users', {
+            method: 'POST',
+            body: JSON.stringify({full_name: pseudo, email, password})
+        })
+        await login(email, password)
+    }
+
     async function logout() {
         await apiFetch('/auth/logout', {method: 'POST'})
         setAccessToken(null)
@@ -72,6 +80,7 @@ export function AuthProvider({children}: {children: ReactNode}) {
         isAuthenticated: accessToken !== null,
         isLoading,
         login,
+        register,
         logout,
         refresh
     }
