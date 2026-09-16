@@ -12,7 +12,10 @@ export default function Home() {
           <button onClick={() => logout()}>Se déconnecter</button>
         </>
       ) : (
+        <>
         <Link to="/login">Se connecter</Link>
+        <Link to="/register">S'enregistrer</Link>
+        </>
       )}
       <nav style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
         <Link to="/stocks">Stocks</Link>

@@ -9,7 +9,7 @@ export interface AuthContextValue {
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
   // Cree le compte via POST /users puis enchaine sur login (meme session que login()).
-  register: (pseudo: string, email: string, password: string) => Promise<void>
+  register: (pseudo: string, email: string, password: string, confirm: string) => Promise<void>
   logout: () => Promise<void>
   // Appelle POST /auth/refresh (route implémentée par Axel côté backend) et pose un
   // nouveau access_token. Renvoie le token pour permettre un retry immédiat après un 401.

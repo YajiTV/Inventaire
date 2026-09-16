@@ -25,10 +25,10 @@ export function AuthProvider({children}: {children: ReactNode}) {
         setUser(await meResponse.json())
     }
 
-    async function register(pseudo: string, email: string, password: string) {
+    async function register(pseudo: string, email: string, password: string, confirm: string) {
         await apiFetch('/users', {
             method: 'POST',
-            body: JSON.stringify({full_name: pseudo, email, password})
+            body: JSON.stringify({full_name: pseudo, email, password, confirm})
         })
         await login(email, password)
     }
