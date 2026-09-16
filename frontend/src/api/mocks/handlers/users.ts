@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import type { UserRead, UserCreate, UserUpdate } from '../../../types/api'
 
-let users: UserRead[] = [
+export let users: UserRead[] = [
     {
         id: 1,
         email: 'admin@inventaire.fr',

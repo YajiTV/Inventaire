@@ -1,14 +1,10 @@
 import { http, HttpResponse } from 'msw'
 import type { TokenResponse, UserRead } from '../../../types/api'
+import { users } from './users'
 
-const MOCK_USER: UserRead = {
-    id: 1,
-    email: 'demo@inventaire.fr',
-    full_name: 'Demo User',
-    role: 'operator',
-    is_active: true,
-    created_at: new Date().toISOString()
-}
+// Personne n'est connecte par defaut : pas de session tant que /auth/login
+// n'a pas ete appele avec un email connu.
+let currentUser: UserRead | null = null
 
 const MOCK_TOKEN: TokenResponse = {
     access_token: 'mock-access-token',
@@ -17,16 +13,30 @@ const MOCK_TOKEN: TokenResponse = {
 }
 
 export const authHandlers = [
-    http.post('*/auth/login', () => HttpResponse.json(MOCK_TOKEN)),
+    http.post('*/auth/login', async ({request}) => {
+        const {email} = (await request.json()) as {email: string; password: string}
+        const user = users.find((u) => u.email === email)
+        if (!user)
+            return new HttpResponse(null, {status: 401})
+        currentUser = user
+        return HttpResponse.json(MOCK_TOKEN)
+    }),
 
     http.get('*/auth/me', ({request}) => {
         const auth = request.headers.get('Authorization')
-        if (!auth)
+        if (!auth || !currentUser)
             return new HttpResponse(null, {status: 401})
-        return HttpResponse.json(MOCK_USER)
+        return HttpResponse.json(currentUser)
     }),
 
-    http.post('*/auth/refresh', () => HttpResponse.json(MOCK_TOKEN)),
+    http.post('*/auth/refresh', () => {
+        if (!currentUser)
+            return new HttpResponse(null, {status: 401})
+        return HttpResponse.json(MOCK_TOKEN)
+    }),
 
-    http.post('*/auth/logout', () => new HttpResponse(null, {status: 204}))
+    http.post('*/auth/logout', () => {
+        currentUser = null
+        return new HttpResponse(null, {status: 204})
+    })
 ]
