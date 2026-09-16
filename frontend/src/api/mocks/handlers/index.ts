@@ -5,5 +5,6 @@ import { supplierHandlers } from './suppliers'
 import { userHandlers } from './users'
 import { stockHandlers } from './stocks'
 import { productHandlers } from './products'
+import { purchaseOrderHandlers } from './purchase-orders'
 
-export const handlers = [...authHandlers, ...categoryHandlers, ...locationHandlers, ...supplierHandlers, ...userHandlers, ...stockHandlers, ...productHandlers]
+export const handlers = [...authHandlers, ...categoryHandlers, ...locationHandlers, ...supplierHandlers, ...userHandlers, ...stockHandlers, ...productHandlers, ...purchaseOrderHandlers]
