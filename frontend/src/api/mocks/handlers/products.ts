@@ -23,12 +23,12 @@ let products: ProductRead[] = [
 
 let nextId = 2
 
-// ProductLookup simule l'API tierce Open Food Facts : seul ce code-barres est connu.
+// Donnees fixes locales pour /products/lookup : aucun appel reseau sortant, seul ce code-barres est connu.
 const knownLookups: Record<string, ProductLookup> = {
   '3017620422003': {
     barcode: '3017620422003',
     name: 'Nutella',
-    description: 'Pâte à tartiner aux noisettes et au cacao',
+    description: 'Pâte à tartiner aux sucre avec un peu de cacoa, mais surtout du sucre',
     image_url: null,
   },
 }
