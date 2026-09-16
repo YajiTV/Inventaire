@@ -26,9 +26,11 @@ export function AuthProvider({children}: {children: ReactNode}) {
     }
 
     async function register(pseudo: string, email: string, password: string, confirm: string) {
+        if (password !== confirm)
+            throw new Error('Les mots de passe ne correspondent pas')
         await apiFetch('/users', {
             method: 'POST',
-            body: JSON.stringify({full_name: pseudo, email, password, confirm})
+            body: JSON.stringify({full_name: pseudo, email, password})
         })
         await login(email, password)
     }

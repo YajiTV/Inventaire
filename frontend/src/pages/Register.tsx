@@ -13,6 +13,10 @@ export default function Register() {
 
     async function handleSubmit(event: FormEvent) {
         event.preventDefault()
+        if (password !== confirm) {
+            setError('Les mots de passe ne correspondent pas')
+            return
+        }
         try {
             await register(pseudo, email, password, confirm)
             navigate('/')
