@@ -9,6 +9,7 @@ import Movements from './pages/Movements'
 import NewMovement from './pages/NewMovement'
 import Products from './pages/Products'
 import Suppliers from './pages/Suppliers'
+import Categories from './pages/Categories'
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
             <Route path="/movements/new" element={<NewMovement />} />
             <Route path="/products" element={<Products />} />
             <Route path="/suppliers" element={<Suppliers />} />
+            <Route path="/categories" element={<Categories />} />
           </Route>
         </Routes>
       </AuthProvider>

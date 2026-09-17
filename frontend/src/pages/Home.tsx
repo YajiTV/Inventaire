@@ -22,6 +22,7 @@ export default function Home() {
         <Link to="/movements">Mouvements de stock</Link>
         <Link to="/products">Produits</Link>
         <Link to="/suppliers">Fournisseurs</Link>
+        <Link to="/categories">Catégories</Link>
       </nav>
     </div>
   )
