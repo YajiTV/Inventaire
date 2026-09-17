@@ -30,20 +30,31 @@ npm run dev
 
 Application : http://localhost:5173
 
-## Avancement 
+## Avancement actuel
 
 - ### Maxence
-     création d'un CRUD fournisseur avec ses appels Api (provisoire, appel API crée a l'aide de claude pour quelque chose de propre et que je puisse comprendre), création du compte rendu et ajout sur le repo git.
+
+    Création de la partie Produits sur le meme schéma que fournisseur, mise en place du responsive sur produit et fournisseur et un peu de style pour l’ergonomie.
 
 - ### Mathys
-    Mise en place du contexte d'authentification React (access token en mémoire, login/logout fonctionnels, refresh laissé pour Axel) ainsi que les mocks MSW sur les endpoints d'authentification du contrat d'interface, en s'appuyant sur les types générés depuis openapi.json  fait par Baptiste
+
+    Ralisation de tous les handlers Mocks MSW complétés.
+    Contexte d'authentification fini : refresh + intercepteur 401 + routes protégées.
+    Formulaire d'inscription (pseudo/email/password) ajouté avec validation du mot de passe confirmé.
+    La home page est rendue publique, tout le reste est protégé ; mock d'auth corrigé pour ne plus connecter tout le monde par défaut ("Demo User"), je l'avais utiliser uniquement pour faire des tests.
 
 - ### Baptiste
-    Initialisation du monorepo et du front. Contrat d'interface figé : schémas Pydantic, 26 routes REST déclarées mais non implémentées, openapi.json exporté et testé. Fait principalement avec Claude Code, pour avoir une base propre sur laquelle travailler ensuite.
+
+    Remplacement des types générés automatiquement par des types écrits à la main dans types/api.ts pour mieux apprendre les types et TS etc...
+    Implémentation de la logique des mouvements de stock et création des composants React associés
+    Création des écrans Stocks, Mouvements et Nouveau mouvement, branchés à l'API
 
 - ### Axel
-    Création de toute la gestion de projet avec notion et SKILL claude (SKILL dispo dans docs sous le nom de SKILL.md)
-    gestion des écheances et mise en relation des différentes étapes du groupe.
+
+    Création du modele user et implémentation du service de hachage argon2id
+    Migrationde la bdd pour la table Utilisateurs
+    Tests mis en place pour la partie auth/password
 
 ## Lien du notion Gestion de projet créer par Axel
+
     https://app.notion.com/p/ed6b4894b23a4d9d8d7cc3f49c06482a?v=a5ead5fd6a1e40a48ac5843ecd0435ca&source=copy_link
