@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { useFournisseurs } from "../hooks/useSuppliers";
 import type { Fournisseur } from "../types/supplier";
 
@@ -48,15 +47,10 @@ export default function Fournisseurs() {
 
     return (
         <div className="p-8">
-            <p>
-                <Link to="/">← Retour</Link>
-            </p>
+
             <h1>Fournisseurs</h1>
 
-            <form
-                onSubmit={handleSubmit}
-                style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1rem" }}
-            >
+            <form onSubmit={handleSubmit} className="mb-4 flex flex-wrap gap-2">
                 <input placeholder="Nom" value={name} onChange={(e) => setName(e.target.value)} required />
                 <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
                 <input placeholder="Téléphone" value={phone} onChange={(e) => setPhone(e.target.value)} />
@@ -65,15 +59,15 @@ export default function Fournisseurs() {
             </form>
 
             {loading && <p>Chargement...</p>}
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            {error && <p className="text-red-600">{error}</p>}
 
-            <table style={{ borderCollapse: "collapse", width: "100%" }}>
+            <table className="w-full border-collapse">
                 <thead>
                     <tr>
-                        <th style={{ textAlign: "left", padding: "0.25rem 1.5rem 0.25rem 0" }}>Nom</th>
-                        <th style={{ textAlign: "left", padding: "0.25rem 1.5rem 0.25rem 0" }}>Email</th>
-                        <th style={{ textAlign: "left", padding: "0.25rem 1.5rem 0.25rem 0" }}>Téléphone</th>
-                        <th style={{ textAlign: "left", padding: "0.25rem 1.5rem 0.25rem 0" }}>Adresse</th>
+                        <th className="py-1 pr-6 text-left">Nom</th>
+                        <th className="py-1 pr-6 text-left">Email</th>
+                        <th className="py-1 pr-6 text-left">Téléphone</th>
+                        <th className="py-1 pr-6 text-left">Adresse</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -82,15 +76,15 @@ export default function Fournisseurs() {
                         <tr key={f.id}>
                             {editingId === f.id ? (
                                 <>
-                                    <td style={{ padding: "0.25rem 1.5rem 0.25rem 0" }}>
+                                    <td className="py-1 pr-6 text-left">
                                         <input
                                             value={editName}
                                             onChange={(e) => setEditName(e.target.value)}
                                         />
                                     </td>
-                                    <td style={{ padding: "0.25rem 1.5rem 0.25rem 0" }}>{f.email}</td>
-                                    <td style={{ padding: "0.25rem 1.5rem 0.25rem 0" }}>{f.phone}</td>
-                                    <td style={{ padding: "0.25rem 1.5rem 0.25rem 0" }}>{f.address}</td>
+                                    <td className="py-1 pr-6 text-left">{f.email}</td>
+                                    <td className="py-1 pr-6 text-left">{f.phone}</td>
+                                    <td className="py-1 pr-6 text-left">{f.address}</td>
                                     <td>
                                         <button onClick={() => saveEdit(f.id)}>Enregistrer</button>
                                         <button onClick={() => setEditingId(null)}>Annuler</button>
@@ -98,10 +92,10 @@ export default function Fournisseurs() {
                                 </>
                             ) : (
                                 <>
-                                    <td style={{ padding: "0.25rem 1.5rem 0.25rem 0" }}>{f.name}</td>
-                                    <td style={{ padding: "0.25rem 1.5rem 0.25rem 0" }}>{f.email}</td>
-                                    <td style={{ padding: "0.25rem 1.5rem 0.25rem 0" }}>{f.phone}</td>
-                                    <td style={{ padding: "0.25rem 1.5rem 0.25rem 0" }}>{f.address}</td>
+                                    <td className="py-1 pr-6 text-left">{f.name}</td>
+                                    <td className="py-1 pr-6 text-left">{f.email}</td>
+                                    <td className="py-1 pr-6 text-left">{f.phone}</td>
+                                    <td className="py-1 pr-6 text-left">{f.address}</td>
                                     <td>
                                         <button onClick={() => startEdit(f)}>Modifier</button>
                                         <button onClick={() => removeFournisseur(f.id)}>Supprimer</button>
