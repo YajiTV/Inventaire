@@ -25,8 +25,8 @@ export default function Home() {
         <div className="flex items-center gap-3">
           {isAuthenticated ? (
             <>
-              <span>Connecté en tant que {user?.full_name}</span>
-              <button type="button" onClick={() => logout()}>
+              <span>Bienvenue {user?.full_name}</span>
+              <button className='text-red-600'type="button" onClick={() => logout()}>
                 Se déconnecter
               </button>
             </>
