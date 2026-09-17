@@ -5,24 +5,39 @@ export default function Home() {
   const { user, isAuthenticated, logout } = useAuth()
 
   return (
-    <div className="p-8">
-      {isAuthenticated ? (
-        <>
-          <p>Connecté en tant que {user?.full_name}</p>
-          <button onClick={() => logout()}>Se déconnecter</button>
-        </>
-      ) : (
-        <>
-        <Link to="/login">Se connecter</Link>
-        <Link to="/register">S'enregistrer</Link>
-        </>
-      )}
-      <nav style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-        <Link to="/stocks">Stocks</Link>
-        <Link to="/movements">Mouvements de stock</Link>
-        <Link to="/products">Produits</Link>
-        <Link to="/suppliers">Fournisseurs</Link>
+    <header className="border-b p-4">
+      <nav className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <ul className="flex flex-col gap-2 sm:flex-row sm:gap-4">
+          <li>
+            <Link to="/stocks">Stocks</Link>
+          </li>
+          <li>
+            <Link to="/movements">Mouvements de stock</Link>
+          </li>
+          <li>
+            <Link to="/products">Produits</Link>
+          </li>
+          <li>
+            <Link to="/suppliers">Fournisseurs</Link>
+          </li>
+        </ul>
+
+        <div className="flex items-center gap-3">
+          {isAuthenticated ? (
+            <>
+              <span>Connecté en tant que {user?.full_name}</span>
+              <button type="button" onClick={() => logout()}>
+                Se déconnecter
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login">Se connecter</Link>
+              <Link to="/register">S'enregistrer</Link>
+            </>
+          )}
+        </div>
       </nav>
-    </div>
+    </header>
   )
 }

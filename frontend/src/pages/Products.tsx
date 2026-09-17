@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { useProduits } from "../hooks/useProduct";
 import type { Produit } from "../types/product";
 
@@ -51,15 +50,9 @@ export default function Produits() {
 
     return (
         <div className="p-8">
-            <p>
-                <Link to="/">← Retour</Link>
-            </p>
             <h1>Produits</h1>
 
-            <form
-                onSubmit={handleSubmit}
-                style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1rem" }}
-            >
+            <form onSubmit={handleSubmit} className="mb-4 flex flex-wrap gap-2">
                 <input placeholder="SKU" value={sku} onChange={(e) => setSku(e.target.value)} required />
                 <input placeholder="Nom" value={name} onChange={(e) => setName(e.target.value)} required />
                 <input
@@ -77,14 +70,14 @@ export default function Produits() {
             </form>
 
             {loading && <p>Chargement...</p>}
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            {error && <p className="text-red-600">{error}</p>}
 
-            <table style={{ borderCollapse: "collapse", width: "100%" }}>
+            <table className="w-full border-collapse">
                 <thead>
                     <tr>
-                        <th style={{ textAlign: "left", padding: "0.25rem 1.5rem 0.25rem 0" }}>SKU</th>
-                        <th style={{ textAlign: "left", padding: "0.25rem 1.5rem 0.25rem 0" }}>Nom</th>
-                        <th style={{ textAlign: "left", padding: "0.25rem 1.5rem 0.25rem 0" }}>Prix</th>
+                        <th className="py-1 pr-6 text-left">SKU</th>
+                        <th className="py-1 pr-6 text-left">Nom</th>
+                        <th className="py-1 pr-6 text-left">Prix</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -93,14 +86,14 @@ export default function Produits() {
                         <tr key={p.id}>
                             {editingId === p.id ? (
                                 <>
-                                    <td style={{ padding: "0.25rem 1.5rem 0.25rem 0" }}>{p.sku}</td>
-                                    <td style={{ padding: "0.25rem 1.5rem 0.25rem 0" }}>
+                                    <td className="py-1 pr-6 text-left">{p.sku}</td>
+                                    <td className="py-1 pr-6 text-left">
                                         <input
                                             value={editName}
                                             onChange={(e) => setEditName(e.target.value)}
                                         />
                                     </td>
-                                    <td style={{ padding: "0.25rem 1.5rem 0.25rem 0" }}>
+                                    <td className="py-1 pr-6 text-left">
                                         <input
                                             value={editUnitPrice}
                                             onChange={(e) => setEditUnitPrice(e.target.value)}
@@ -113,9 +106,9 @@ export default function Produits() {
                                 </>
                             ) : (
                                 <>
-                                    <td style={{ padding: "0.25rem 1.5rem 0.25rem 0" }}>{p.sku}</td>
-                                    <td style={{ padding: "0.25rem 1.5rem 0.25rem 0" }}>{p.name}</td>
-                                    <td style={{ padding: "0.25rem 1.5rem 0.25rem 0" }}>{p.unit_price} €</td>
+                                    <td className="py-1 pr-6 text-left">{p.sku}</td>
+                                    <td className="py-1 pr-6 text-left">{p.name}</td>
+                                    <td className="py-1 pr-6 text-left">{p.unit_price} €</td>
                                     <td>
                                         <button onClick={() => startEdit(p)}>Modifier</button>
                                         <button onClick={() => removeProduit(p.id)}>Supprimer</button>

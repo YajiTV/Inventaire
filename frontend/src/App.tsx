@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { Layout } from './components/Layout'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Home from './pages/Home'
@@ -19,11 +20,13 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<Home />} />
           <Route element={<ProtectedRoute />}>
+            <Route element={<Layout/>}>
             <Route path="/stocks" element={<Stocks />} />
             <Route path="/movements" element={<Movements />} />
             <Route path="/movements/new" element={<NewMovement />} />
             <Route path="/products" element={<Products />} />
             <Route path="/suppliers" element={<Suppliers />} />
+            </Route>
           </Route>
         </Routes>
       </AuthProvider>
