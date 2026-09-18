@@ -11,6 +11,8 @@ import NewMovement from './pages/NewMovement'
 import Products from './pages/Products'
 import Suppliers from './pages/Suppliers'
 import Categories from './pages/Categories'
+import Orders from './pages/Orders'
+import OrderDetail from './pages/OrderDetail'
 
 export default function App() {
   return (
@@ -28,6 +30,8 @@ export default function App() {
               <Route path="/products" element={<Products />} />
               <Route path="/suppliers" element={<Suppliers />} />
               <Route path="/categories" element={<Categories />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/orders/:id" element={<OrderDetail />} />
             </Route>
           </Route>
         </Routes>

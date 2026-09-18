@@ -12,8 +12,5 @@ export function orderStatusLabel(status: OrderStatus): string {
 }
 
 export function lineTotal(line: OrderLineRead): number {
-    if (line.quantity === 0) {
-        return 0;
-    }
     return line.quantity * Number(line.unit_price);
 }

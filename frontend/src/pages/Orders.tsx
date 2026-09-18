@@ -15,7 +15,7 @@ export default function Orders() {
                 <thead>
                     <tr>
                         <th className="py-1 pr-6 text-left">Référence</th>
-                        <th className="py-1 pr-6 text-left">Status</th>
+                        <th className="py-1 pr-6 text-left">Statut</th>
                         <th></th>
                     </tr>
                 </thead>
