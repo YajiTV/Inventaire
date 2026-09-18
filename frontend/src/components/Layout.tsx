@@ -7,6 +7,7 @@ const links = [
   { to: '/movements', label: 'Mouvements' },
   { to: '/products', label: 'Produits' },
   { to: '/suppliers', label: 'Fournisseurs' },
+  { to: '/replenishment', label: 'Réapprovisionnement' },
   { to: '/categories', label: 'Catégories' },
 ]
 
