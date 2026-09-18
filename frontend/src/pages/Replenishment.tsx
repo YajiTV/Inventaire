@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { useReplenishment } from '../hooks/useReplenishment'
 import { useLocations } from '../hooks/useLocations'
@@ -22,9 +21,6 @@ export default function Replenishment() {
 
   return (
     <section className="p-8">
-      <p>
-        <Link to="/">← Retour</Link>
-      </p>
       <h1 className="text-xl font-semibold mb-4">Réapprovisionnement</h1>
 
       <div className="mb-6">
