@@ -1,11 +1,8 @@
 import { useState } from "react";
 import { useProduits } from "../hooks/useProduct";
 import type { Produit } from "../types/product";
+import { ApiError } from "../lib/api";
 
-// Page CRUD produits : liste + formulaire d'ajout + édition/suppression
-// inline sur chaque ligne. category_id est saisi en brut (id d'une catégorie
-// déjà créée côté /categories) : pas de sélecteur, la gestion des
-// catégories est hors du périmètre de cette page.
 export default function Produits() {
     const { produits, loading, error, addProduit, editProduit, removeProduit } = useProduits();
 
@@ -20,20 +17,55 @@ export default function Produits() {
     const [editName, setEditName] = useState("");
     const [editUnitPrice, setEditUnitPrice] = useState("");
 
+    //Erreurs de validation, une par champ (absente = pas d'erreur)
+    const [errors, setErrors] = useState<{sku?: string; name?: string; unitPrice?: string; categoryId?: string}>({});
+    // Erreur renvoyée par l'API lors d'un ajout/modif/suppression (422, 409, etc.)
+    const [apiError, setApiError] = useState<string | null>(null);
+    // Message affiché après une action réussie
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+    function validate(): boolean {
+        const newErrors: typeof errors = {};
+
+        if (!sku.trim()) newErrors.sku = "Le SKU est obligatoire.";
+        if (!name.trim()) newErrors.name = "Le nom est obligatoire.";
+        if (!categoryId) newErrors.categoryId = "L'ID de catégorie est obligatoire.";
+
+        const price = Number(unitPrice);
+        if (!unitPrice.trim()) {
+            newErrors.unitPrice = "Le prix est obligatoire.";
+        } else if (Number.isNaN(price) || price <= 0) {
+            newErrors.unitPrice = "Le prix doit être un nombre positif.";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0; // true = pas d'erreurs
+    }
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        if (!sku.trim() || !name.trim() || !categoryId) return;
-        await addProduit({
-            sku,
-            name,
-            unit_price: unitPrice || "0",
-            category_id: Number(categoryId),
-            reorder_threshold: 0,
-        });
-        setSku("");
-        setName("");
-        setUnitPrice("");
-        setCategoryId("");
+        setApiError(null);
+        setSuccessMessage(null);
+
+        if (!validate()) return; // stoppe si un champ est invalide
+
+        try {
+            await addProduit({
+                sku,
+                name,
+                unit_price: unitPrice, // plus de "|| '0'" : le prix est vérifié avant
+                category_id: Number(categoryId),
+                reorder_threshold: 0,
+            });
+            setSku("");
+            setName("");
+            setUnitPrice("");
+            setCategoryId("");
+            setErrors({});
+            setSuccessMessage("Produit ajouté avec succès");
+        } catch (err) {
+            setApiError(err instanceof ApiError ? err.message : "Erreur inattendue");
+        }
     }
 
     function startEdit(p: Produit) {
@@ -43,9 +75,36 @@ export default function Produits() {
     }
 
     async function saveEdit(id: number) {
-        if (!editName.trim()) return;
-        await editProduit(id, { name: editName, unit_price: editUnitPrice });
-        setEditingId(null);
+        setApiError(null);
+        setSuccessMessage(null);
+
+        if (!editName.trim()) {
+            setApiError("Le nom est obligatoire");
+            return;
+        }
+        if (Number.isNaN(Number(editUnitPrice)) || Number(editUnitPrice) <= 0) {
+            setApiError("Le prix doit être un nombre positif");
+            return;
+        }
+
+        try {
+            await editProduit(id, { name: editName, unit_price: editUnitPrice });
+            setEditingId(null);
+            setSuccessMessage("Produit modifié avec succès");
+        } catch (err) {
+            setApiError(err instanceof ApiError ? err.message : "Erreur inattendue");
+        }
+    }
+
+    async function handleDelete(id: number) {
+        setApiError(null);
+        setSuccessMessage(null);
+        try {
+            await removeProduit(id);
+            setSuccessMessage("Produit supprimé avec succès");
+        } catch (err) {
+            setApiError(err instanceof ApiError ? err.message : "Erreur inattendue");
+        }
     }
 
     return (
@@ -53,24 +112,38 @@ export default function Produits() {
             <h1>Produits</h1>
 
             <form onSubmit={handleSubmit} className="mb-4 flex flex-wrap gap-2">
-                <input placeholder="SKU" value={sku} onChange={(e) => setSku(e.target.value)} required />
-                <input placeholder="Nom" value={name} onChange={(e) => setName(e.target.value)} required />
-                <input
-                    placeholder="Prix unitaire"
-                    value={unitPrice}
-                    onChange={(e) => setUnitPrice(e.target.value)}
-                />
-                <input
-                    placeholder="ID catégorie"
-                    value={categoryId}
-                    onChange={(e) => setCategoryId(e.target.value)}
-                    required
-                />
+                <div>
+                    <input placeholder="SKU" value={sku} onChange={(e) => setSku(e.target.value)} required />
+                    {errors.sku && <p className="text-red-600 text-sm">{errors.sku}</p>}
+                </div>
+                <div>
+                    <input placeholder="Nom" value={name} onChange={(e) => setName(e.target.value)} required />
+                    {errors.name && <p className="text-red-600 text-sm">{errors.name}</p>}
+                </div>
+                <div>
+                    <input
+                        placeholder="Prix unitaire"
+                        value={unitPrice}
+                        onChange={(e) => setUnitPrice(e.target.value)}
+                    />
+                    {errors.unitPrice && <p className="text-red-600 text-sm">{errors.unitPrice}</p>}
+                </div>
+                <div>
+                    <input
+                        placeholder="ID catégorie"
+                        value={categoryId}
+                        onChange={(e) => setCategoryId(e.target.value)}
+                        required
+                    />
+                    {errors.categoryId && <p className="text-red-600 text-sm">{errors.categoryId}</p>}
+                </div>
                 <button type="submit">Ajouter</button>
             </form>
 
             {loading && <p>Chargement...</p>}
             {error && <p className="text-red-600">{error}</p>}
+            {apiError && <p role="alert" className="text-red-600">{apiError}</p>}
+            {successMessage && <p className="text-green-600">{successMessage}</p>}
 
             <table className="w-full border-collapse">
                 <thead>
@@ -111,7 +184,7 @@ export default function Produits() {
                                     <td className="py-1 pr-6 text-left">{p.unit_price} €</td>
                                     <td>
                                         <button onClick={() => startEdit(p)}>Modifier</button>
-                                        <button onClick={() => removeProduit(p.id)}>Supprimer</button>
+                                        <button onClick={() => handleDelete(p.id)}>Supprimer</button>
                                     </td>
                                 </>
                             )}
