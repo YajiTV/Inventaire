@@ -2,6 +2,20 @@ import { useState } from "react";
 import { useProduits } from "../hooks/useProduct";
 import type { Produit } from "../types/product";
 import { ApiError } from "../lib/api";
+import { DataTable } from "../components/DataTable";
+import type { DataTableColumn } from "../components/DataTable";
+import { FormField } from "../components/FormField";
+import { StatusMessage } from "../components/StatusMessage";
+
+// Page CRUD produits : liste + formulaire d'ajout + édition/suppression
+// inline sur chaque ligne. category_id est saisi en brut (id d'une catégorie
+// déjà créée côté /categories) : pas de sélecteur, la gestion des
+// catégories est hors du périmètre de cette page.
+//
+// Le tableau (DataTable), les champs (FormField) et les messages
+// chargement/erreur/liste vide (StatusMessage) sont des composants partagés
+// avec Fournisseurs, pour ne pas dupliquer la structure "form + table +
+// édition inline" entre les deux pages.
 
 // Même format que le backend (backend/app/schemas/product.py) : majuscules, chiffres et tirets uniquement
 const SKU_PATTERN = /^[A-Z0-9-]+$/;
@@ -114,91 +128,104 @@ export default function Produits() {
         }
     }
 
+    // Colonnes du DataTable : chaque render() affiche soit la valeur brute,
+    // soit un FormField d'édition si la ligne est celle en cours d'édition
+    // (label vide car l'en-tête de colonne fait déjà office de label).
+    const columns: DataTableColumn<Produit>[] = [
+        { header: "SKU", render: (p) => p.sku },
+        {
+            header: "Nom",
+            render: (p) =>
+                editingId === p.id ? (
+                    <FormField id={`edit-name-${p.id}`} label="" value={editName} onChange={setEditName} />
+                ) : (
+                    p.name
+                ),
+        },
+        {
+            header: "Prix",
+            render: (p) =>
+                editingId === p.id ? (
+                    <FormField
+                        id={`edit-price-${p.id}`}
+                        label=""
+                        value={editUnitPrice}
+                        onChange={setEditUnitPrice}
+                    />
+                ) : (
+                    `${p.unit_price} €`
+                ),
+        },
+    ];
+
     return (
         <div className="p-8">
             <h1>Produits</h1>
 
             <form onSubmit={handleSubmit} className="mb-4 flex flex-wrap gap-2">
-                <div>
-                    <input placeholder="SKU" value={sku} onChange={(e) => setSku(e.target.value)} required />
-                    {errors.sku && <p className="text-red-600 text-sm">{errors.sku}</p>}
-                </div>
-                <div>
-                    <input placeholder="Nom" value={name} onChange={(e) => setName(e.target.value)} required />
-                    {errors.name && <p className="text-red-600 text-sm">{errors.name}</p>}
-                </div>
-                <div>
-                    <input
-                        placeholder="Prix unitaire"
-                        value={unitPrice}
-                        onChange={(e) => setUnitPrice(e.target.value)}
-                    />
-                    {errors.unitPrice && <p className="text-red-600 text-sm">{errors.unitPrice}</p>}
-                </div>
-                <div>
-                    <input
-                        placeholder="ID catégorie"
-                        value={categoryId}
-                        onChange={(e) => setCategoryId(e.target.value)}
-                        required
-                    />
-                    {errors.categoryId && <p className="text-red-600 text-sm">{errors.categoryId}</p>}
-                </div>
-                <button type="submit">Ajouter</button>
+                <FormField
+                    id="sku"
+                    label="SKU"
+                    value={sku}
+                    onChange={setSku}
+                    error={errors.sku}
+                    placeholder="PAIN-BIGM-001"
+                    required
+                />
+                <FormField id="name" label="Nom" value={name} onChange={setName} error={errors.name} required />
+                <FormField
+                    id="unit-price"
+                    label="Prix unitaire"
+                    value={unitPrice}
+                    onChange={setUnitPrice}
+                    error={errors.unitPrice}
+                />
+                <FormField
+                    id="category-id"
+                    label="ID catégorie"
+                    value={categoryId}
+                    onChange={setCategoryId}
+                    error={errors.categoryId}
+                    required
+                />
+                <button type="submit" className="self-end border rounded px-3 py-1">
+                    Ajouter
+                </button>
             </form>
 
-            {loading && <p>Chargement...</p>}
-            {error && <p className="text-red-600">{error}</p>}
-            {apiError && <p role="alert" className="text-red-600">{apiError}</p>}
+            <StatusMessage
+                loading={loading}
+                error={error}
+                isEmpty={!loading && !error && produits.length === 0}
+                emptyMessage="Aucun produit"
+            />
+            {apiError && (
+                <p role="alert" className="text-red-600">
+                    {apiError}
+                </p>
+            )}
             {successMessage && <p className="text-green-600">{successMessage}</p>}
 
-            <table className="w-full border-collapse">
-                <thead>
-                    <tr>
-                        <th className="py-1 pr-6 text-left">SKU</th>
-                        <th className="py-1 pr-6 text-left">Nom</th>
-                        <th className="py-1 pr-6 text-left">Prix</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {produits.map((p) => (
-                        <tr key={p.id}>
-                            {editingId === p.id ? (
-                                <>
-                                    <td className="py-1 pr-6 text-left">{p.sku}</td>
-                                    <td className="py-1 pr-6 text-left">
-                                        <input
-                                            value={editName}
-                                            onChange={(e) => setEditName(e.target.value)}
-                                        />
-                                    </td>
-                                    <td className="py-1 pr-6 text-left">
-                                        <input
-                                            value={editUnitPrice}
-                                            onChange={(e) => setEditUnitPrice(e.target.value)}
-                                        />
-                                    </td>
-                                    <td>
-                                        <button onClick={() => saveEdit(p.id)}>Enregistrer</button>
-                                        <button onClick={() => setEditingId(null)}>Annuler</button>
-                                    </td>
-                                </>
-                            ) : (
-                                <>
-                                    <td className="py-1 pr-6 text-left">{p.sku}</td>
-                                    <td className="py-1 pr-6 text-left">{p.name}</td>
-                                    <td className="py-1 pr-6 text-left">{p.unit_price} €</td>
-                                    <td>
-                                        <button onClick={() => startEdit(p)}>Modifier</button>
-                                        <button onClick={() => handleDelete(p.id)}>Supprimer</button>
-                                    </td>
-                                </>
-                            )}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {!loading && !error && produits.length > 0 && (
+                <DataTable
+                    columns={columns}
+                    rows={produits}
+                    getRowId={(p) => p.id}
+                    renderActions={(p) =>
+                        editingId === p.id ? (
+                            <>
+                                <button onClick={() => saveEdit(p.id)}>Enregistrer</button>
+                                <button onClick={() => setEditingId(null)}>Annuler</button>
+                            </>
+                        ) : (
+                            <>
+                                <button onClick={() => startEdit(p)}>Modifier</button>
+                                <button onClick={() => handleDelete(p.id)}>Supprimer</button>
+                            </>
+                        )
+                    }
+                />
+            )}
         </div>
     );
 }
