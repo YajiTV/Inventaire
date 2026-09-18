@@ -81,14 +81,14 @@ export default function Register() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                        className="w-full rounded border px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-gray-400"
                     />
                     <button
                         type="button"
                         onClick={() => setShowPassword((v) => !v )}
-                        aria-label={showPassword ? 'Masquer le mot de passe' : 'Affichier le mot de passe'}
+                        aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                         className="absolute inset-y-0 right-2 text-sm text-gray-500 hover:text-gray-800">
-                            {showPassword ? 'Masquer' : 'Affichier'}
+                            {showPassword ? 'Masquer' : 'Afficher'}
                         </button>
                     </div>
                 </div>
