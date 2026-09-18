@@ -1,44 +1,39 @@
-import {http, HttpResponse} from 'msw';
-import type { CategoryRead, CategoryCreate, CategoryUpdate } from '../../../types/api';
+import { http, HttpResponse } from "msw";
+import type { CategoryCreate, CategoryRead, CategoryUpdate } from "../../../types/api";
+import { nextIdFrom, seedCategories } from "../seed";
 
-let categories: CategoryRead[] = [
-    {id: 1, name: 'Alimentaire', description: 'Produits Frais'},
-    {id: 2, name: 'Alimentaire', description: 'Produits sec'}
-]
+let categories: CategoryRead[] = [...seedCategories];
 
-let nextId = 3
+let nextId = nextIdFrom(seedCategories);
 
 export const categoryHandlers = [
-    http.get('*/categories', () => HttpResponse.json(categories)),
+    http.get("*/categories", () => HttpResponse.json(categories)),
 
-    http.post('*/categories', async ({request}) => {
-        const payload = (await request.json()) as CategoryCreate
-        const created: CategoryRead = {id: nextId++, description: null, ...payload}
-        categories.push(created)
-        return HttpResponse.json(created, {status: 201})
+    http.post("*/categories", async ({ request }) => {
+        const payload = (await request.json()) as CategoryCreate;
+        const created: CategoryRead = { id: nextId++, description: null, ...payload };
+        categories.push(created);
+        return HttpResponse.json(created, { status: 201 });
     }),
 
-    http.get('*/categories/:id', ({params}) => {
-        const category = categories.find((c) => c.id === Number(params.id))
-        if (!category)
-            return new HttpResponse(null, {status: 404})
-        return HttpResponse.json(category)
+    http.get("*/categories/:id", ({ params }) => {
+        const category = categories.find(c => c.id === Number(params.id));
+        if (!category) return new HttpResponse(null, { status: 404 });
+        return HttpResponse.json(category);
     }),
 
-    http.patch('*/categories/:id', async ({params, request}) => {
-        const category = categories.find((c) => c.id === Number(params.id))
-        if (!category)
-            return new HttpResponse(null, {status: 404})
-        const patch = (await request.json()) as CategoryUpdate
-        Object.assign(category, patch)
-        return HttpResponse.json(category)
+    http.patch("*/categories/:id", async ({ params, request }) => {
+        const category = categories.find(c => c.id === Number(params.id));
+        if (!category) return new HttpResponse(null, { status: 404 });
+        const patch = (await request.json()) as CategoryUpdate;
+        Object.assign(category, patch);
+        return HttpResponse.json(category);
     }),
 
-    http.delete('*/categories/:id', ({params}) => {
-        const exists = categories.some((c) => c.id === Number(params.id))
-        if (!exists)
-            return new HttpResponse(null, {status: 404})
-        categories = categories.filter((c) => c.id !== Number(params.id))
-        return new HttpResponse(null, {status: 204})
-    })
-]
+    http.delete("*/categories/:id", ({ params }) => {
+        const exists = categories.some(c => c.id === Number(params.id));
+        if (!exists) return new HttpResponse(null, { status: 404 });
+        categories = categories.filter(c => c.id !== Number(params.id));
+        return new HttpResponse(null, { status: 204 });
+    }),
+];

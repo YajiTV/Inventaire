@@ -1,64 +1,47 @@
-import {http, HttpResponse} from 'msw';
-import type { StockMovementRead, StockMovementCreate } from '../../../types/api';
-import { applyMovement } from '../../../lib/stockMovements';
-import { getStocks, setStocks } from './stocks';
+import { http, HttpResponse } from "msw";
+import { applyMovement } from "../../../lib/stockMovements";
+import type { StockMovementCreate, StockMovementRead } from "../../../types/api";
+import { nextIdFrom, seedMovements } from "../seed";
+import { getStocks, setStocks } from "./stocks";
 
-let stockMovements: StockMovementRead[] = [
-    {
-        id: 1,
-        product_id: 1,
-        type: 'in',
-        quantity: 25,
-        source_location_id: null,
-        target_location_id: 1,
-        reason: 'Reception initiale',
-        user_id: 1,
-        created_at: new Date().toISOString()
-    }
-]
+let stockMovements: StockMovementRead[] = [...seedMovements];
 
-let nextId = 2
+let nextId = nextIdFrom(seedMovements);
 
 export const stockMovementHandlers = [
     // Pas de PATCH/DELETE : un mouvement de stock est un evenement, pas une ressource modifiable
-    http.get('*/stock-movements', ({request}) => {
-        const url = new URL(request.url)
-        const productId = url.searchParams.get('product_id')
-        const locationId = url.searchParams.get('location_id')
-        const type = url.searchParams.get('type')
-        const limit = Number(url.searchParams.get('limit') ?? 50)
+    http.get("*/stock-movements", ({ request }) => {
+        const url = new URL(request.url);
+        const productId = url.searchParams.get("product_id");
+        const locationId = url.searchParams.get("location_id");
+        const type = url.searchParams.get("type");
+        const limit = Number(url.searchParams.get("limit") ?? 50);
 
-        let result = stockMovements
+        let result = stockMovements;
 
-        if (productId)
-            result = result.filter((m) => m.product_id === Number(productId))
+        if (productId) result = result.filter(m => m.product_id === Number(productId));
 
         if (locationId) {
-            const id = Number(locationId)
-            result = result.filter((m) => m.source_location_id === id || m.target_location_id === id)
+            const id = Number(locationId);
+            result = result.filter(m => m.source_location_id === id || m.target_location_id === id);
         }
 
-        if (type)
-            result = result.filter((m) => m.type === type)
+        if (type) result = result.filter(m => m.type === type);
 
-        return HttpResponse.json(result.slice(0, limit))
+        return HttpResponse.json(result.slice(0, limit));
     }),
 
-    http.post('*/stock-movements', async ({request}) => {
-        const payload = (await request.json()) as StockMovementCreate
+    http.post("*/stock-movements", async ({ request }) => {
+        const payload = (await request.json()) as StockMovementCreate;
 
         // Une sortie ou un transfert ne peut pas prendre plus que ce qui est en rayon :
         // le backend repond 409 dans ce cas, le mock doit faire pareil.
-        if (payload.type !== 'in') {
+        if (payload.type !== "in") {
             const line = getStocks().find(
-                (s) => s.product_id === payload.product_id
-                    && s.location_id === payload.source_location_id
-            )
+                s => s.product_id === payload.product_id && s.location_id === payload.source_location_id,
+            );
             if (!line || line.quantity < payload.quantity) {
-                return HttpResponse.json(
-                    {detail: "Stock insuffisant sur l'emplacement d'origine."},
-                    {status: 409}
-                )
+                return HttpResponse.json({ detail: "Stock insuffisant sur l'emplacement d'origine." }, { status: 409 });
             }
         }
 
@@ -71,10 +54,10 @@ export const stockMovementHandlers = [
             target_location_id: payload.target_location_id ?? null,
             reason: payload.reason ?? null,
             user_id: 1, // aligne sur MOCK_USER dans auth.ts
-            created_at: new Date().toISOString()
-        }
-        stockMovements.push(created)
-        setStocks(applyMovement(getStocks(), payload))
-        return HttpResponse.json(created, {status: 201})
-    })
-]
+            created_at: new Date().toISOString(),
+        };
+        stockMovements.push(created);
+        setStocks(applyMovement(getStocks(), payload));
+        return HttpResponse.json(created, { status: 201 });
+    }),
+];
