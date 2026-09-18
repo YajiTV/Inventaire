@@ -141,3 +141,5 @@ npm-debug.log*
 
 # Learn
 .learn/
+
+!.env.example
