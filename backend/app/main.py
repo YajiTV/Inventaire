@@ -1,7 +1,9 @@
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.db.session import get_db
 from app.routers import (
     auth,
@@ -17,6 +19,15 @@ from app.routers import (
 )
 
 app = FastAPI(title="Inventory API", version="1.0.0")
+
+settings = get_settings()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 for module in (
     auth,

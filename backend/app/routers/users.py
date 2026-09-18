@@ -1,8 +1,11 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
+from app.db.session import get_db
 from app.routers._stub import not_implemented
 from app.schemas.common import ErrorResponse
 from app.schemas.user import UserCreate, UserRead, UserUpdate
+from app.services import auth_service
 
 router = APIRouter(
     prefix="/users",
@@ -19,9 +22,12 @@ def list_users() -> list[UserRead]:
     not_implemented()
 
 
-@router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
-def create_user(payload: UserCreate) -> UserRead:
-    not_implemented()
+@router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED, responses={409: {"model": ErrorResponse}})
+def create_user(payload: UserCreate, db: Session = Depends(get_db)) -> UserRead:
+    try:
+        return auth_service.register_user(db, payload)
+    except auth_service.EmailAlreadyRegisteredError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Un compte existe deja avec cet email") from exc
 
 
 @router.get("/{user_id}", response_model=UserRead)
