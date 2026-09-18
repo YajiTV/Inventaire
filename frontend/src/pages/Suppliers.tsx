@@ -1,10 +1,19 @@
 import { useState } from "react";
 import { useFournisseurs } from "../hooks/useSuppliers";
 import type { Fournisseur } from "../types/supplier";
+import { DataTable } from "../components/DataTable";
+import type { DataTableColumn } from "../components/DataTable";
+import { FormField } from "../components/FormField";
+import { StatusMessage } from "../components/StatusMessage";
 
 // Page CRUD fournisseurs : liste + formulaire d'ajout + édition/suppression
 // inline sur chaque ligne. Pas de librairie de formulaire, juste du useState
 // simple pour rester lisible pour la fiche de révision React/TS.
+//
+// Le tableau (DataTable), les champs (FormField) et les messages
+// chargement/erreur/liste vide (StatusMessage) sont des composants partagés
+// avec Produits, pour ne pas dupliquer la structure "form + table +
+// édition inline" entre les deux pages.
 export default function Fournisseurs() {
     const { fournisseurs, loading, error, addFournisseur, editFournisseur, removeFournisseur } =
         useFournisseurs();
@@ -45,67 +54,65 @@ export default function Fournisseurs() {
         setEditingId(null);
     }
 
+    // Colonnes du DataTable : seule "Nom" est éditable inline (comportement
+    // identique à la version précédente), les autres colonnes sont en lecture
+    // seule dans ce tableau.
+    const columns: DataTableColumn<Fournisseur>[] = [
+        {
+            header: "Nom",
+            render: (f) =>
+                editingId === f.id ? (
+                    <FormField id={`edit-name-${f.id}`} label="" value={editName} onChange={setEditName} />
+                ) : (
+                    f.name
+                ),
+        },
+        { header: "Email", render: (f) => f.email },
+        { header: "Téléphone", render: (f) => f.phone },
+        { header: "Adresse", render: (f) => f.address },
+    ];
+
     return (
         <div className="p-8">
-
             <h1>Fournisseurs</h1>
 
             <form onSubmit={handleSubmit} className="mb-4 flex flex-wrap gap-2">
-                <input placeholder="Nom" value={name} onChange={(e) => setName(e.target.value)} required />
-                <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                <input placeholder="Téléphone" value={phone} onChange={(e) => setPhone(e.target.value)} />
-                <input placeholder="Adresse" value={address} onChange={(e) => setAddress(e.target.value)} />
-                <button type="submit">Ajouter</button>
+                <FormField id="name" label="Nom" value={name} onChange={setName} required />
+                <FormField id="email" label="Email" value={email} onChange={setEmail} />
+                <FormField id="phone" label="Téléphone" value={phone} onChange={setPhone} />
+                <FormField id="address" label="Adresse" value={address} onChange={setAddress} />
+                <button type="submit" className="self-end border rounded px-3 py-1">
+                    Ajouter
+                </button>
             </form>
 
-            {loading && <p>Chargement...</p>}
-            {error && <p className="text-red-600">{error}</p>}
+            <StatusMessage
+                loading={loading}
+                error={error}
+                isEmpty={!loading && !error && fournisseurs.length === 0}
+                emptyMessage="Aucun fournisseur"
+            />
 
-            <table className="w-full border-collapse">
-                <thead>
-                    <tr>
-                        <th className="py-1 pr-6 text-left">Nom</th>
-                        <th className="py-1 pr-6 text-left">Email</th>
-                        <th className="py-1 pr-6 text-left">Téléphone</th>
-                        <th className="py-1 pr-6 text-left">Adresse</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {fournisseurs.map((f) => (
-                        <tr key={f.id}>
-                            {editingId === f.id ? (
-                                <>
-                                    <td className="py-1 pr-6 text-left">
-                                        <input
-                                            value={editName}
-                                            onChange={(e) => setEditName(e.target.value)}
-                                        />
-                                    </td>
-                                    <td className="py-1 pr-6 text-left">{f.email}</td>
-                                    <td className="py-1 pr-6 text-left">{f.phone}</td>
-                                    <td className="py-1 pr-6 text-left">{f.address}</td>
-                                    <td>
-                                        <button onClick={() => saveEdit(f.id)}>Enregistrer</button>
-                                        <button onClick={() => setEditingId(null)}>Annuler</button>
-                                    </td>
-                                </>
-                            ) : (
-                                <>
-                                    <td className="py-1 pr-6 text-left">{f.name}</td>
-                                    <td className="py-1 pr-6 text-left">{f.email}</td>
-                                    <td className="py-1 pr-6 text-left">{f.phone}</td>
-                                    <td className="py-1 pr-6 text-left">{f.address}</td>
-                                    <td>
-                                        <button onClick={() => startEdit(f)}>Modifier</button>
-                                        <button onClick={() => removeFournisseur(f.id)}>Supprimer</button>
-                                    </td>
-                                </>
-                            )}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {!loading && !error && fournisseurs.length > 0 && (
+                <DataTable
+                    columns={columns}
+                    rows={fournisseurs}
+                    getRowId={(f) => f.id}
+                    renderActions={(f) =>
+                        editingId === f.id ? (
+                            <>
+                                <button onClick={() => saveEdit(f.id)}>Enregistrer</button>
+                                <button onClick={() => setEditingId(null)}>Annuler</button>
+                            </>
+                        ) : (
+                            <>
+                                <button onClick={() => startEdit(f)}>Modifier</button>
+                                <button onClick={() => removeFournisseur(f.id)}>Supprimer</button>
+                            </>
+                        )
+                    }
+                />
+            )}
         </div>
     );
 }
