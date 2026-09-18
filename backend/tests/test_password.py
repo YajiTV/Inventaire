@@ -18,3 +18,7 @@ def test_verify_password_rejects_wrong_password() -> None:
 
 def test_hash_password_uses_random_salt() -> None:
     assert hash_password("s3cret-pass") != hash_password("s3cret-pass")
+
+
+def test_verify_password_rejects_unreadable_hash() -> None:
+    assert verify_password("s3cret-pass", "not-a-hash") is False
