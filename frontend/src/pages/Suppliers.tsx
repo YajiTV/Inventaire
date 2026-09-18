@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useFournisseurs } from "../hooks/useSuppliers";
 import type { Fournisseur } from "../types/supplier";
+import { ApiError } from "../lib/api";
 import { DataTable } from "../components/DataTable";
 import type { DataTableColumn } from "../components/DataTable";
 import { FormField } from "../components/FormField";
@@ -14,6 +15,9 @@ import { StatusMessage } from "../components/StatusMessage";
 // chargement/erreur/liste vide (StatusMessage) sont des composants partagés
 // avec Produits, pour ne pas dupliquer la structure "form + table +
 // édition inline" entre les deux pages.
+
+const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+$/;
+
 export default function Fournisseurs() {
     const { fournisseurs, loading, error, addFournisseur, editFournisseur, removeFournisseur } =
         useFournisseurs();
@@ -28,19 +32,45 @@ export default function Fournisseurs() {
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editName, setEditName] = useState("");
 
+    const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
+    const [apiError, setApiError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+    function validate(): boolean {
+        const newErrors: typeof errors = {};
+
+        if (!name.trim()) newErrors.name = "Le nom est obligatoire.";
+        if (email.trim() && !EMAIL_PATTERN.test(email.trim())) {
+            newErrors.email = "Format d'email invalide (ex: contact@fournisseur.fr).";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    }
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        if (!name.trim()) return;
-        await addFournisseur({
-            name,
-            email: email || null,
-            phone: phone || null,
-            address: address || null,
-        });
-        setName("");
-        setEmail("");
-        setPhone("");
-        setAddress("");
+        setApiError(null);
+        setSuccessMessage(null);
+
+        if (!validate()) return;
+
+        try {
+            await addFournisseur({
+                name,
+                email: email || null,
+                phone: phone || null,
+                address: address || null,
+            });
+            setName("");
+            setEmail("");
+            setPhone("");
+            setAddress("");
+            setErrors({});
+            setSuccessMessage("Fournisseur ajouté avec succès");
+        } catch (err) {
+            setApiError(err instanceof ApiError ? err.message : "Erreur inattendue");
+        }
     }
 
     function startEdit(f: Fournisseur) {
@@ -49,9 +79,32 @@ export default function Fournisseurs() {
     }
 
     async function saveEdit(id: number) {
-        if (!editName.trim()) return;
-        await editFournisseur(id, { name: editName });
-        setEditingId(null);
+        setApiError(null);
+        setSuccessMessage(null);
+
+        if (!editName.trim()) {
+            setApiError("Le nom est obligatoire");
+            return;
+        }
+
+        try {
+            await editFournisseur(id, { name: editName });
+            setEditingId(null);
+            setSuccessMessage("Fournisseur modifié avec succès");
+        } catch (err) {
+            setApiError(err instanceof ApiError ? err.message : "Erreur inattendue");
+        }
+    }
+
+    async function handleDelete(id: number) {
+        setApiError(null);
+        setSuccessMessage(null);
+        try {
+            await removeFournisseur(id);
+            setSuccessMessage("Fournisseur supprimé avec succès");
+        } catch (err) {
+            setApiError(err instanceof ApiError ? err.message : "Erreur inattendue");
+        }
     }
 
     // Colonnes du DataTable : seule "Nom" est éditable inline (comportement
@@ -77,9 +130,17 @@ export default function Fournisseurs() {
             <h1>Fournisseurs</h1>
 
             <form onSubmit={handleSubmit} className="mb-4 flex flex-wrap gap-2">
-                <FormField id="name" label="Nom" value={name} onChange={setName} required />
-                <FormField id="email" label="Email" value={email} onChange={setEmail} />
-                <FormField id="phone" label="Téléphone" value={phone} onChange={setPhone} />
+                <FormField id="name" label="Nom" value={name} onChange={setName} error={errors.name} required />
+                <FormField
+                    id="email"
+                    label="Email"
+                    type="email"
+                    value={email}
+                    onChange={setEmail}
+                    error={errors.email}
+                    placeholder="contact@fournisseur.fr"
+                />
+                <FormField id="phone" label="Téléphone" value={phone} onChange={setPhone} placeholder="0102030405" />
                 <FormField id="address" label="Adresse" value={address} onChange={setAddress} />
                 <button type="submit" className="self-end border rounded px-3 py-1">
                     Ajouter
@@ -92,6 +153,12 @@ export default function Fournisseurs() {
                 isEmpty={!loading && !error && fournisseurs.length === 0}
                 emptyMessage="Aucun fournisseur"
             />
+            {apiError && (
+                <p role="alert" className="text-red-600">
+                    {apiError}
+                </p>
+            )}
+            {successMessage && <p className="text-green-600">{successMessage}</p>}
 
             {!loading && !error && fournisseurs.length > 0 && (
                 <DataTable
@@ -107,7 +174,7 @@ export default function Fournisseurs() {
                         ) : (
                             <>
                                 <button onClick={() => startEdit(f)}>Modifier</button>
-                                <button onClick={() => removeFournisseur(f.id)}>Supprimer</button>
+                                <button onClick={() => handleDelete(f.id)}>Supprimer</button>
                             </>
                         )
                     }
