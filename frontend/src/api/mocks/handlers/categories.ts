@@ -1,10 +1,11 @@
 import { http, HttpResponse } from "msw";
 import type { CategoryCreate, CategoryRead, CategoryUpdate } from "../../../types/api";
 import { nextIdFrom, seedCategories } from "../seed";
+import { loadMock, saveMock } from "../storage";
 
-let categories: CategoryRead[] = [...seedCategories];
+let categories: CategoryRead[] = loadMock("categories", [...seedCategories]);
 
-let nextId = nextIdFrom(seedCategories);
+let nextId = nextIdFrom(categories);
 
 export const categoryHandlers = [
     http.get("*/categories", () => HttpResponse.json(categories)),
@@ -13,6 +14,7 @@ export const categoryHandlers = [
         const payload = (await request.json()) as CategoryCreate;
         const created: CategoryRead = { id: nextId++, description: null, ...payload };
         categories.push(created);
+        saveMock("categories", categories);
         return HttpResponse.json(created, { status: 201 });
     }),
 
@@ -27,6 +29,7 @@ export const categoryHandlers = [
         if (!category) return new HttpResponse(null, { status: 404 });
         const patch = (await request.json()) as CategoryUpdate;
         Object.assign(category, patch);
+        saveMock("categories", categories);
         return HttpResponse.json(category);
     }),
 
@@ -34,6 +37,7 @@ export const categoryHandlers = [
         const exists = categories.some(c => c.id === Number(params.id));
         if (!exists) return new HttpResponse(null, { status: 404 });
         categories = categories.filter(c => c.id !== Number(params.id));
+        saveMock("categories", categories);
         return new HttpResponse(null, { status: 204 });
     }),
 ];

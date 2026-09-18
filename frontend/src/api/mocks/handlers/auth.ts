@@ -1,10 +1,9 @@
 import { http, HttpResponse } from 'msw'
 import type { TokenResponse, UserRead } from '../../../types/api'
 import { users } from './users'
+import { loadMock, saveMock } from '../storage'
 
-// Personne n'est connecte par defaut : pas de session tant que /auth/login
-// n'a pas ete appele avec un email connu.
-let currentUser: UserRead | null = null
+let currentUser: UserRead | null = loadMock('auth:user', null)
 
 const MOCK_TOKEN: TokenResponse = {
     access_token: 'mock-access-token',
@@ -19,6 +18,7 @@ export const authHandlers = [
         if (!user)
             return new HttpResponse(null, {status: 401})
         currentUser = user
+        saveMock('auth:user', currentUser)
         return HttpResponse.json(MOCK_TOKEN)
     }),
 
@@ -37,6 +37,7 @@ export const authHandlers = [
 
     http.post('*/auth/logout', () => {
         currentUser = null
+        saveMock('auth:user', null)
         return new HttpResponse(null, {status: 204})
     })
 ]

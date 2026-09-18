@@ -1,10 +1,11 @@
 import { http, HttpResponse } from "msw";
 import type { StockCreate, StockRead, StockUpdate } from "../../../types/api";
 import { nextIdFrom, seedStocks } from "../seed";
+import { loadMock, saveMock } from "../storage";
 
-let stocks: StockRead[] = [...seedStocks];
+let stocks: StockRead[] = loadMock("stocks", [...seedStocks]);
 
-let nextId = nextIdFrom(seedStocks);
+let nextId = nextIdFrom(stocks);
 
 // Partage de l'etat avec le handler des mouvements : un mouvement doit deplacer
 // le stock, sinon la demo montre un historique qui ne change rien.
@@ -14,6 +15,7 @@ export function getStocks(): StockRead[] {
 
 export function setStocks(next: StockRead[]): void {
     stocks = next;
+    saveMock("stocks", stocks);
 }
 
 export const stockHandlers = [
@@ -23,6 +25,7 @@ export const stockHandlers = [
         const payload = (await request.json()) as StockCreate;
         const created: StockRead = { id: nextId++, ...payload };
         stocks.push(created);
+        saveMock("stocks", stocks);
         return HttpResponse.json(created, { status: 201 });
     }),
 
@@ -39,6 +42,7 @@ export const stockHandlers = [
         if (!stock) return new HttpResponse(null, { status: 404 });
         const patch = (await request.json()) as StockUpdate;
         Object.assign(stock, patch);
+        saveMock("stocks", stocks);
         return HttpResponse.json(stock);
     }),
 
@@ -46,6 +50,7 @@ export const stockHandlers = [
         const exists = stocks.some(s => s.id === Number(params.id));
         if (!exists) return new HttpResponse(null, { status: 404 });
         stocks = stocks.filter(s => s.id !== Number(params.id));
+        saveMock("stocks", stocks);
         return new HttpResponse(null, { status: 204 });
     }),
 ];

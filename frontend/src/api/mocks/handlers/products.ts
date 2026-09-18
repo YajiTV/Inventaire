@@ -1,10 +1,11 @@
 import { http, HttpResponse } from "msw";
 import type { ProductCreate, ProductLookup, ProductRead, ProductUpdate } from "../../../types/api";
 import { nextIdFrom, seedProducts } from "../seed";
+import { loadMock, saveMock } from "../storage";
 
-let products: ProductRead[] = [...seedProducts];
+let products: ProductRead[] = loadMock("products", [...seedProducts]);
 
-let nextId = nextIdFrom(seedProducts);
+let nextId = nextIdFrom(products);
 
 // Donnees fixes locales pour /products/lookup : aucun appel reseau sortant, seul ce code-barres est connu.
 const knownLookups: Record<string, ProductLookup> = {
@@ -42,6 +43,7 @@ export const productHandlers = [
             unit_price: String(payload.unit_price),
         };
         products.push(created);
+        saveMock("products", products);
         return HttpResponse.json(created, { status: 201 });
     }),
 
@@ -67,6 +69,7 @@ export const productHandlers = [
                 ? { unit_price: String(patch.unit_price) }
                 : {}),
         });
+        saveMock("products", products);
         return HttpResponse.json(product);
     }),
 
@@ -74,6 +77,7 @@ export const productHandlers = [
         const exists = products.some(p => p.id === Number(params.id));
         if (!exists) return new HttpResponse(null, { status: 404 });
         products = products.filter(p => p.id !== Number(params.id));
+        saveMock("products", products);
         return new HttpResponse(null, { status: 204 });
     }),
 ];

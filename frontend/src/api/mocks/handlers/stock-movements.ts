@@ -2,11 +2,12 @@ import { http, HttpResponse } from "msw";
 import { applyMovement } from "../../../lib/stockMovements";
 import type { StockMovementCreate, StockMovementRead } from "../../../types/api";
 import { nextIdFrom, seedMovements } from "../seed";
+import { loadMock, saveMock } from "../storage";
 import { getStocks, setStocks } from "./stocks";
 
-let stockMovements: StockMovementRead[] = [...seedMovements];
+let stockMovements: StockMovementRead[] = loadMock("stock-movements", [...seedMovements]);
 
-let nextId = nextIdFrom(seedMovements);
+let nextId = nextIdFrom(stockMovements);
 
 export const stockMovementHandlers = [
     // Pas de PATCH/DELETE : un mouvement de stock est un evenement, pas une ressource modifiable
@@ -57,6 +58,7 @@ export const stockMovementHandlers = [
             created_at: new Date().toISOString(),
         };
         stockMovements.push(created);
+        saveMock("stock-movements", stockMovements);
         setStocks(applyMovement(getStocks(), payload));
         return HttpResponse.json(created, { status: 201 });
     }),

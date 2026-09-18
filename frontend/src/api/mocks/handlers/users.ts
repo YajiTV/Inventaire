@@ -1,7 +1,9 @@
 import { http, HttpResponse } from 'msw'
 import type { UserRead, UserCreate, UserUpdate } from '../../../types/api'
+import { nextIdFrom } from '../seed'
+import { loadMock, saveMock } from '../storage'
 
-export let users: UserRead[] = [
+const seedUsers: UserRead[] = [
     {
         id: 1,
         email: 'admin@inventaire.fr',
@@ -12,7 +14,9 @@ export let users: UserRead[] = [
     }
 ]
 
-let nextId = 2
+export let users: UserRead[] = loadMock('users', seedUsers)
+
+let nextId = nextIdFrom(users)
 
 export const userHandlers = [
     http.get('*/users', () => HttpResponse.json(users)),
@@ -29,6 +33,7 @@ export const userHandlers = [
             created_at: new Date().toISOString()
         }
         users.push(created)
+        saveMock('users', users)
         return HttpResponse.json(created, {status: 201})
     }),
 
@@ -45,6 +50,7 @@ export const userHandlers = [
             return new HttpResponse(null, {status: 404})
         const patch = (await request.json()) as UserUpdate
         Object.assign(user, patch)
+        saveMock('users', users)
         return HttpResponse.json(user)
     }),
 
@@ -53,6 +59,7 @@ export const userHandlers = [
         if (!exists)
             return new HttpResponse(null, {status: 404})
         users = users.filter((u) => u.id !== Number(params.id))
+        saveMock('users', users)
         return new HttpResponse(null, {status: 204})
     })
 ]

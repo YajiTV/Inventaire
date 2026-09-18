@@ -1,11 +1,14 @@
 import {http, HttpResponse} from 'msw';
 import type { PurchaseOrderRead, PurchaseOrderCreate, PurchaseOrderUpdate, OrderLineRead, OrderLineCreate, OrderLineUpdate } from '../../../types/api';
 import { nextIdFrom, seedPurchaseOrders } from '../seed';
+import { loadMock, saveMock } from '../storage';
 
-let purchaseOrders: PurchaseOrderRead[] = seedPurchaseOrders.map((order) => ({...order, lines: [...order.lines]}))
+const seedOrders = seedPurchaseOrders.map((order) => ({...order, lines: [...order.lines]}))
 
-let nextOrderId = nextIdFrom(seedPurchaseOrders)
-let nextLineId = nextIdFrom(seedPurchaseOrders.flatMap((order) => order.lines))
+let purchaseOrders: PurchaseOrderRead[] = loadMock('purchase-orders', seedOrders)
+
+let nextOrderId = nextIdFrom(purchaseOrders)
+let nextLineId = nextIdFrom(purchaseOrders.flatMap((order) => order.lines))
 
 // Additionne quantite * prix unitaire de chaque ligne pour obtenir le total de la commande
 function computeTotalPrice(lines: OrderLineRead[]): string {
@@ -57,6 +60,7 @@ export const purchaseOrderHandlers = [
             lines: lines
         }
         purchaseOrders.push(created)
+        saveMock('purchase-orders', purchaseOrders)
         return HttpResponse.json(created, {status: 201})
     }),
 
@@ -73,6 +77,7 @@ export const purchaseOrderHandlers = [
             return new HttpResponse(null, {status: 404})
         const patch = (await request.json()) as PurchaseOrderUpdate
         Object.assign(order, patch)
+        saveMock('purchase-orders', purchaseOrders)
         return HttpResponse.json(order)
     }),
 
@@ -81,6 +86,7 @@ export const purchaseOrderHandlers = [
         if (!exists)
             return new HttpResponse(null, {status: 404})
         purchaseOrders = purchaseOrders.filter((o) => o.id !== Number(params.id))
+        saveMock('purchase-orders', purchaseOrders)
         return new HttpResponse(null, {status: 204})
     }),
 
@@ -105,6 +111,7 @@ export const purchaseOrderHandlers = [
             unit_price: String(payload.unit_price)
         }
         order.lines.push(created)
+        saveMock('purchase-orders', purchaseOrders)
         return HttpResponse.json(created, {status: 201})
     }),
 
@@ -123,6 +130,7 @@ export const purchaseOrderHandlers = [
         if (patch.unit_price !== undefined && patch.unit_price !== null)
             line.unit_price = String(patch.unit_price)
 
+        saveMock('purchase-orders', purchaseOrders)
         return HttpResponse.json(line)
     }),
 
@@ -136,6 +144,7 @@ export const purchaseOrderHandlers = [
             return new HttpResponse(null, {status: 404})
 
         order.lines = order.lines.filter((l) => l.id !== Number(params.lineId))
+        saveMock('purchase-orders', purchaseOrders)
         return new HttpResponse(null, {status: 204})
     })
 ]

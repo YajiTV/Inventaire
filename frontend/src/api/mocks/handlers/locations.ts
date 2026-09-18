@@ -1,10 +1,11 @@
 import { http, HttpResponse } from "msw";
 import type { LocationCreate, LocationRead, LocationUpdate } from "../../../types/api";
 import { nextIdFrom, seedLocations } from "../seed";
+import { loadMock, saveMock } from "../storage";
 
-let locations: LocationRead[] = [...seedLocations];
+let locations: LocationRead[] = loadMock("locations", [...seedLocations]);
 
-let nextId = nextIdFrom(seedLocations);
+let nextId = nextIdFrom(locations);
 
 export const locationHandlers = [
     http.get("*/locations", () => HttpResponse.json(locations)),
@@ -13,6 +14,7 @@ export const locationHandlers = [
         const payload = (await request.json()) as LocationCreate;
         const createLocations: LocationRead = { id: nextId++, description: null, ...payload };
         locations.push(createLocations);
+        saveMock("locations", locations);
         return HttpResponse.json(createLocations, { status: 201 });
     }),
 
@@ -27,6 +29,7 @@ export const locationHandlers = [
         if (!location) return new HttpResponse(null, { status: 404 });
         const patch = (await request.json()) as LocationUpdate;
         Object.assign(location, patch);
+        saveMock("locations", locations);
         return HttpResponse.json(location);
     }),
 
@@ -34,6 +37,7 @@ export const locationHandlers = [
         const exists = locations.some(l => l.id === Number(params.id));
         if (!exists) return new HttpResponse(null, { status: 404 });
         locations = locations.filter(c => c.id !== Number(params.id));
+        saveMock("locations", locations);
         return new HttpResponse(null, { status: 204 });
     }),
 ];
