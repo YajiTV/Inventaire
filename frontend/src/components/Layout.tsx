@@ -10,6 +10,7 @@ const links = [
   { to: '/replenishment', label: 'Réapprovisionnement' },
   { to: '/categories', label: 'Catégories' },
   { to: '/orders', label: 'Commandes' },
+  { to: '/users', label: 'Utilisateurs' },
 ]
 
 export function Layout() {
