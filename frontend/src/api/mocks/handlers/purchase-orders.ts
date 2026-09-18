@@ -1,24 +1,11 @@
 import {http, HttpResponse} from 'msw';
 import type { PurchaseOrderRead, PurchaseOrderCreate, PurchaseOrderUpdate, OrderLineRead, OrderLineCreate, OrderLineUpdate } from '../../../types/api';
+import { nextIdFrom, seedPurchaseOrders } from '../seed';
 
-let purchaseOrders: PurchaseOrderRead[] = [
-    {
-        id: 1,
-        reference: 'PO-2026-001',
-        supplier_id: 1,
-        location_id: 1,
-        status: 'draft',
-        total_price: '25.00',
-        ordered_at: '2026-09-10T09:00:00Z',
-        received_at: null,
-        lines: [
-            {id: 1, order_id: 1, product_id: 1, quantity: 10, unit_price: '2.50'}
-        ]
-    }
-]
+let purchaseOrders: PurchaseOrderRead[] = seedPurchaseOrders.map((order) => ({...order, lines: [...order.lines]}))
 
-let nextOrderId = 2
-let nextLineId = 2
+let nextOrderId = nextIdFrom(seedPurchaseOrders)
+let nextLineId = nextIdFrom(seedPurchaseOrders.flatMap((order) => order.lines))
 
 // Additionne quantite * prix unitaire de chaque ligne pour obtenir le total de la commande
 function computeTotalPrice(lines: OrderLineRead[]): string {

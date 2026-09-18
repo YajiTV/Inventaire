@@ -4,6 +4,7 @@ import type {
     CategoryRead,
     LocationRead,
     ProductRead,
+    PurchaseOrderRead,
     ReplenishmentSuggestion,
     StockMovementRead,
     StockRead,
@@ -208,6 +209,31 @@ export const seedMovements: StockMovementRead[] = [
         reason: "Poches branchées sur la fontaine",
         user_id: 1,
         created_at: "2026-09-17T18:20:00.000Z",
+    },
+];
+
+export const seedPurchaseOrders: PurchaseOrderRead[] = [
+    {
+        id: 1,
+        reference: "PO-2026-001",
+        supplier_id: 1,
+        location_id: 3,
+        status: "received",
+        total_price: "86.40",
+        ordered_at: "2026-09-14T08:00:00.000Z",
+        received_at: "2026-09-15T05:30:00.000Z",
+        lines: [{ id: 1, order_id: 1, product_id: 1, quantity: 480, unit_price: "0.18" }],
+    },
+    {
+        id: 2,
+        reference: "PO-2026-002",
+        supplier_id: 2,
+        location_id: 1,
+        status: "draft",
+        total_price: "201.60",
+        ordered_at: "2026-09-17T09:30:00.000Z",
+        received_at: null,
+        lines: [{ id: 2, order_id: 2, product_id: 2, quantity: 480, unit_price: "0.42" }],
     },
 ];
 
