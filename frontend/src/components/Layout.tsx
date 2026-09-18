@@ -9,6 +9,7 @@ const links = [
   { to: '/suppliers', label: 'Fournisseurs' },
   { to: '/replenishment', label: 'Réapprovisionnement' },
   { to: '/categories', label: 'Catégories' },
+  { to: '/users', label: 'Utilisateurs' },
 ]
 
 export function Layout() {
