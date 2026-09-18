@@ -17,3 +17,15 @@ def create(db: Session, user: User) -> User:
     db.commit()
     db.refresh(user)
     return user
+
+def list_all(db: Session) -> list[User]:
+    return list(db.execute(select(User)).scalars())
+
+def save(db: Session, user: User) -> User:
+    db.commit()
+    db.refresh(user)
+    return user
+
+def delete(db: Session, user: User) -> None:
+    db.delete(user)
+    db.commit()
