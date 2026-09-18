@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Register() {
     const { register } = useAuth()
@@ -10,30 +10,109 @@ export default function Register() {
     const [confirm, setConfirm] = useState('')
     const [pseudo, setPseudo] = useState('')
     const [error, setError] = useState<string | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     async function handleSubmit(event: FormEvent) {
         event.preventDefault()
+        setError(null)
+
         if (password !== confirm) {
             setError('Les mots de passe ne correspondent pas')
             return
         }
+
+        setIsSubmitting(true)
         try {
             await register(pseudo, email, password, confirm)
             navigate('/')
         } catch {
             setError('Erreur dans les champs requis')
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
     return (
-        <form onSubmit={handleSubmit} className="mx-auto mt-20 flex max-w-sm flex-col gap-4">
-            <h1 className="text-xl font-semibold">S'enregistrer</h1>
-            <input type="speudo" placeholder="Votre pseudo" value={pseudo} onChange={(p) => setPseudo(p.target.value)} required/>
-            <input type="email" placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            <input type="text" placeholder="Votre mot de passe" value={password} onChange={(m) => setPassword(m.target.value)} required />
-            <input type="text" placeholder="Confirmez votre mot de passe" value={confirm} onChange={(c) => setConfirm(c.target.value)} required />
-            {error && <p className="text-red-600">{error}</p>}
-            <button type="submit">S'enregistrer</button>
-        </form>
+        <div className="mx-auto mt-20 max-w-sm rounded border p-6 shadow-sm">
+            <h1 className="mb-1 text-xl font-semibold">Créer un compte</h1>
+            <p className="mb-6 text-sm text-gray-500">Renseigne tes informations pour t'enregistrer.</p>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                    <label htmlFor="pseudo" className="text-sm text-gray-700">
+                        Pseudo
+                    </label>
+                    <input
+                        id="pseudo"
+                        type="text"
+                        placeholder="Votre pseudo"
+                        value={pseudo}
+                        onChange={(e) => setPseudo(e.target.value)}
+                        required
+                        className="rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                    <label htmlFor="email" className="text-sm text-gray-700">
+                        Email
+                    </label>
+                    <input
+                        id="email"
+                        type="email"
+                        placeholder="vous@exemple.fr"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                    <label htmlFor="password" className="text-sm text-gray-700">
+                        Mot de passe
+                    </label>
+                    <input
+                        id="password"
+                        type="password"
+                        placeholder="8 caractères minimum"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                    <label htmlFor="confirm" className="text-sm text-gray-700">
+                        Confirmer le mot de passe
+                    </label>
+                    <input
+                        id="confirm"
+                        type="password"
+                        placeholder="Retapez le mot de passe"
+                        value={confirm}
+                        onChange={(e) => setConfirm(e.target.value)}
+                        required
+                        className="rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    />
+                </div>
+
+                {error && <p className="text-sm text-red-600">{error}</p>}
+
+                <div className="flex items-center gap-4 pt-2">
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="rounded bg-gray-900 px-4 py-2 text-white hover:bg-gray-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+                    >
+                        {isSubmitting ? 'Création...' : "S'enregistrer"}
+                    </button>
+                    <Link to="/login" className="text-sm underline">
+                        Déjà un compte ?
+                    </Link>
+                </div>
+            </form>
+        </div>
     )
 }
