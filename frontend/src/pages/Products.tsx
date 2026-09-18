@@ -3,6 +3,9 @@ import { useProduits } from "../hooks/useProduct";
 import type { Produit } from "../types/product";
 import { ApiError } from "../lib/api";
 
+// Même format que le backend (backend/app/schemas/product.py) : majuscules, chiffres et tirets uniquement
+const SKU_PATTERN = /^[A-Z0-9-]+$/;
+
 export default function Produits() {
     const { produits, loading, error, addProduit, editProduit, removeProduit } = useProduits();
 
@@ -27,7 +30,11 @@ export default function Produits() {
     function validate(): boolean {
         const newErrors: typeof errors = {};
 
-        if (!sku.trim()) newErrors.sku = "Le SKU est obligatoire.";
+        if (!sku.trim()) {
+            newErrors.sku = "Le SKU est obligatoire.";
+        } else if (!SKU_PATTERN.test(sku.trim())) {
+            newErrors.sku = "Format de SKU invalide (majuscules, chiffres et tirets uniquement, ex: PAIN-BIGM-001).";
+        }
         if (!name.trim()) newErrors.name = "Le nom est obligatoire.";
         if (!categoryId) newErrors.categoryId = "L'ID de catégorie est obligatoire.";
 
