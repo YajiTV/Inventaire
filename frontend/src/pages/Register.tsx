@@ -11,6 +11,7 @@ export default function Register() {
     const [pseudo, setPseudo] = useState('')
     const [error, setError] = useState<string | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
 
     async function handleSubmit(event: FormEvent) {
         event.preventDefault()
@@ -72,15 +73,24 @@ export default function Register() {
                     <label htmlFor="password" className="text-sm text-gray-700">
                         Mot de passe
                     </label>
-                    <input
+                    <div className="relative">
+                        <input
                         id="password"
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         placeholder="8 caractères minimum"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         className="rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
                     />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v )}
+                        aria-label={showPassword ? 'Masquer le mot de passe' : 'Affichier le mot de passe'}
+                        className="absolute inset-y-0 right-2 text-sm text-gray-500 hover:text-gray-800">
+                            {showPassword ? 'Masquer' : 'Affichier'}
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex flex-col gap-1">
