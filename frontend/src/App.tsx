@@ -23,9 +23,9 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/" element={<Home />} />
-          <Route element={<ProtectedRoute />}>
-            <Route element={<Layout />}>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route element={<ProtectedRoute />}>
               <Route path="/stocks" element={<Stocks />} />
               <Route path="/movements" element={<Movements />} />
               <Route path="/movements/new" element={<NewMovement />} />

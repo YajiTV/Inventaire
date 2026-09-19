@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
 const links = [
@@ -14,7 +14,7 @@ const links = [
 ]
 
 export function Layout() {
-  const { user, logout } = useAuth()
+  const { user, isAuthenticated, logout } = useAuth()
 
   return (
     <div>
@@ -31,10 +31,19 @@ export function Layout() {
           </ul>
 
           <div className="flex items-center gap-3">
-            {user !== null && <span>{user.full_name}</span>}
-            <button type="button" onClick={() => logout()}>
-              Se déconnecter
-            </button>
+            {isAuthenticated ? (
+              <>
+                {user !== null && <span>{user.full_name}</span>}
+                <button className="text-red-600" type="button" onClick={() => logout()}>
+                  Se déconnecter
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login">Se connecter</Link>
+                <Link to="/register">S'enregistrer</Link>
+              </>
+            )}
           </div>
         </nav>
       </header>
