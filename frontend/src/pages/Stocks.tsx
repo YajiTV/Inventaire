@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { StockTable } from '../components/StockTable'
 import { useStocks } from '../hooks/useStocks'
 import { useLocations } from '../hooks/useLocations'
@@ -21,17 +20,7 @@ export default function Stocks() {
 
   return (
     <section className="p-4 sm:p-8">
-      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold">Stocks</h1>
-        <div className="flex gap-4 text-sm">
-          <Link to="/movements" className="underline">
-            Mouvements
-          </Link>
-          <Link to="/replenishment" className="underline">
-            Réapprovisionnement
-          </Link>
-        </div>
-      </div>
+      <h1 className="mb-6 text-2xl font-semibold">Stocks</h1>
 
       <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded border p-3">
