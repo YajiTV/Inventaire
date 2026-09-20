@@ -1,4 +1,4 @@
-import type { UserRead } from './api'
+import type { UserRead, UserUpdate } from './api'
 
 export type User = UserRead
 
@@ -14,4 +14,5 @@ export interface AuthContextValue {
   // Appelle POST /auth/refresh (route implémentée par Axel côté backend) et pose un
   // nouveau access_token. Renvoie le token pour permettre un retry immédiat après un 401.
   refresh: () => Promise<string | null>
+  updateProfile: (data: UserUpdate) => Promise<void>
 }
