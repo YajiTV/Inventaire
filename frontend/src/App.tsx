@@ -9,6 +9,7 @@ import Stocks from './pages/Stocks'
 import Movements from './pages/Movements'
 import NewMovement from './pages/NewMovement'
 import Products from './pages/Products'
+import ProductDetail from './pages/ProductDetail'
 import Suppliers from './pages/Suppliers'
 import Categories from './pages/Categories'
 import Replenishment from './pages/Replenishment'
@@ -31,6 +32,7 @@ export default function App() {
               <Route path="/movements" element={<Movements />} />
               <Route path="/movements/new" element={<NewMovement />} />
               <Route path="/products" element={<Products />} />
+              <Route path="/products/:id" element={<ProductDetail />} />
               <Route path="/suppliers" element={<Suppliers />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/replenishment" element={<Replenishment />} />
