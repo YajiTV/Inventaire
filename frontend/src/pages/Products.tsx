@@ -1,27 +1,38 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useProduits } from "../hooks/useProduct";
-import type { Produit } from "../types/product";
+import { useCategories } from "../hooks/useCategories";
+import { useFournisseurs } from "../hooks/useSuppliers";
+import { EMPTY_PRODUIT_FILTERS, PRODUITS_PAGE_SIZE } from "../types/product";
+import type { Produit, ProduitFilters } from "../types/product";
 import { ApiError } from "../lib/api";
 import { DataTable } from "../components/DataTable";
 import type { DataTableColumn } from "../components/DataTable";
 import { FormField } from "../components/FormField";
 import { StatusMessage } from "../components/StatusMessage";
 
-// Page CRUD produits : liste + formulaire d'ajout + édition/suppression
-// inline sur chaque ligne. category_id est saisi en brut (id d'une catégorie
-// déjà créée côté /categories) : pas de sélecteur, la gestion des
-// catégories est hors du périmètre de cette page.
+// Page CRUD produits : filtres + liste paginée + formulaire d'ajout +
+// édition/suppression inline sur chaque ligne. category_id est saisi en brut
+// dans le formulaire d'ajout (le sélecteur viendra avec la tâche "formulaire").
 //
 // Le tableau (DataTable), les champs (FormField) et les messages
 // chargement/erreur/liste vide (StatusMessage) sont des composants partagés
-// avec Fournisseurs, pour ne pas dupliquer la structure "form + table +
-// édition inline" entre les deux pages.
+// avec Fournisseurs.
 
 // Même format que le backend (backend/app/schemas/product.py) : majuscules, chiffres et tirets uniquement
 const SKU_PATTERN = /^[A-Z0-9-]+$/;
 
 export default function Produits() {
-    const { produits, loading, error, addProduit, editProduit, removeProduit } = useProduits();
+    // Filtres (un seul objet) et position dans la liste (0 = page 1, 5 = page 2...)
+    const [filters, setFilters] = useState<ProduitFilters>(EMPTY_PRODUIT_FILTERS);
+    const [offset, setOffset] = useState(0);
+
+    // Le hook recharge la liste dès que filters ou offset changent
+    const { produits, total, loading, error, addProduit, editProduit, removeProduit } = useProduits(filters, offset);
+
+    // Listes pour remplir les <select> de filtre et afficher les noms
+    const { categories } = useCategories();
+    const { fournisseurs } = useFournisseurs();
 
     // Champs du formulaire de création
     const [sku, setSku] = useState("");
@@ -40,6 +51,22 @@ export default function Produits() {
     const [apiError, setApiError] = useState<string | null>(null);
     // Message affiché après une action réussie
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+    // Calcul de la pagination à partir du total renvoyé par le serveur
+    const totalPages = Math.max(1, Math.ceil(total / PRODUITS_PAGE_SIZE));
+    const currentPage = offset / PRODUITS_PAGE_SIZE + 1;
+
+    // Quand un filtre change, on revient toujours à la page 1 : sinon on
+    // pourrait se retrouver page 3 d'une liste qui n'a plus que 1 page.
+    function updateFilters(newFilters: ProduitFilters) {
+        setFilters(newFilters);
+        setOffset(0);
+    }
+
+    // Retrouve le nom d'une catégorie à partir de son id (sinon on affiche l'id)
+    function categoryName(id: number): string {
+        return categories.find((c) => c.id === id)?.name ?? String(id);
+    }
 
     function validate(): boolean {
         const newErrors: typeof errors = {};
@@ -122,6 +149,11 @@ export default function Produits() {
         setSuccessMessage(null);
         try {
             await removeProduit(id);
+            // Si on vient de supprimer le dernier produit d'une page (autre que
+            // la première), on recule d'une page pour ne pas afficher une page vide.
+            if (produits.length === 1 && offset > 0) {
+                setOffset(offset - PRODUITS_PAGE_SIZE);
+            }
             setSuccessMessage("Produit supprimé avec succès");
         } catch (err) {
             setApiError(err instanceof ApiError ? err.message : "Erreur inattendue");
@@ -139,9 +171,13 @@ export default function Produits() {
                 editingId === p.id ? (
                     <FormField id={`edit-name-${p.id}`} label="" value={editName} onChange={setEditName} />
                 ) : (
-                    p.name
+                    // Le nom est un lien vers la page détail /products/:id
+                    <Link to={`/products/${p.id}`} className="underline">
+                        {p.name}
+                    </Link>
                 ),
         },
+        { header: "Catégorie", render: (p) => categoryName(p.category_id) },
         {
             header: "Prix",
             render: (p) =>
@@ -156,11 +192,72 @@ export default function Produits() {
                     `${p.unit_price} €`
                 ),
         },
+        {
+            header: "Stock",
+            render: (p) =>
+                p.total_quantity <= p.reorder_threshold ? (
+                    <span className="text-red-600">{p.total_quantity} (sous le seuil)</span>
+                ) : (
+                    p.total_quantity
+                ),
+        },
     ];
 
     return (
         <div className="p-8">
             <h1>Produits</h1>
+
+            {/* Barre de filtres : chaque changement met à jour l'objet filters,
+                ce qui relance le chargement de la liste (voir useProduits) */}
+            <div className="mb-4 flex flex-wrap items-end gap-2">
+                <FormField
+                    id="filter-search"
+                    label="Rechercher"
+                    value={filters.search}
+                    onChange={(value) => updateFilters({ ...filters, search: value })}
+                    placeholder="Nom, SKU ou code-barres"
+                />
+                <div className="flex flex-col">
+                    <label htmlFor="filter-category">Catégorie</label>
+                    <select
+                        id="filter-category"
+                        value={filters.categoryId}
+                        onChange={(e) => updateFilters({ ...filters, categoryId: e.target.value })}
+                        className="border rounded px-2 py-1"
+                    >
+                        <option value="">Toutes</option>
+                        {categories.map((c) => (
+                            <option key={c.id} value={c.id}>
+                                {c.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="flex flex-col">
+                    <label htmlFor="filter-supplier">Fournisseur</label>
+                    <select
+                        id="filter-supplier"
+                        value={filters.supplierId}
+                        onChange={(e) => updateFilters({ ...filters, supplierId: e.target.value })}
+                        className="border rounded px-2 py-1"
+                    >
+                        <option value="">Tous</option>
+                        {fournisseurs.map((f) => (
+                            <option key={f.id} value={f.id}>
+                                {f.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <label className="flex items-center gap-2 py-1">
+                    <input
+                        type="checkbox"
+                        checked={filters.belowThreshold}
+                        onChange={(e) => updateFilters({ ...filters, belowThreshold: e.target.checked })}
+                    />
+                    Sous le seuil uniquement
+                </label>
+            </div>
 
             <form onSubmit={handleSubmit} className="mb-4 flex flex-wrap gap-2">
                 <FormField
@@ -197,7 +294,7 @@ export default function Produits() {
                 loading={loading}
                 error={error}
                 isEmpty={!loading && !error && produits.length === 0}
-                emptyMessage="Aucun produit"
+                emptyMessage="Aucun produit ne correspond"
             />
             {apiError && (
                 <p role="alert" className="text-red-600">
@@ -226,6 +323,27 @@ export default function Produits() {
                     }
                 />
             )}
+
+            {/* Pagination : Précédent/Suivant modifient offset, le hook recharge la page */}
+            <div className="mt-4 flex items-center gap-4">
+                <button
+                    onClick={() => setOffset(offset - PRODUITS_PAGE_SIZE)}
+                    disabled={offset === 0}
+                    className="border rounded px-3 py-1 disabled:opacity-50"
+                >
+                    Précédent
+                </button>
+                <span>
+                    Page {currentPage} / {totalPages} ({total} produits)
+                </span>
+                <button
+                    onClick={() => setOffset(offset + PRODUITS_PAGE_SIZE)}
+                    disabled={currentPage >= totalPages}
+                    className="border rounded px-3 py-1 disabled:opacity-50"
+                >
+                    Suivant
+                </button>
+            </div>
         </div>
     );
 }
