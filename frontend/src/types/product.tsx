@@ -37,3 +37,27 @@ export interface ProduitUpdate {
     barcode?: string | null;
     reorder_threshold?: number;
 }
+
+export interface ProduitFilters{
+    search: string;
+    categoryId: string;
+    supplierId: string;
+    belowThreshold: boolean;
+}
+
+export const EMPTY_PRODUIT_FILTERS: ProduitFilters = {
+    search: '',
+    categoryId: '',
+    supplierId: '',
+    belowThreshold: false,
+};
+
+export const PRODUITS_PAGE_SIZE = 5;
+
+export interface ProduitsPage {
+    items: Produit[];
+    total: number;
+    limit: number;
+    offset: number;
+}
+
