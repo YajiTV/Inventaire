@@ -9,6 +9,7 @@ from app.core.config import get_settings
 from app.db.session import get_db
 from app.models.user import User
 from app.repositories import user_repository
+from app.schemas.enums import UserRole
 
 settings = get_settings()
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -58,3 +59,9 @@ def get_current_user(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Non authentifie")
 
     return user
+
+
+def require_admin(current_user: User = Depends(get_current_user)) -> User:
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Acces reserve aux administrateurs")
+    return current_user
