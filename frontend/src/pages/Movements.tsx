@@ -2,11 +2,16 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MovementsTable } from '../components/MovementsTable'
 import { useStockMovements } from '../hooks/useStockMovements'
+import { useProduits } from '../hooks/useProduct'
 import { EMPTY_MOVEMENT_FILTERS } from '../api/stockMovements'
 
 export default function Movements() {
   const [filters, setFilters] = useState(EMPTY_MOVEMENT_FILTERS)
-  const { movements, loading, error } = useStockMovements(filters)
+  const { movements, loading: movementsLoading, error: movementsError } = useStockMovements(filters)
+  const { produits, loading: productsLoading, error: productsError } = useProduits()
+
+  const loading = movementsLoading || productsLoading
+  const error = movementsError ?? productsError
 
   return (
     <section className="p-4 sm:p-8">
@@ -27,12 +32,19 @@ export default function Movements() {
           <label htmlFor="filter-product" className="mb-1 block text-sm">
             Produit
           </label>
-          <input
+          <select
             id="filter-product"
             value={filters.productId}
             onChange={(event) => setFilters({ ...filters, productId: event.target.value })}
             className="w-full rounded border px-2 py-1"
-          />
+          >
+            <option value="">Tous</option>
+            {produits.map((produit) => (
+              <option key={produit.id} value={produit.id}>
+                {produit.name} ({produit.sku})
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="flex-1">
@@ -71,7 +83,7 @@ export default function Movements() {
           {error}
         </p>
       )}
-      {!loading && error === null && <MovementsTable movements={movements} />}
+      {!loading && error === null && <MovementsTable movements={movements} products={produits} />}
     </section>
   )
 }
