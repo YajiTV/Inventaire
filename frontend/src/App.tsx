@@ -15,6 +15,7 @@ import Replenishment from './pages/Replenishment'
 import Orders from './pages/Orders'
 import OrderDetail from './pages/OrderDetail'
 import Users from './pages/Users'
+import Profile from './pages/Profile'
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
               <Route path="/orders" element={<Orders />} />
               <Route path="/orders/:id" element={<OrderDetail />} />
               <Route path="/users" element={<Users />} />
+              <Route path="/profile" element={<Profile />} />
             </Route>
           </Route>
         </Routes>
