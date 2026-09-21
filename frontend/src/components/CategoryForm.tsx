@@ -31,33 +31,39 @@ export function CategoryForm({ onSubmit }: CategoryFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-wrap gap-2 mb-4">
-      <div className="flex flex-col">
-        <label htmlFor="category-name">Nom</label>
-        <input
-          id="category-name"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          className="border rounded px-2 py-1"
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="mb-6 flex flex-col gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex-1">
+          <label htmlFor="category-name" className="mb-1 block text-sm">
+            Nom
+          </label>
+          <input
+            id="category-name"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            className="w-full rounded border px-2 py-1"
+          />
+        </div>
 
-      <div className="flex flex-col">
-        <label htmlFor="category-description">Description</label>
-        <input
-          id="category-description"
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
-          className="border rounded px-2 py-1"
-        />
-      </div>
+        <div className="flex-1">
+          <label htmlFor="category-description" className="mb-1 block text-sm">
+            Description
+          </label>
+          <input
+            id="category-description"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            className="w-full rounded border px-2 py-1"
+          />
+        </div>
 
-      <button type="submit" className="self-end border rounded px-3 py-1">
-        Ajouter
-      </button>
+        <button type="submit" className="rounded border px-3 py-1 hover:bg-gray-50">
+          Ajouter
+        </button>
+      </div>
 
       {errors.map((error) => (
-        <p key={error} role="alert" className="w-full text-red-600 text-sm">
+        <p key={error} role="alert" className="text-sm text-red-600">
           {error}
         </p>
       ))}

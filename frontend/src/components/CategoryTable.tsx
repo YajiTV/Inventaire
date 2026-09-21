@@ -15,7 +15,7 @@ export function CategoryTable({ categories, onUpdate, onDelete }: CategoryTableP
   const [editErrors, setEditErrors] = useState<string[]>([])
 
   if (categories.length === 0) {
-    return <p>Aucune catégorie</p>
+    return <p className="rounded border border-dashed p-6 text-center text-gray-600">Aucune catégorie.</p>
   }
 
   function startEdit(category: CategoryRead) {
@@ -53,72 +53,87 @@ export function CategoryTable({ categories, onUpdate, onDelete }: CategoryTableP
   }
 
   return (
-    <table className="w-full border-collapse">
-      <thead>
-        <tr>
-          <th className="text-left border-b p-2">Nom</th>
-          <th className="text-left border-b p-2">Description</th>
-          <th className="border-b p-2"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {categories.map((category) => (
-          <tr key={category.id}>
-            {editingId === category.id ? (
-              <>
-                <td className="p-2">
-                  <input
-                    value={editName}
-                    onChange={(event) => setEditName(event.target.value)}
-                    className="border rounded px-2 py-1"
-                  />
-                </td>
-                <td className="p-2">
-                  <input
-                    value={editDescription}
-                    onChange={(event) => setEditDescription(event.target.value)}
-                    className="border rounded px-2 py-1"
-                  />
-                </td>
-                <td className="p-2 space-x-2">
-                  <button onClick={() => saveEdit(category.id)} className="border rounded px-2 py-1">
-                    Enregistrer
-                  </button>
-                  <button onClick={cancelEdit} className="border rounded px-2 py-1">
-                    Annuler
-                  </button>
-                </td>
-              </>
-            ) : (
-              <>
-                <td className="p-2">{category.name}</td>
-                <td className="p-2">{category.description}</td>
-                <td className="p-2 space-x-2">
-                  <button onClick={() => startEdit(category)} className="border rounded px-2 py-1">
-                    Modifier
-                  </button>
-                  <button onClick={() => handleDelete(category)} className="border rounded px-2 py-1">
-                    Supprimer
-                  </button>
-                </td>
-              </>
-            )}
-          </tr>
-        ))}
-      </tbody>
-      {editErrors.length > 0 && (
-        <tfoot>
+    <div className="overflow-x-auto rounded border">
+      <table className="w-full border-collapse text-sm">
+        <thead className="bg-gray-50 text-left">
           <tr>
-            <td colSpan={3}>
-              {editErrors.map((error) => (
-                <p key={error} role="alert" className="text-red-600 text-sm p-2">
-                  {error}
-                </p>
-              ))}
-            </td>
+            <th className="px-3 py-2 font-medium">Nom</th>
+            <th className="px-3 py-2 font-medium">Description</th>
+            <th className="px-3 py-2 font-medium"></th>
           </tr>
-        </tfoot>
-      )}
-    </table>
+        </thead>
+        <tbody>
+          {categories.map((category) => (
+            <tr key={category.id} className="border-t">
+              {editingId === category.id ? (
+                <>
+                  <td className="px-3 py-2">
+                    <input
+                      value={editName}
+                      onChange={(event) => setEditName(event.target.value)}
+                      className="w-full min-w-32 rounded border px-2 py-1"
+                    />
+                  </td>
+                  <td className="px-3 py-2">
+                    <input
+                      value={editDescription}
+                      onChange={(event) => setEditDescription(event.target.value)}
+                      className="w-full min-w-32 rounded border px-2 py-1"
+                    />
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => saveEdit(category.id)}
+                        className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50"
+                      >
+                        Enregistrer
+                      </button>
+                      <button onClick={cancelEdit} className="rounded border px-2 py-1 hover:bg-gray-50">
+                        Annuler
+                      </button>
+                    </div>
+                  </td>
+                </>
+              ) : (
+                <>
+                  <td className="px-3 py-2 font-medium">{category.name}</td>
+                  <td className="px-3 py-2 text-gray-600">{category.description}</td>
+                  <td className="px-3 py-2">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => startEdit(category)}
+                        className="rounded border px-2 py-1 hover:bg-gray-50"
+                      >
+                        Modifier
+                      </button>
+                      <button
+                        onClick={() => handleDelete(category)}
+                        className="rounded border px-2 py-1 hover:bg-gray-50"
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  </td>
+                </>
+              )}
+            </tr>
+          ))}
+        </tbody>
+        {editErrors.length > 0 && (
+          <tfoot>
+            <tr className="border-t">
+              <td colSpan={3} className="px-3 py-2">
+                {editErrors.map((error) => (
+                  <p key={error} role="alert" className="text-sm text-red-600">
+                    {error}
+                  </p>
+                ))}
+              </td>
+            </tr>
+          </tfoot>
+        )}
+      </table>
+    </div>
   )
 }
