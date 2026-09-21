@@ -37,58 +37,70 @@ export function UserForm({ onSubmit }: UserFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-wrap gap-2 mb-4">
-      <div className="flex flex-col">
-        <label htmlFor="user-email">Email</label>
-        <input
-          id="user-email"
-          type="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          className="border rounded px-2 py-1"
-        />
+    <form onSubmit={handleSubmit} className="mb-6 flex flex-col gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <label htmlFor="user-email" className="mb-1 block text-sm">
+            Email
+          </label>
+          <input
+            id="user-email"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            className="w-full rounded border px-2 py-1"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="user-full-name" className="mb-1 block text-sm">
+            Nom complet
+          </label>
+          <input
+            id="user-full-name"
+            value={fullName}
+            onChange={(event) => setFullName(event.target.value)}
+            className="w-full rounded border px-2 py-1"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="user-password" className="mb-1 block text-sm">
+            Mot de passe
+          </label>
+          <input
+            id="user-password"
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            className="w-full rounded border px-2 py-1"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="user-role" className="mb-1 block text-sm">
+            Rôle
+          </label>
+          <select
+            id="user-role"
+            value={role}
+            onChange={(event) => setRole(event.target.value as UserRole)}
+            className="w-full rounded border px-2 py-1"
+          >
+            <option value="operator">Opérateur</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
       </div>
 
-      <div className="flex flex-col">
-        <label htmlFor="user-full-name">Nom complet</label>
-        <input
-          id="user-full-name"
-          value={fullName}
-          onChange={(event) => setFullName(event.target.value)}
-          className="border rounded px-2 py-1"
-        />
+      <div>
+        <button type="submit" className="rounded border px-3 py-1 hover:bg-gray-50">
+          Ajouter
+        </button>
       </div>
-
-      <div className="flex flex-col">
-        <label htmlFor="user-password">Mot de passe</label>
-        <input
-          id="user-password"
-          type="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          className="border rounded px-2 py-1"
-        />
-      </div>
-
-      <div className="flex flex-col">
-        <label htmlFor="user-role">Rôle</label>
-        <select
-          id="user-role"
-          value={role}
-          onChange={(event) => setRole(event.target.value as UserRole)}
-          className="border rounded px-2 py-1"
-        >
-          <option value="operator">Opérateur</option>
-          <option value="admin">Admin</option>
-        </select>
-      </div>
-
-      <button type="submit" className="self-end border rounded px-3 py-1">
-        Ajouter
-      </button>
 
       {errors.map((error) => (
-        <p key={error} role="alert" className="w-full text-red-600 text-sm">
+        <p key={error} role="alert" className="text-sm text-red-600">
           {error}
         </p>
       ))}

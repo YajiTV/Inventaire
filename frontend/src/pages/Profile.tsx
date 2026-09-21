@@ -11,7 +11,7 @@ export default function Profile() {
   const [saving, setSaving] = useState(false)
 
   if (user === null) {
-    return <p>Chargement du profil...</p>
+    return <p className="p-4 sm:p-8">Chargement du profil...</p>
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -33,46 +33,67 @@ export default function Profile() {
     }
   }
 
+  // Initiales pour l'avatar : premiere lettre des deux premiers mots du nom,
+  // l'email en secours tant que le nom est vide.
+  const initials = (user.full_name || user.email)
+    .split(' ')
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join('')
+
   return (
-    <section className="p-8">
-      <h1 className="text-xl font-semibold mb-4">Profil</h1>
+    <div className="p-4 sm:p-8">
+      <div className="mx-auto mt-10 max-w-sm rounded border p-6 shadow-sm sm:mt-20">
+        <div className="mb-6 flex flex-col items-center text-center">
+          <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gray-900 text-xl font-semibold text-white">
+            {initials}
+          </div>
+          <h1 className="text-2xl font-semibold">{user.full_name}</h1>
+          <p className="text-sm text-gray-500">{user.email}</p>
+          <span className="mt-2 rounded-full border px-3 py-0.5 text-xs text-gray-600">
+            {user.role === 'admin' ? 'Admin' : 'Opérateur'}
+          </span>
+        </div>
 
-      <dl className="mb-6">
-        <dt className="font-semibold">Email</dt>
-        <dd className="mb-2">{user.email}</dd>
-        <dt className="font-semibold">Rôle</dt>
-        <dd>{user.role === 'admin' ? 'Admin' : 'Opérateur'}</dd>
-      </dl>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 border-t pt-6">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="profile-full-name" className="text-sm text-gray-700">
+              Nom complet
+            </label>
+            <input
+              id="profile-full-name"
+              value={fullName}
+              onChange={(event) => setFullName(event.target.value)}
+              className="w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            />
+          </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2 max-w-sm">
-        <label htmlFor="profile-full-name">Nom complet</label>
-        <input
-          id="profile-full-name"
-          value={fullName}
-          onChange={(event) => setFullName(event.target.value)}
-          className="border rounded px-2 py-1"
-        />
+          {errors.map((error) => (
+            <p key={error} role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              {error}
+            </p>
+          ))}
 
-        <button type="submit" disabled={saving} className="self-start border rounded px-3 py-1">
-          {saving ? 'Enregistrement...' : 'Enregistrer'}
-        </button>
+          {saved && (
+            <p role="status" className="rounded border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+              Informations mises à jour.
+            </p>
+          )}
 
-        {errors.map((error) => (
-          <p key={error} role="alert" className="text-red-600 text-sm">
-            {error}
-          </p>
-        ))}
-
-        {saved && (
-          <p role="status" className="text-green-700 text-sm">
-            Informations mises à jour.
-          </p>
-        )}
-      </form>
-
-      <button type="button" onClick={() => logout()} className="mt-6 border rounded px-3 py-1">
-        Se déconnecter
-      </button>
-    </section>
+          <div className="flex items-center justify-between pt-2">
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded bg-gray-900 px-4 py-2 text-white hover:bg-gray-700 disabled:opacity-50"
+            >
+              {saving ? 'Enregistrement...' : 'Enregistrer'}
+            </button>
+            <button type="button" onClick={() => logout()} className="text-sm text-red-600 underline">
+              Se déconnecter
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   )
 }
