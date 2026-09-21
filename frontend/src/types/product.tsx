@@ -52,7 +52,7 @@ export const EMPTY_PRODUIT_FILTERS: ProduitFilters = {
     belowThreshold: false,
 };
 
-export const PRODUITS_PAGE_SIZE = 5;
+export const PRODUITS_PAGE_SIZE = 10;
 
 export interface ProduitsPage {
     items: Produit[];
