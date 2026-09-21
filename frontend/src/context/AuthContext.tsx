@@ -2,6 +2,8 @@ import { createContext, useEffect, useState, type ReactNode } from 'react'
 import type { AuthContextValue, User } from '../types/auth'
 import { apiFetch, registerAuth } from '../lib/api'
 import type { TokenResponse } from '../types/api'
+import {updateUser} from "../api/users";
+import type {UserUpdate} from "../types/api";
 
 export const AuthContext = createContext<AuthContextValue | null>(null)
 
@@ -39,6 +41,11 @@ export function AuthProvider({children}: {children: ReactNode}) {
         await apiFetch('/auth/logout', {method: 'POST'})
         setAccessToken(null)
         setUser(null)
+    }
+    async function updateProfile(data: UserUpdate): Promise<void> {
+        if (user === null) return
+        const updated = await updateUser(user.id, data)
+        setUser(updated)
     }
 
     // Pose un nouveau access token a partir du cookie refresh, renvoie le token
@@ -84,7 +91,8 @@ export function AuthProvider({children}: {children: ReactNode}) {
         login,
         register,
         logout,
-        refresh
+        refresh,
+        updateProfile
     }
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
