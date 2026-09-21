@@ -20,18 +20,18 @@ export default function Replenishment() {
   }
 
   return (
-    <section className="p-8">
-      <h1 className="text-xl font-semibold mb-4">Réapprovisionnement</h1>
+    <section className="p-4 sm:p-8">
+      <h1 className="mb-6 text-2xl font-semibold">Réapprovisionnement</h1>
 
-      <div className="mb-6">
-        <label htmlFor="location" className="block mb-1">
+      <div className="mb-6 max-w-sm">
+        <label htmlFor="location" className="mb-1 block text-sm">
           Emplacement de livraison
         </label>
         <select
           id="location"
           value={locationId ?? ''}
           onChange={(event) => setLocationId(event.target.value === '' ? null : Number(event.target.value))}
-          className="border rounded px-2 py-1"
+          className="w-full rounded border px-2 py-1"
           disabled={locationsLoading}
         >
           <option value="">Choisir...</option>
@@ -44,10 +44,16 @@ export default function Replenishment() {
       </div>
 
       {loading && <p>Chargement des suggestions...</p>}
-      {error !== null && <p role="alert">{error}</p>}
+      {!loading && error !== null && (
+        <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700">
+          {error}
+        </p>
+      )}
 
       {!loading && error === null && withSupplier.size === 0 && withoutSupplier.length === 0 && (
-        <p>Aucun produit sous le seuil de réapprovisionnement.</p>
+        <p className="rounded border border-dashed p-6 text-center text-gray-600">
+          Aucun produit sous le seuil de réapprovisionnement.
+        </p>
       )}
 
       {!loading &&
@@ -63,13 +69,13 @@ export default function Replenishment() {
         ))}
 
       {withoutSupplier.length > 0 && (
-        <div className="border rounded p-4 mt-4">
-          <h2 className="font-semibold mb-2">Sans fournisseur assigné</h2>
-          <p className="text-sm text-gray-600 mb-2">
+        <div className="mt-4 rounded border p-4">
+          <h2 className="mb-2 font-semibold">Sans fournisseur assigné</h2>
+          <p className="mb-2 text-sm text-gray-600">
             Ces produits sont sous le seuil mais n'ont pas de fournisseur associé : impossible de générer une
             commande automatiquement.
           </p>
-          <ul className="list-disc list-inside">
+          <ul className="list-inside list-disc text-sm">
             {withoutSupplier.map((s) => (
               <li key={s.product_id}>{s.product_name}</li>
             ))}

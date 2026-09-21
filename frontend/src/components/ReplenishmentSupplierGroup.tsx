@@ -42,42 +42,49 @@ export function ReplenishmentSupplierGroup({
   }
 
   return (
-    <div className="mb-6 border rounded p-4">
-      <h2 className="font-semibold mb-2">Fournisseur #{supplierId}</h2>
+    <div className="mb-6 rounded border p-4">
+      <h2 className="mb-3 font-semibold">Fournisseur #{supplierId}</h2>
 
-      <table className="w-full border-collapse mb-2">
-        <thead>
-          <tr>
-            <th className="text-left border-b p-2">Produit</th>
-            <th className="text-left border-b p-2">Quantité actuelle</th>
-            <th className="text-left border-b p-2">Seuil</th>
-            <th className="text-left border-b p-2">Quantité suggérée</th>
-          </tr>
-        </thead>
-        <tbody>
-          {suggestions.map((s) => (
-            <tr key={s.product_id}>
-              <td className="p-2">{s.product_name}</td>
-              <td className="p-2">{s.current_quantity}</td>
-              <td className="p-2">{s.reorder_threshold}</td>
-              <td className="p-2">{s.suggested_quantity}</td>
+      <div className="mb-3 overflow-x-auto rounded border">
+        <table className="w-full border-collapse text-sm">
+          <thead className="bg-gray-50 text-left">
+            <tr>
+              <th className="px-3 py-2 font-medium">Produit</th>
+              <th className="px-3 py-2 font-medium text-right">Quantité actuelle</th>
+              <th className="px-3 py-2 font-medium text-right">Seuil</th>
+              <th className="px-3 py-2 font-medium text-right">Quantité suggérée</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {suggestions.map((s) => (
+              <tr key={s.product_id} className="border-t">
+                <td className="px-3 py-2 font-medium">{s.product_name}</td>
+                <td className="px-3 py-2 text-right tabular-nums">{s.current_quantity}</td>
+                <td className="px-3 py-2 text-right tabular-nums text-gray-600">{s.reorder_threshold}</td>
+                <td className="px-3 py-2 text-right tabular-nums">{s.suggested_quantity}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <button type="button" onClick={handleGenerate} disabled={pending} className="border rounded px-3 py-1">
+      <button
+        type="button"
+        onClick={handleGenerate}
+        disabled={pending}
+        className="rounded border px-3 py-1 hover:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-400"
+      >
         {pending ? 'Génération...' : 'Générer la commande'}
       </button>
 
       {errors.map((error) => (
-        <p key={error} role="alert" className="text-red-600 text-sm mt-2">
+        <p key={error} role="alert" className="mt-2 text-sm text-red-600">
           {error}
         </p>
       ))}
 
       {result !== null && (
-        <p role="status" className="text-green-700 text-sm mt-2">
+        <p role="status" className="mt-2 text-sm text-green-700">
           Commande {result.reference} générée ({result.lines.length} ligne(s), total {result.total_price} €).
         </p>
       )}
