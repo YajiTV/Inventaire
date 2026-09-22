@@ -311,13 +311,13 @@ export default function Produits() {
                     renderActions={(p) =>
                         editingId === p.id ? (
                             <>
-                                <button onClick={() => saveEdit(p.id)}>Enregistrer</button>
-                                <button onClick={() => setEditingId(null)}>Annuler</button>
+                                <button onClick={() => saveEdit(p.id)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Enregistrer</button>
+                                <button onClick={() => setEditingId(null)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Annuler</button>
                             </>
                         ) : (
                             <>
-                                <button onClick={() => startEdit(p)}>Modifier</button>
-                                <button onClick={() => handleDelete(p.id)}>Supprimer</button>
+                                <button onClick={() => startEdit(p)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Modifier</button>
+                                <button onClick={() => handleDelete(p.id)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Supprimer</button>
                             </>
                         )
                     }
