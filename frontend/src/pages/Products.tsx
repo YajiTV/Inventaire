@@ -204,8 +204,8 @@ export default function Produits() {
     ];
 
     return (
-        <div className="p-8">
-            <h1>Produits</h1>
+        <div className="p-4 sm:p-8">
+            <h1 className="mb-6 text-2xl font-semibold">Produits</h1>
 
             {/* Barre de filtres : chaque changement met à jour l'objet filters,
                 ce qui relance le chargement de la liste (voir useProduits) */}
