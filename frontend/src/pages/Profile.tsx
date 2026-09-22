@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
-import { validateFullName } from '../lib/users'
+import { getInitials, validateFullName } from '../lib/users'
 
 export default function Profile() {
   const { user, updateProfile, logout } = useAuth()
@@ -33,13 +33,7 @@ export default function Profile() {
     }
   }
 
-  // Initiales pour l'avatar : premiere lettre des deux premiers mots du nom,
-  // l'email en secours tant que le nom est vide.
-  const initials = (user.full_name || user.email)
-    .split(' ')
-    .slice(0, 2)
-    .map((word) => word.charAt(0).toUpperCase())
-    .join('')
+  const initials = getInitials(user.full_name, user.email)
 
   return (
     <div className="p-4 sm:p-8">
