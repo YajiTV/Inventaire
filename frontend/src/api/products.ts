@@ -16,6 +16,13 @@ export async function getProducts(filters: ProductFilters, offset: number): Prom
     return res.json();
 }
 
+// ponytail: capped at the API max page size (100), paginate if the catalogue grows past it
+export async function getAllProducts(): Promise<ProductRead[]> {
+    const res = await apiFetch("/products?limit=100");
+    const page: PageProductRead = await res.json();
+    return page.items;
+}
+
 export async function getProduct(id: number): Promise<ProductRead> {
     const res = await apiFetch(`/products/${id}`);
     return res.json();

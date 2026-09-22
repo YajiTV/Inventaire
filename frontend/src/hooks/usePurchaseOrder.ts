@@ -1,21 +1,8 @@
-import { useEffect, useState } from "react";
-import { getPurchaseOrder } from "../api/purchaseOrders";
-import type { PurchaseOrderRead } from "../types/api";
+import { getPurchaseOrder } from '../api/purchaseOrders'
+import type { PurchaseOrderRead } from '../types/api'
+import { useFetch } from './useFetch'
 
-export function usePurchaseOrder(id: number): {
-    order: PurchaseOrderRead | null;
-    loading: boolean;
-    error: string | null;
-} {
-    const [order, setOrder] = useState<PurchaseOrderRead | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        getPurchaseOrder(id)
-            .then(data => setOrder(data))
-            .catch(err => setError(err.message))
-            .finally(() => setLoading(false));
-    }, [id]);
-    return { order, loading, error };
+export function usePurchaseOrder(id: number) {
+  const { data: order, loading, error } = useFetch<PurchaseOrderRead | null>(() => getPurchaseOrder(id), null, id)
+  return { order, loading, error }
 }
