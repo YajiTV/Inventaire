@@ -18,6 +18,33 @@ function computeTotalPrice(lines: OrderLineRead[]): string {
     return total.toFixed(2)
 }
 
+// Shared with the replenishment handler: a generated order must show up in the orders list
+export function createPurchaseOrder(payload: PurchaseOrderCreate): PurchaseOrderRead {
+    const orderId = nextOrderId++
+    const lines: OrderLineRead[] = payload.lines.map((line) => ({
+        id: nextLineId++,
+        order_id: orderId,
+        product_id: line.product_id,
+        quantity: line.quantity,
+        unit_price: String(line.unit_price)
+    }))
+
+    const created: PurchaseOrderRead = {
+        id: orderId,
+        reference: payload.reference || `REPL-${orderId}`,
+        supplier_id: payload.supplier_id,
+        location_id: payload.location_id,
+        status: 'draft',
+        total_price: computeTotalPrice(lines),
+        ordered_at: new Date().toISOString(),
+        received_at: null,
+        lines: lines
+    }
+    purchaseOrders.push(created)
+    saveMock('purchase-orders', purchaseOrders)
+    return created
+}
+
 export const purchaseOrderHandlers = [
     http.get('*/purchase-orders', ({request}) => {
         const url = new URL(request.url)
@@ -35,32 +62,7 @@ export const purchaseOrderHandlers = [
 
     http.post('*/purchase-orders', async ({request}) => {
         const payload = (await request.json()) as PurchaseOrderCreate
-
-        const lines: OrderLineRead[] = []
-        for (const line of payload.lines) {
-            lines.push({
-                id: nextLineId++,
-                order_id: nextOrderId,
-                product_id: line.product_id,
-                quantity: line.quantity,
-                unit_price: String(line.unit_price)
-            })
-        }
-
-        const created: PurchaseOrderRead = {
-            id: nextOrderId++,
-            reference: payload.reference,
-            supplier_id: payload.supplier_id,
-            location_id: payload.location_id,
-            status: 'draft',
-            total_price: computeTotalPrice(lines),
-            ordered_at: new Date().toISOString(),
-            received_at: null,
-            lines: lines
-        }
-        purchaseOrders.push(created)
-        saveMock('purchase-orders', purchaseOrders)
-        return HttpResponse.json(created, {status: 201})
+        return HttpResponse.json(createPurchaseOrder(payload), {status: 201})
     }),
 
     http.get('*/purchase-orders/:id', ({params}) => {

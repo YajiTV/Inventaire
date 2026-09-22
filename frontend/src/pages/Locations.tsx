@@ -2,11 +2,14 @@ import type { FormEvent } from 'react'
 import { useState } from 'react'
 import { useLocations } from '../hooks/useLocations'
 import { validateLocation } from '../lib/locations'
-import { ApiError } from '../lib/api'
+import { useActionFeedback } from '../hooks/useActionFeedback'
 import { DataTable } from '../components/DataTable'
 import type { DataTableColumn } from '../components/DataTable'
 import { FormField } from '../components/FormField'
 import { StatusMessage } from '../components/StatusMessage'
+import { ActionFeedback } from '../components/ActionFeedback'
+import { ErrorList } from '../components/ErrorList'
+import { Button } from '../components/Button'
 import type { LocationRead } from '../types/api'
 
 export default function Locations() {
@@ -23,13 +26,11 @@ export default function Locations() {
   const [editDescription, setEditDescription] = useState('')
   const [editErrors, setEditErrors] = useState<string[]>([])
 
-  const [apiError, setApiError] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const feedback = useActionFeedback()
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
-    setApiError(null)
-    setSuccessMessage(null)
+    feedback.clear()
 
     const payload = {
       code: code.trim(),
@@ -41,14 +42,11 @@ export default function Locations() {
     setFormErrors(found)
     if (found.length > 0) return
 
-    try {
-      await addLocation(payload)
+    const added = await feedback.run(() => addLocation(payload), 'Emplacement ajouté avec succès.')
+    if (added) {
       setCode('')
       setName('')
       setDescription('')
-      setSuccessMessage('Emplacement ajouté avec succès.')
-    } catch (err) {
-      setApiError(err instanceof ApiError ? err.message : 'Erreur inattendue')
     }
   }
 
@@ -66,9 +64,6 @@ export default function Locations() {
   }
 
   async function saveEdit(id: number) {
-    setApiError(null)
-    setSuccessMessage(null)
-
     const payload = {
       code: editCode.trim(),
       name: editName.trim(),
@@ -79,27 +74,15 @@ export default function Locations() {
     setEditErrors(found)
     if (found.length > 0) return
 
-    try {
-      await editLocation(id, payload)
-      setEditingId(null)
-      setSuccessMessage('Emplacement modifié avec succès.')
-    } catch (err) {
-      setApiError(err instanceof ApiError ? err.message : 'Erreur inattendue')
-    }
+    const saved = await feedback.run(() => editLocation(id, payload), 'Emplacement modifié avec succès.')
+    if (saved) setEditingId(null)
   }
 
   async function handleDelete(location: LocationRead) {
     const confirmed = window.confirm(`Supprimer l'emplacement "${location.name}" ?`)
     if (!confirmed) return
 
-    setApiError(null)
-    setSuccessMessage(null)
-    try {
-      await removeLocation(location.id)
-      setSuccessMessage('Emplacement supprimé avec succès.')
-    } catch (err) {
-      setApiError(err instanceof ApiError ? err.message : 'Erreur inattendue')
-    }
+    await feedback.run(() => removeLocation(location.id), 'Emplacement supprimé avec succès.')
   }
 
   const columns: DataTableColumn<LocationRead>[] = [
@@ -133,21 +116,15 @@ export default function Locations() {
   ]
 
   return (
-    <div className="p-8">
-      <h1 className="text-xl font-semibold mb-4">Emplacements</h1>
+    <div className="p-4 sm:p-8">
+      <h1 className="mb-6 text-2xl font-semibold">Emplacements</h1>
 
-      <form onSubmit={handleSubmit} className="mb-4 flex flex-wrap gap-2">
+      <form onSubmit={handleSubmit} noValidate className="mb-4 flex flex-wrap gap-2">
         <FormField id="code" label="Code" value={code} onChange={setCode} placeholder="RESERVE-01" required />
         <FormField id="name" label="Nom" value={name} onChange={setName} required />
         <FormField id="description" label="Description" value={description} onChange={setDescription} />
-        <button type="submit" className="self-end border rounded px-3 py-1">
-          Ajouter
-        </button>
-        {formErrors.map((err) => (
-          <p key={err} role="alert" className="w-full text-red-600 text-sm">
-            {err}
-          </p>
-        ))}
+        <Button type="submit">Ajouter</Button>
+        <ErrorList errors={formErrors} />
       </form>
 
       <StatusMessage
@@ -156,17 +133,8 @@ export default function Locations() {
         isEmpty={!loading && !error && locations.length === 0}
         emptyMessage="Aucun emplacement"
       />
-      {apiError && (
-        <p role="alert" className="text-red-600">
-          {apiError}
-        </p>
-      )}
-      {successMessage && <p className="text-green-600">{successMessage}</p>}
-      {editErrors.map((err) => (
-        <p key={err} role="alert" className="text-red-600 text-sm">
-          {err}
-        </p>
-      ))}
+      <ActionFeedback error={feedback.error} success={feedback.success} />
+      <ErrorList errors={editErrors} />
 
       {!loading && !error && locations.length > 0 && (
         <DataTable
@@ -176,13 +144,13 @@ export default function Locations() {
           renderActions={(l) =>
             editingId === l.id ? (
               <>
-                <button onClick={() => saveEdit(l.id)}>Enregistrer</button>
-                <button onClick={cancelEdit}>Annuler</button>
+                <Button onClick={() => saveEdit(l.id)}>Enregistrer</Button>
+                <Button onClick={cancelEdit}>Annuler</Button>
               </>
             ) : (
               <>
-                <button onClick={() => startEdit(l)}>Modifier</button>
-                <button onClick={() => handleDelete(l)}>Supprimer</button>
+                <Button onClick={() => startEdit(l)}>Modifier</Button>
+                <Button onClick={() => handleDelete(l)}>Supprimer</Button>
               </>
             )
           }

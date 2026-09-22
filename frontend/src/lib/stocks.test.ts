@@ -54,8 +54,8 @@ describe('buildStockRows', () => {
   it('reste lisible quand le produit ou l emplacement est inconnu', () => {
     const rows = buildStockRows(stocks, products, locations)
 
-    expect(rows[2].productName).toBe('Produit #99')
-    expect(rows[2].locationName).toBe('Emplacement #42')
+    expect(rows[2].productName).toBe('Produit supprimé')
+    expect(rows[2].locationName).toBe('Emplacement supprimé')
     expect(rows[2].belowThreshold).toBe(false)
   })
 })

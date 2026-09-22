@@ -21,9 +21,21 @@ export const productHandlers = [
         const url = new URL(request.url);
         const limit = Number(url.searchParams.get("limit") ?? 20);
         const offset = Number(url.searchParams.get("offset") ?? 0);
+        const q = url.searchParams.get("q")?.toLowerCase();
+        const categoryId = url.searchParams.get("category_id");
+        const supplierId = url.searchParams.get("supplier_id");
+        const belowThreshold = url.searchParams.get("below_threshold") === "true";
+
+        const matching = products.filter(p =>
+            (!q || [p.name, p.sku, p.barcode ?? ""].some(value => value.toLowerCase().includes(q))) &&
+            (!categoryId || p.category_id === Number(categoryId)) &&
+            (!supplierId || p.supplier_id === Number(supplierId)) &&
+            (!belowThreshold || p.total_quantity <= p.reorder_threshold)
+        );
+
         return HttpResponse.json({
-            items: products.slice(offset, offset + limit),
-            total: products.length,
+            items: matching.slice(offset, offset + limit),
+            total: matching.length,
             limit,
             offset,
         });

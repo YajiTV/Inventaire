@@ -2,12 +2,12 @@ import { useMemo, useState } from 'react'
 import { StockTable } from '../components/StockTable'
 import { useStocks } from '../hooks/useStocks'
 import { useLocations } from '../hooks/useLocations'
-import { useProducts } from '../hooks/useProducts'
+import { useAllProducts } from '../hooks/useProducts'
 import { EMPTY_STOCK_FILTERS, buildStockRows, filterStockRows, summarize } from '../lib/stocks'
 
 export default function Stocks() {
   const { stocks, loading: stocksLoading, error: stocksError } = useStocks()
-  const { products, loading: productsLoading, error: productsError } = useProducts()
+  const { products, loading: productsLoading, error: productsError } = useAllProducts()
   const { locations, loading: locationsLoading, error: locationsError } = useLocations()
   const [filters, setFilters] = useState(EMPTY_STOCK_FILTERS)
 

@@ -6,11 +6,15 @@ import { useSuppliers } from "../hooks/useSuppliers";
 import { EMPTY_PRODUCT_FILTERS, PRODUCTS_PAGE_SIZE } from "../lib/products";
 import type { ProductFilters } from "../lib/products";
 import type { ProductRead } from "../types/api";
-import { ApiError } from "../lib/api";
+import { useActionFeedback } from "../hooks/useActionFeedback";
 import { DataTable } from "../components/DataTable";
 import type { DataTableColumn } from "../components/DataTable";
 import { FormField } from "../components/FormField";
+import { SelectField } from "../components/SelectField";
 import { StatusMessage } from "../components/StatusMessage";
+import { ActionFeedback } from "../components/ActionFeedback";
+import { ErrorList } from "../components/ErrorList";
+import { Button } from "../components/Button";
 
 const SKU_PATTERN = /^[A-Z0-9-]+$/;
 
@@ -27,14 +31,15 @@ export default function Products() {
     const [name, setName] = useState("");
     const [unitPrice, setUnitPrice] = useState("");
     const [categoryId, setCategoryId] = useState("");
+    const [supplierId, setSupplierId] = useState("");
 
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editName, setEditName] = useState("");
     const [editUnitPrice, setEditUnitPrice] = useState("");
 
     const [errors, setErrors] = useState<{sku?: string; name?: string; unitPrice?: string; categoryId?: string}>({});
-    const [apiError, setApiError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [editErrors, setEditErrors] = useState<string[]>([]);
+    const feedback = useActionFeedback();
 
     const totalPages = Math.max(1, Math.ceil(total / PRODUCTS_PAGE_SIZE));
     const currentPage = offset / PRODUCTS_PAGE_SIZE + 1;
@@ -45,7 +50,11 @@ export default function Products() {
     }
 
     function categoryName(id: number): string {
-        return categories.find((c) => c.id === id)?.name ?? String(id);
+        return categories.find((c) => c.id === id)?.name ?? "";
+    }
+
+    function supplierName(id: number | null | undefined): string {
+        return suppliers.find((s) => s.id === id)?.name ?? "Aucun";
     }
 
     function validate(): boolean {
@@ -57,7 +66,7 @@ export default function Products() {
             newErrors.sku = "Format de SKU invalide (majuscules, chiffres et tirets uniquement, ex: PAIN-BIGM-001).";
         }
         if (!name.trim()) newErrors.name = "Le nom est obligatoire.";
-        if (!categoryId) newErrors.categoryId = "L'ID de catégorie est obligatoire.";
+        if (!categoryId) newErrors.categoryId = "La catégorie est obligatoire.";
 
         const price = Number(unitPrice);
         if (!unitPrice.trim()) {
@@ -72,27 +81,28 @@ export default function Products() {
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        setApiError(null);
-        setSuccessMessage(null);
+        feedback.clear();
 
         if (!validate()) return;
 
-        try {
-            await addProduct({
-                sku,
-                name,
-                unit_price: unitPrice,
-                category_id: Number(categoryId),
-                reorder_threshold: 0,
-            });
+        const added = await feedback.run(
+            () =>
+                addProduct({
+                    sku: sku.trim(),
+                    name: name.trim(),
+                    unit_price: unitPrice,
+                    category_id: Number(categoryId),
+                    supplier_id: supplierId === "" ? null : Number(supplierId),
+                    reorder_threshold: 0,
+                }),
+            "Produit ajouté avec succès.",
+        );
+        if (added) {
             setSku("");
             setName("");
             setUnitPrice("");
             setCategoryId("");
-            setErrors({});
-            setSuccessMessage("Produit ajouté avec succès");
-        } catch (err) {
-            setApiError(err instanceof ApiError ? err.message : "Erreur inattendue");
+            setSupplierId("");
         }
     }
 
@@ -100,42 +110,32 @@ export default function Products() {
         setEditingId(p.id);
         setEditName(p.name);
         setEditUnitPrice(String(p.unit_price));
+        setEditErrors([]);
     }
 
     async function saveEdit(id: number) {
-        setApiError(null);
-        setSuccessMessage(null);
-
-        if (!editName.trim()) {
-            setApiError("Le nom est obligatoire");
-            return;
-        }
+        const found: string[] = [];
+        if (!editName.trim()) found.push("Le nom est obligatoire.");
         if (Number.isNaN(Number(editUnitPrice)) || Number(editUnitPrice) <= 0) {
-            setApiError("Le prix doit être un nombre positif");
-            return;
+            found.push("Le prix doit être un nombre positif.");
         }
+        setEditErrors(found);
+        if (found.length > 0) return;
 
-        try {
-            await editProduct(id, { name: editName, unit_price: editUnitPrice });
-            setEditingId(null);
-            setSuccessMessage("Produit modifié avec succès");
-        } catch (err) {
-            setApiError(err instanceof ApiError ? err.message : "Erreur inattendue");
-        }
+        const saved = await feedback.run(
+            () => editProduct(id, { name: editName.trim(), unit_price: editUnitPrice }),
+            "Produit modifié avec succès.",
+        );
+        if (saved) setEditingId(null);
     }
 
-    async function handleDelete(id: number) {
-        setApiError(null);
-        setSuccessMessage(null);
-        try {
-            await removeProduct(id);
-            // Deleted the last item of a page: go back one page instead of showing an empty one
-            if (products.length === 1 && offset > 0) {
-                setOffset(offset - PRODUCTS_PAGE_SIZE);
-            }
-            setSuccessMessage("Produit supprimé avec succès");
-        } catch (err) {
-            setApiError(err instanceof ApiError ? err.message : "Erreur inattendue");
+    async function handleDelete(p: ProductRead) {
+        if (!window.confirm(`Supprimer le produit "${p.name}" ?`)) return;
+
+        const deleted = await feedback.run(() => removeProduct(p.id), "Produit supprimé avec succès.");
+        // Deleted the last item of a page: go back one page instead of showing an empty one
+        if (deleted && products.length === 1 && offset > 0) {
+            setOffset(offset - PRODUCTS_PAGE_SIZE);
         }
     }
 
@@ -153,6 +153,7 @@ export default function Products() {
                 ),
         },
         { header: "Catégorie", render: (p) => categoryName(p.category_id) },
+        { header: "Fournisseur", render: (p) => supplierName(p.supplier_id) },
         {
             header: "Prix",
             render: (p) =>
@@ -190,38 +191,22 @@ export default function Products() {
                     onChange={(value) => updateFilters({ ...filters, search: value })}
                     placeholder="Nom, SKU ou code-barres"
                 />
-                <div className="flex flex-col">
-                    <label htmlFor="filter-category">Catégorie</label>
-                    <select
-                        id="filter-category"
-                        value={filters.categoryId}
-                        onChange={(e) => updateFilters({ ...filters, categoryId: e.target.value })}
-                        className="border rounded px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
-                    >
-                        <option value="">Toutes</option>
-                        {categories.map((c) => (
-                            <option key={c.id} value={c.id}>
-                                {c.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="flex flex-col">
-                    <label htmlFor="filter-supplier">Fournisseur</label>
-                    <select
-                        id="filter-supplier"
-                        value={filters.supplierId}
-                        onChange={(e) => updateFilters({ ...filters, supplierId: e.target.value })}
-                        className="border rounded px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
-                    >
-                        <option value="">Tous</option>
-                        {suppliers.map((f) => (
-                            <option key={f.id} value={f.id}>
-                                {f.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                <SelectField
+                    id="filter-category"
+                    label="Catégorie"
+                    value={filters.categoryId}
+                    onChange={(value) => updateFilters({ ...filters, categoryId: value })}
+                    options={categories.map((c) => ({ value: c.id, label: c.name }))}
+                    placeholder="Toutes"
+                />
+                <SelectField
+                    id="filter-supplier"
+                    label="Fournisseur"
+                    value={filters.supplierId}
+                    onChange={(value) => updateFilters({ ...filters, supplierId: value })}
+                    options={suppliers.map((s) => ({ value: s.id, label: s.name }))}
+                    placeholder="Tous"
+                />
                 <label className="flex items-center gap-2 py-1">
                     <input
                         type="checkbox"
@@ -232,7 +217,7 @@ export default function Products() {
                 </label>
             </div>
 
-            <form onSubmit={handleSubmit} className="mb-4 flex flex-wrap gap-2">
+            <form onSubmit={handleSubmit} noValidate className="mb-4 flex flex-wrap gap-2">
                 <FormField
                     id="sku"
                     label="SKU"
@@ -249,18 +234,27 @@ export default function Products() {
                     value={unitPrice}
                     onChange={setUnitPrice}
                     error={errors.unitPrice}
-                />
-                <FormField
-                    id="category-id"
-                    label="ID catégorie"
-                    value={categoryId}
-                    onChange={setCategoryId}
-                    error={errors.categoryId}
+                    placeholder="1.50"
                     required
                 />
-                <button type="submit" className="self-end border rounded px-3 py-1 dark:border-gray-600">
-                    Ajouter
-                </button>
+                <SelectField
+                    id="category-id"
+                    label="Catégorie"
+                    value={categoryId}
+                    onChange={setCategoryId}
+                    options={categories.map((c) => ({ value: c.id, label: c.name }))}
+                    placeholder="Choisir..."
+                    error={errors.categoryId}
+                />
+                <SelectField
+                    id="supplier-id"
+                    label="Fournisseur"
+                    value={supplierId}
+                    onChange={setSupplierId}
+                    options={suppliers.map((s) => ({ value: s.id, label: s.name }))}
+                    placeholder="Aucun"
+                />
+                <Button type="submit">Ajouter</Button>
             </form>
 
             <StatusMessage
@@ -269,12 +263,8 @@ export default function Products() {
                 isEmpty={!loading && !error && products.length === 0}
                 emptyMessage="Aucun produit ne correspond"
             />
-            {apiError && (
-                <p role="alert" className="text-red-600 dark:text-red-400">
-                    {apiError}
-                </p>
-            )}
-            {successMessage && <p className="text-green-600 dark:text-green-400">{successMessage}</p>}
+            <ActionFeedback error={feedback.error} success={feedback.success} />
+            <ErrorList errors={editErrors} />
 
             {!loading && !error && products.length > 0 && (
                 <DataTable
@@ -284,13 +274,13 @@ export default function Products() {
                     renderActions={(p) =>
                         editingId === p.id ? (
                             <>
-                                <button onClick={() => saveEdit(p.id)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Enregistrer</button>
-                                <button onClick={() => setEditingId(null)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Annuler</button>
+                                <Button onClick={() => saveEdit(p.id)}>Enregistrer</Button>
+                                <Button onClick={() => setEditingId(null)}>Annuler</Button>
                             </>
                         ) : (
                             <>
-                                <button onClick={() => startEdit(p)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Modifier</button>
-                                <button onClick={() => handleDelete(p.id)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Supprimer</button>
+                                <Button onClick={() => startEdit(p)}>Modifier</Button>
+                                <Button onClick={() => handleDelete(p)}>Supprimer</Button>
                             </>
                         )
                     }
@@ -298,23 +288,15 @@ export default function Products() {
             )}
 
             <div className="mt-4 flex items-center gap-4">
-                <button
-                    onClick={() => setOffset(offset - PRODUCTS_PAGE_SIZE)}
-                    disabled={offset === 0}
-                    className="border rounded px-3 py-1 disabled:opacity-50 dark:border-gray-600"
-                >
+                <Button onClick={() => setOffset(offset - PRODUCTS_PAGE_SIZE)} disabled={offset === 0}>
                     Précédent
-                </button>
+                </Button>
                 <span>
                     Page {currentPage} / {totalPages} ({total} produits)
                 </span>
-                <button
-                    onClick={() => setOffset(offset + PRODUCTS_PAGE_SIZE)}
-                    disabled={currentPage >= totalPages}
-                    className="border rounded px-3 py-1 disabled:opacity-50 dark:border-gray-600"
-                >
+                <Button onClick={() => setOffset(offset + PRODUCTS_PAGE_SIZE)} disabled={currentPage >= totalPages}>
                     Suivant
-                </button>
+                </Button>
             </div>
         </div>
     );

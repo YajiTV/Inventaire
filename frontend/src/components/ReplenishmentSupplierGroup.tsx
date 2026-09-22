@@ -4,6 +4,7 @@ import { validateTrigger } from '../lib/replenishment'
 
 type ReplenishmentSupplierGroupProps = {
   supplierId: number
+  supplierName: string
   suggestions: ReplenishmentSuggestion[]
   locationId: number | null
   onTrigger: (supplierId: number, productIds: number[], locationId: number) => Promise<PurchaseOrderRead>
@@ -11,6 +12,7 @@ type ReplenishmentSupplierGroupProps = {
 
 export function ReplenishmentSupplierGroup({
   supplierId,
+  supplierName,
   suggestions,
   locationId,
   onTrigger,
@@ -43,7 +45,7 @@ export function ReplenishmentSupplierGroup({
 
   return (
     <div className="mb-6 rounded border p-4 dark:border-gray-700">
-      <h2 className="mb-3 font-semibold">Fournisseur #{supplierId}</h2>
+      <h2 className="mb-3 font-semibold">{supplierName}</h2>
 
       <div className="mb-3 overflow-x-auto rounded border dark:border-gray-700">
         <table className="w-full border-collapse text-sm">

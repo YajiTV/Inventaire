@@ -43,9 +43,9 @@ export function buildStockRows(
     return {
       id: stock.id,
       locationId: stock.location_id,
-      productName: product?.name ?? `Produit #${stock.product_id}`,
+      productName: product?.name ?? 'Produit supprimé',
       productSku: product?.sku ?? '',
-      locationName: location?.name ?? `Emplacement #${stock.location_id}`,
+      locationName: location?.name ?? 'Emplacement supprimé',
       locationCode: location?.code ?? '',
       quantity: stock.quantity,
       totalQuantity,

@@ -1,11 +1,22 @@
 import { Link, useParams } from "react-router-dom";
 import { OrderLinesTable } from "../components/OrderLinesTable";
 import { usePurchaseOrder } from "../hooks/usePurchaseOrder";
+import { useAllProducts } from "../hooks/useProducts";
+import { useSuppliers } from "../hooks/useSuppliers";
+import { useLocations } from "../hooks/useLocations";
 import { orderStatusLabel } from "../lib/purchaseOrders";
 
 export default function OrderDetail() {
     const { id } = useParams();
-    const { order, loading, error } = usePurchaseOrder(Number(id));
+    const { order, loading: orderLoading, error: orderError } = usePurchaseOrder(Number(id));
+    const { products, loading: productsLoading, error: productsError } = useAllProducts();
+    const { suppliers, loading: suppliersLoading, error: suppliersError } = useSuppliers();
+    const { locations, loading: locationsLoading, error: locationsError } = useLocations();
+
+    const loading = orderLoading || productsLoading || suppliersLoading || locationsLoading;
+    const error = orderError ?? productsError ?? suppliersError ?? locationsError;
+    const supplier = suppliers.find(s => s.id === order?.supplier_id);
+    const location = locations.find(l => l.id === order?.location_id);
 
     return (
         <section className="p-4 sm:p-8">
@@ -36,7 +47,15 @@ export default function OrderDetail() {
 
             {!loading && error === null && order !== null && (
                 <>
-                    <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="rounded border p-3 dark:border-gray-700">
+                            <div className="text-xs text-gray-500 dark:text-gray-400">Fournisseur</div>
+                            <div className="text-xl font-semibold">{supplier?.name ?? "Inconnu"}</div>
+                        </div>
+                        <div className="rounded border p-3 dark:border-gray-700">
+                            <div className="text-xs text-gray-500 dark:text-gray-400">Livraison</div>
+                            <div className="text-xl font-semibold">{location?.name ?? "Inconnu"}</div>
+                        </div>
                         <div className="rounded border p-3 dark:border-gray-700">
                             <div className="text-xs text-gray-500 dark:text-gray-400">Statut</div>
                             <div className="text-xl font-semibold">{orderStatusLabel(order.status)}</div>
@@ -47,7 +66,7 @@ export default function OrderDetail() {
                         </div>
                     </div>
 
-                    <OrderLinesTable lines={order.lines} />
+                    <OrderLinesTable lines={order.lines} products={products} />
                 </>
             )}
         </section>
