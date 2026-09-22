@@ -3,7 +3,7 @@ import { useAuth } from '../hooks/useAuth'
 import { ThemeToggle } from './ThemeToggle'
 
 const links = [
-  {to: '/', label: 'Home'},
+  {to: '/', label: 'Accueil'},
   { to: '/stocks', label: 'Stocks' },
   { to: '/movements', label: 'Mouvements' },
   { to: '/products', label: 'Produits' },
