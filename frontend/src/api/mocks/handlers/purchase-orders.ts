@@ -10,7 +10,6 @@ let purchaseOrders: PurchaseOrderRead[] = loadMock('purchase-orders', seedOrders
 let nextOrderId = nextIdFrom(purchaseOrders)
 let nextLineId = nextIdFrom(purchaseOrders.flatMap((order) => order.lines))
 
-// Additionne quantite * prix unitaire de chaque ligne pour obtenir le total de la commande
 function computeTotalPrice(lines: OrderLineRead[]): string {
     let total = 0
     for (const line of lines) {

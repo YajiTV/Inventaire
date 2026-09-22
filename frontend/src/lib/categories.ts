@@ -3,8 +3,6 @@ import type { CategoryCreate } from '../types/api'
 const NAME_MAX_LENGTH = 80
 const DESCRIPTION_MAX_LENGTH = 500
 
-// Reprend exactement les contraintes du schema Pydantic CategoryBase
-// (backend/app/schemas/category.py) pour eviter un 422 evitable.
 export function validateCategory(category: CategoryCreate): string[] {
   const errors: string[] = []
   const name = category.name.trim()

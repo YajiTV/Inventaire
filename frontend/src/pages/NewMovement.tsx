@@ -14,7 +14,6 @@ export default function NewMovement() {
       await createMovement(movement)
       navigate('/movements')
     } catch (err) {
-      // Le 409 « stock insuffisant » arrive ici avec son detail : on l'affiche tel quel.
       setServerError((err as Error).message)
     }
   }

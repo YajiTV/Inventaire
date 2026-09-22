@@ -7,7 +7,6 @@ let products: ProductRead[] = loadMock("products", [...seedProducts]);
 
 let nextId = nextIdFrom(products);
 
-// Donnees fixes locales pour /products/lookup : aucun appel reseau sortant, seul ce code-barres est connu.
 const knownLookups: Record<string, ProductLookup> = {
     "3017620422003": {
         barcode: "3017620422003",

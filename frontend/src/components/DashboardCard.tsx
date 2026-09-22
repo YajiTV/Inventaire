@@ -6,7 +6,6 @@ interface DashboardCardProps {
   value: number
   loading?: boolean
   error?: string | null
-  // Affiche le nombre en rouge quand la valeur demande une action (ex : produits sous le seuil)
   alert?: boolean
 }
 

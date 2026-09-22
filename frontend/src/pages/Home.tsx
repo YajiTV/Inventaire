@@ -12,7 +12,6 @@ import { DashboardCard } from '../components/DashboardCard'
 import { MovementsTable } from '../components/MovementsTable'
 import { StatusMessage } from '../components/StatusMessage'
 
-// Nombre d'éléments affichés dans chaque encart de l'accueil
 const PREVIEW_SIZE = 5
 
 const QUICK_ACTIONS = [
@@ -33,8 +32,6 @@ const BUTTON = 'rounded border px-3 py-2 text-sm hover:bg-gray-50 dark:border-gr
 
 export default function Home() {
   const { isAuthenticated } = useAuth()
-  // Deux composants séparés : les appels API du tableau de bord ne partent
-  // que si l'utilisateur est connecté.
   return isAuthenticated ? <Dashboard /> : <Welcome />
 }
 
@@ -175,7 +172,6 @@ interface PanelProps {
   children: React.ReactNode
 }
 
-// Encart titré avec un lien vers la page complète
 function Panel({ title, to, children }: PanelProps) {
   return (
     <section className={CARD}>

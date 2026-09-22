@@ -1,4 +1,3 @@
-// Données de demonstration partagees par tous les handlers MSW.
 
 import type {
     CategoryRead,
