@@ -1,109 +1,95 @@
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { validateMovement } from "../lib/stockMovements";
-import type { MovementType, StockMovementCreate } from "../types/api";
+import type { LocationRead, MovementType, ProductRead, StockMovementCreate } from "../types/api";
+import { FormField } from "./FormField";
+import { SelectField } from "./SelectField";
 
 type MovementFormProps = {
-    onSubmit: (movement: StockMovementCreate) => void;
+    products: ProductRead[];
+    locations: LocationRead[];
+    onSubmit: (movement: StockMovementCreate) => Promise<void>;
 };
 
-export function MovementForm({ onSubmit }: MovementFormProps) {
+const TYPE_OPTIONS = [
+    { value: "in", label: "Entrée" },
+    { value: "out", label: "Sortie" },
+    { value: "transfer", label: "Transfert" },
+];
+
+export function MovementForm({ products, locations, onSubmit }: MovementFormProps) {
     const [type, setType] = useState<MovementType>("in");
     const [productId, setProductId] = useState("");
     const [quantity, setQuantity] = useState("");
     const [sourceId, setSourceId] = useState("");
     const [targetId, setTargetId] = useState("");
     const [errors, setErrors] = useState<string[]>([]);
+    const [submitting, setSubmitting] = useState(false);
 
-    function handleSubmit(event: FormEvent) {
+    const productOptions = products.map(p => ({ value: p.id, label: `${p.name} (${p.sku})` }));
+    const locationOptions = locations.map(l => ({ value: l.id, label: `${l.name} (${l.code})` }));
+
+    async function handleSubmit(event: FormEvent) {
         event.preventDefault();
 
         const movement: StockMovementCreate = {
             product_id: Number(productId),
             type,
             quantity: Number(quantity),
-            source_location_id: sourceId === "" ? null : Number(sourceId),
-            target_location_id: targetId === "" ? null : Number(targetId),
+            source_location_id: type === "in" || sourceId === "" ? null : Number(sourceId),
+            target_location_id: type === "out" || targetId === "" ? null : Number(targetId),
             reason: null,
         };
 
         const found = validateMovement(movement);
         setErrors(found);
+        if (found.length > 0) return;
 
-        if (found.length === 0) {
-            onSubmit(movement);
-        }
+        setSubmitting(true);
+        await onSubmit(movement);
+        setSubmitting(false);
     }
 
     return (
-        <form onSubmit={handleSubmit} className="max-w-xl">
+        <form onSubmit={handleSubmit} noValidate className="max-w-xl">
             <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div>
-                    <label htmlFor="type" className="mb-1 block text-sm">
-                        Type de mouvement
-                    </label>
-                    <select
-                        id="type"
-                        value={type}
-                        onChange={event => setType(event.target.value as MovementType)}
-                        className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
-                    >
-                        <option value="in">Entrée</option>
-                        <option value="out">Sortie</option>
-                        <option value="transfer">Transfert</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label htmlFor="product" className="mb-1 block text-sm">
-                        Produit
-                    </label>
-                    <input
-                        id="product"
-                        value={productId}
-                        onChange={event => setProductId(event.target.value)}
-                        className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
-                    />
-                </div>
-
-                <div>
-                    <label htmlFor="quantity" className="mb-1 block text-sm">
-                        Quantité
-                    </label>
-                    <input
-                        id="quantity"
-                        value={quantity}
-                        onChange={event => setQuantity(event.target.value)}
-                        className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
-                    />
-                </div>
+                <SelectField
+                    id="type"
+                    label="Type de mouvement"
+                    value={type}
+                    onChange={value => setType(value as MovementType)}
+                    options={TYPE_OPTIONS}
+                />
+                <SelectField
+                    id="product"
+                    label="Produit"
+                    value={productId}
+                    onChange={setProductId}
+                    options={productOptions}
+                    placeholder="Choisir..."
+                />
+                <FormField id="quantity" label="Quantité" type="number" value={quantity} onChange={setQuantity} placeholder="30" />
 
                 {type !== "in" && (
-                    <div>
-                        <label htmlFor="source" className="mb-1 block text-sm">
-                            Emplacement d'origine
-                        </label>
-                        <input
-                            id="source"
-                            value={sourceId}
-                            onChange={event => setSourceId(event.target.value)}
-                            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
-                        />
-                    </div>
+                    <SelectField
+                        id="source"
+                        label="Emplacement d'origine"
+                        value={sourceId}
+                        onChange={setSourceId}
+                        options={locationOptions}
+                        placeholder="Choisir..."
+                    />
                 )}
 
                 {type !== "out" && (
-                    <div>
-                        <label htmlFor="target" className="mb-1 block text-sm">
-                            Emplacement de destination
-                        </label>
-                        <input
-                            id="target"
-                            value={targetId}
-                            onChange={event => setTargetId(event.target.value)}
-                            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
-                        />
-                    </div>
+                    <SelectField
+                        id="target"
+                        label="Emplacement de destination"
+                        value={targetId}
+                        onChange={setTargetId}
+                        options={locationOptions}
+                        placeholder="Choisir..."
+                    />
                 )}
             </div>
 
@@ -117,8 +103,12 @@ export function MovementForm({ onSubmit }: MovementFormProps) {
                 </ul>
             )}
 
-            <button type="submit" className="rounded bg-gray-900 px-4 py-2 text-white hover:bg-gray-700 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-300">
-                Enregistrer
+            <button
+                type="submit"
+                disabled={submitting}
+                className="rounded bg-gray-900 px-4 py-2 text-white hover:bg-gray-700 disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-300"
+            >
+                {submitting ? "Enregistrement..." : "Enregistrer"}
             </button>
         </form>
     );

@@ -1,20 +1,13 @@
 import { http, HttpResponse } from "msw";
-import type {
-    OrderLineRead,
-    PurchaseOrderRead,
-    ReplenishmentRequest,
-    ReplenishmentSuggestion,
-} from "../../../types/api";
+import type { ReplenishmentRequest, ReplenishmentSuggestion } from "../../../types/api";
 import { buildSuggestions, seedProducts } from "../seed";
+import { createPurchaseOrder } from "./purchase-orders";
 
-let suggestions: ReplenishmentSuggestion[] = buildSuggestions(seedProducts);
+const suggestions: ReplenishmentSuggestion[] = buildSuggestions(seedProducts);
 
 function unitPriceOf(productId: number): string {
     return seedProducts.find(product => product.id === productId)?.unit_price ?? "0.00";
 }
-
-let nextOrderId = 1;
-let nextLineId = 1;
 
 export const replenishmentHandlers = [
     http.get("*/replenishment/suggestions", ({ request }) => {
@@ -30,36 +23,16 @@ export const replenishmentHandlers = [
     http.post("*/replenishment/orders", async ({ request }) => {
         const payload = (await request.json()) as ReplenishmentRequest;
 
-        const orderId = nextOrderId++;
-        const lines: OrderLineRead[] = [];
-        let total = 0;
+        const lines = suggestions
+            .filter(s => payload.product_ids.includes(s.product_id))
+            .map(s => ({ product_id: s.product_id, quantity: s.suggested_quantity, unit_price: unitPriceOf(s.product_id) }));
 
-        for (const productId of payload.product_ids) {
-            const suggestion = suggestions.find(s => s.product_id === productId);
-            if (!suggestion) continue;
-
-            const unitPrice = unitPriceOf(productId);
-            lines.push({
-                id: nextLineId++,
-                order_id: orderId,
-                product_id: productId,
-                quantity: suggestion.suggested_quantity,
-                unit_price: unitPrice,
-            });
-            total += suggestion.suggested_quantity * Number(unitPrice);
-        }
-
-        const created: PurchaseOrderRead = {
-            id: orderId,
-            reference: `REPL-${orderId}`,
+        const created = createPurchaseOrder({
+            reference: "",
             supplier_id: payload.supplier_id,
             location_id: payload.location_id,
-            status: "draft",
-            total_price: total.toFixed(2),
-            ordered_at: new Date().toISOString(),
-            received_at: null,
-            lines: lines,
-        };
+            lines,
+        });
 
         return HttpResponse.json(created, { status: 201 });
     }),

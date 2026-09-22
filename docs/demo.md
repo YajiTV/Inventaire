@@ -24,8 +24,12 @@ Deux produits sont sous leur seuil de reapprovisionnement, c'est le coeur de la 
 | Steak hache 45g | 120 | 300 |
 | Sirop cola 10L | 5 | 12 |
 
-Les mocks sont en memoire : un rafraichissement de page remet le jeu de donnees a zero.
-A ne pas faire pendant la demo.
+Les donnees des mocks sont sauvegardees dans le localStorage : un rafraichissement de page
+conserve la session, les modifications et le theme. C'est la preuve du critere persistance,
+a montrer pendant la demo.
+
+Avant chaque repetition, repartir du jeu de depart : `resetMockData()` dans la console du
+navigateur, puis F5.
 
 ## Parcours
 
@@ -38,9 +42,19 @@ A ne pas faire pendant la demo.
 | 5 | Mouvements | `/movements` | Baptiste | Le transfert saisi apparait en tete de l'historique |
 | 6 | Produits | `/products` | Max | Liste, creation et edition inline d'un produit |
 | 7 | Fournisseurs | `/suppliers` | Max | Liste des 4 fournisseurs, lien avec les produits |
+| 8 | Detail produit | `/products/:id` | Max | Nom de categorie et de fournisseur au lieu des identifiants |
+| 9 | Categories | `/categories` | Axel | Ajout, edition inline, suppression avec confirmation |
+| 10 | Emplacements | `/locations` | Axel | Ajout d'un emplacement, qui apparait ensuite dans les formulaires de mouvement |
+| 11 | Reapprovisionnement | `/replenishment` | Axel | Choix de l'emplacement puis generation d'une commande pour Steak hache et Sirop cola |
+| 12 | Commandes | `/orders` | Baptiste | La commande generee apparait, detail avec fournisseur, livraison et lignes |
+| 13 | Utilisateurs | `/users` | Axel | Creation d'un operateur, changement de role |
+| 14 | Profil | `/profile` | Axel | Modification du nom complet, deconnexion |
+| 15 | Persistance | toutes | Mathys | F5 sur une page modifiee : session, donnees et theme sont conserves |
 
-## Ecrans non couverts
+Cas d'erreur a montrer : formulaire vide ou mal rempli (messages sous les champs), sortie de
+stock superieure a la quantite disponible (erreur 409 affichee), adresse inconnue (page 404).
 
-Reapprovisionnement, Commandes, Categories, Emplacements, Utilisateurs et Profil
-n'ont pas encore de page. Les handlers MSW existent : a integrer au parcours des
-que les ecrans sont livres.
+## Hors perimetre
+
+La demo tourne uniquement sur les mocks MSW (`npm run dev`). Le build de production
+appelle la vraie API et n'est pas utilise pour la demo.

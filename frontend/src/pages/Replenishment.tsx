@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useReplenishment } from '../hooks/useReplenishment'
 import { useLocations } from '../hooks/useLocations'
+import { useSuppliers } from '../hooks/useSuppliers'
 import { groupBySupplier } from '../lib/replenishment'
 import { ReplenishmentSupplierGroup } from '../components/ReplenishmentSupplierGroup'
 
 export default function Replenishment() {
   const { suggestions, loading, error, triggerOrder } = useReplenishment()
   const { locations, loading: locationsLoading } = useLocations()
+  const { suppliers } = useSuppliers()
   const [locationId, setLocationId] = useState<number | null>(null)
 
   const { withSupplier, withoutSupplier } = groupBySupplier(suggestions)
@@ -62,6 +64,7 @@ export default function Replenishment() {
           <ReplenishmentSupplierGroup
             key={supplierId}
             supplierId={supplierId}
+            supplierName={suppliers.find((s) => s.id === supplierId)?.name ?? 'Fournisseur'}
             suggestions={group}
             locationId={locationId}
             onTrigger={handleTrigger}

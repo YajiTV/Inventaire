@@ -1,9 +1,14 @@
 import { Link } from "react-router-dom";
 import { usePurchaseOrders } from "../hooks/usePurchaseOrders";
+import { useSuppliers } from "../hooks/useSuppliers";
 import { orderStatusLabel } from "../lib/purchaseOrders";
 
 export default function Orders() {
-    const { orders, loading, error } = usePurchaseOrders();
+    const { orders, loading: ordersLoading, error: ordersError } = usePurchaseOrders();
+    const { suppliers, loading: suppliersLoading, error: suppliersError } = useSuppliers();
+
+    const loading = ordersLoading || suppliersLoading;
+    const error = ordersError ?? suppliersError;
 
     return (
         <section className="p-4 sm:p-8">
@@ -33,7 +38,9 @@ export default function Orders() {
                         <thead className="bg-gray-50 text-left dark:bg-gray-800">
                             <tr>
                                 <th className="px-3 py-2 font-medium">Référence</th>
+                                <th className="px-3 py-2 font-medium">Fournisseur</th>
                                 <th className="px-3 py-2 font-medium">Statut</th>
+                                <th className="px-3 py-2 font-medium text-right">Total</th>
                                 <th className="px-3 py-2 font-medium"></th>
                             </tr>
                         </thead>
@@ -41,7 +48,9 @@ export default function Orders() {
                             {orders.map(order => (
                                 <tr key={order.id} className="border-t dark:border-gray-700">
                                     <td className="px-3 py-2 font-medium">{order.reference}</td>
+                                    <td className="px-3 py-2">{suppliers.find(s => s.id === order.supplier_id)?.name ?? "Inconnu"}</td>
                                     <td className="px-3 py-2">{orderStatusLabel(order.status)}</td>
+                                    <td className="px-3 py-2 text-right tabular-nums">{order.total_price} €</td>
                                     <td className="px-3 py-2 text-right">
                                         <Link to={`/orders/${order.id}`} className="underline">
                                             Détail

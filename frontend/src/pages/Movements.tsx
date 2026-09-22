@@ -2,16 +2,18 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MovementsTable } from '../components/MovementsTable'
 import { useStockMovements } from '../hooks/useStockMovements'
-import { useProducts } from '../hooks/useProducts'
+import { useAllProducts } from '../hooks/useProducts'
+import { useLocations } from '../hooks/useLocations'
 import { EMPTY_MOVEMENT_FILTERS } from '../api/stockMovements'
 
 export default function Movements() {
   const [filters, setFilters] = useState(EMPTY_MOVEMENT_FILTERS)
   const { movements, loading: movementsLoading, error: movementsError } = useStockMovements(filters)
-  const { products, loading: productsLoading, error: productsError } = useProducts()
+  const { products, loading: productsLoading, error: productsError } = useAllProducts()
+  const { locations, loading: locationsLoading, error: locationsError } = useLocations()
 
-  const loading = movementsLoading || productsLoading
-  const error = movementsError ?? productsError
+  const loading = movementsLoading || productsLoading || locationsLoading
+  const error = movementsError ?? productsError ?? locationsError
 
   return (
     <section className="p-4 sm:p-8">
@@ -51,12 +53,19 @@ export default function Movements() {
           <label htmlFor="filter-location" className="mb-1 block text-sm">
             Emplacement
           </label>
-          <input
+          <select
             id="filter-location"
             value={filters.locationId}
             onChange={(event) => setFilters({ ...filters, locationId: event.target.value })}
             className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
-          />
+          >
+            <option value="">Tous</option>
+            {locations.map((location) => (
+              <option key={location.id} value={location.id}>
+                {location.name} ({location.code})
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
@@ -83,7 +92,7 @@ export default function Movements() {
           {error}
         </p>
       )}
-      {!loading && error === null && <MovementsTable movements={movements} products={products} />}
+      {!loading && error === null && <MovementsTable movements={movements} products={products} locations={locations} />}
     </section>
   )
 }
