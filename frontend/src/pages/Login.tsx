@@ -9,15 +9,25 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     setError(null)
+
+    if (!email.trim() || !password) {
+      setError("L'email et le mot de passe sont obligatoires.")
+      return
+    }
+
+    setIsSubmitting(true)
     try {
-      await login(email, password)
+      await login(email.trim(), password)
       navigate('/')
     } catch {
       setError('Email ou mot de passe incorrect')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -31,7 +41,7 @@ export default function Login() {
         <h1 className="mb-1 text-2xl font-semibold">Connexion</h1>
         <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">Connecte-toi pour accéder à l'inventaire.</p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <label htmlFor="email" className="text-sm text-gray-700 dark:text-gray-300">
               Email
@@ -70,9 +80,10 @@ export default function Login() {
           <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:gap-4">
             <button
               type="submit"
-              className="rounded bg-gray-900 px-4 py-2 text-white hover:bg-gray-700 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-300"
+              disabled={isSubmitting}
+              className="rounded bg-gray-900 px-4 py-2 text-white hover:bg-gray-700 disabled:cursor-not-allowed disabled:bg-gray-400 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-300 dark:disabled:bg-gray-700"
             >
-              Se connecter
+              {isSubmitting ? 'Connexion...' : 'Se connecter'}
             </button>
             <Link to="/register" className="text-sm underline">
               S'enregistrer

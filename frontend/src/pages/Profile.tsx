@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
-import { getInitials, validateFullName } from '../lib/users'
+import { getInitials, roleLabel, validateFullName } from '../lib/users'
 
 export default function Profile() {
   const { user, updateProfile, logout } = useAuth()
@@ -45,7 +45,7 @@ export default function Profile() {
           <h1 className="text-2xl font-semibold">{user.full_name}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
           <span className="mt-2 rounded-full border px-3 py-0.5 text-xs text-gray-600 dark:border-gray-600 dark:text-gray-400">
-            {user.role === 'admin' ? 'Admin' : 'Opérateur'}
+            {roleLabel(user.role)}
           </span>
         </div>
 
