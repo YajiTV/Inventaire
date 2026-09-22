@@ -1,11 +1,10 @@
-import { createContext, useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import type { AuthContextValue, User } from '../types/auth'
+import { AuthContext } from './auth'
 import { apiFetch, registerAuth } from '../lib/api'
 import type { TokenResponse } from '../types/api'
 import {updateUser} from "../api/users";
 import type {UserUpdate} from "../types/api";
-
-export const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({children}: {children: ReactNode}) {
     const [accessToken, setAccessToken] = useState<string | null>(null)
@@ -73,9 +72,14 @@ export function AuthProvider({children}: {children: ReactNode}) {
         setUser(null)
     }
 
-    // Tente de restaurer une session existante au chargement
+    // Tente de restaurer une session existante au chargement (fonction async :
+    // les setState arrivent apres la reponse, pas pendant l'effet)
     useEffect(() => {
-        refresh().finally(() => setIsLoading(false))
+        const restore = async () => {
+            await refresh()
+            setIsLoading(false)
+        }
+        restore()
     }, [])
 
     // Donne a apiFetch (hors React) le token courant et les fonctions refresh/logout

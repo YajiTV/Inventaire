@@ -1,8 +1,9 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { ThemeToggle } from './ThemeToggle'
 
 const links = [
-  {to: '/', label: 'Home'},
+  {to: '/', label: 'Accueil'},
   { to: '/stocks', label: 'Stocks' },
   { to: '/movements', label: 'Mouvements' },
   { to: '/products', label: 'Produits' },
@@ -19,8 +20,8 @@ export function Layout() {
   const { user, isAuthenticated, logout } = useAuth()
 
   return (
-    <div>
-      <header className="border-b p-4">
+    <div className="min-h-screen">
+      <header className="border-b p-4 dark:border-gray-700">
         <nav className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <ul className="flex flex-col gap-2 sm:flex-row sm:gap-4">
             {links.map((link) => (
@@ -33,10 +34,12 @@ export function Layout() {
           </ul>
 
           <div className="flex items-center gap-3">
+            <ThemeToggle />
+
             {isAuthenticated ? (
               <>
                 {user !== null && <span>{user.full_name}</span>}
-                <button className="text-red-600" type="button" onClick={() => logout()}>
+                <button className="text-red-600 dark:text-red-400" type="button" onClick={() => logout()}>
                   Se déconnecter
                 </button>
               </>

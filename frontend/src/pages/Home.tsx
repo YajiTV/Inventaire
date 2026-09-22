@@ -15,7 +15,7 @@ export default function Home() {
 
   if (!isAuthenticated) {
     return (
-      <div className="p-4">
+      <div className="p-4 sm:p-8">
         <p>Bienvenue sur l'inventaire, veuillez vous identifier</p>
       </div>
     )
@@ -24,7 +24,7 @@ export default function Home() {
   const ordersEnCours = orders.filter((order) => order.status === 'draft' || order.status === 'sent').length
 
   return (
-    <div className="p-4">
+    <div className="p-4 sm:p-8">
       <p className="mb-4">Bienvenue {user?.full_name}</p>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <DashboardCard

@@ -38,10 +38,10 @@ export function FormField({
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
                 required={required}
-                className="border rounded px-2 py-1"
+                className="border rounded px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
             />
             {error && (
-                <p role="alert" className="text-red-600 text-sm">
+                <p role="alert" className="text-red-600 text-sm dark:text-red-400">
                     {error}
                 </p>
             )}

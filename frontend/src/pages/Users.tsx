@@ -13,7 +13,7 @@ export default function Users() {
 
       {loading && <p>Chargement des utilisateurs...</p>}
       {!loading && error !== null && (
-        <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700">
+        <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
           {error}
         </p>
       )}
