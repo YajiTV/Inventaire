@@ -31,7 +31,7 @@ export default function Replenishment() {
           id="location"
           value={locationId ?? ''}
           onChange={(event) => setLocationId(event.target.value === '' ? null : Number(event.target.value))}
-          className="w-full rounded border px-2 py-1"
+          className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
           disabled={locationsLoading}
         >
           <option value="">Choisir...</option>
@@ -45,13 +45,13 @@ export default function Replenishment() {
 
       {loading && <p>Chargement des suggestions...</p>}
       {!loading && error !== null && (
-        <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700">
+        <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
           {error}
         </p>
       )}
 
       {!loading && error === null && withSupplier.size === 0 && withoutSupplier.length === 0 && (
-        <p className="rounded border border-dashed p-6 text-center text-gray-600">
+        <p className="rounded border border-dashed p-6 text-center text-gray-600 dark:border-gray-600 dark:text-gray-400">
           Aucun produit sous le seuil de réapprovisionnement.
         </p>
       )}
@@ -69,9 +69,9 @@ export default function Replenishment() {
         ))}
 
       {withoutSupplier.length > 0 && (
-        <div className="mt-4 rounded border p-4">
+        <div className="mt-4 rounded border p-4 dark:border-gray-700">
           <h2 className="mb-2 font-semibold">Sans fournisseur assigné</h2>
-          <p className="mb-2 text-sm text-gray-600">
+          <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
             Ces produits sont sous le seuil mais n'ont pas de fournisseur associé : impossible de générer une
             commande automatiquement.
           </p>

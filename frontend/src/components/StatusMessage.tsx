@@ -17,7 +17,7 @@ export function StatusMessage({ loading, error, isEmpty, emptyMessage = "Aucun Ã
 
     if (error) {
         return (
-            <p role="alert" className="text-red-600">
+            <p role="alert" className="text-red-600 dark:text-red-400">
                 {error}
             </p>
         );

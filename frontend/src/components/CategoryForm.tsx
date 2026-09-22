@@ -41,7 +41,7 @@ export function CategoryForm({ onSubmit }: CategoryFormProps) {
             id="category-name"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            className="w-full rounded border px-2 py-1"
+            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
           />
         </div>
 
@@ -53,17 +53,17 @@ export function CategoryForm({ onSubmit }: CategoryFormProps) {
             id="category-description"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            className="w-full rounded border px-2 py-1"
+            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
           />
         </div>
 
-        <button type="submit" className="rounded border px-3 py-1 hover:bg-gray-50">
+        <button type="submit" className="rounded border px-3 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">
           Ajouter
         </button>
       </div>
 
       {errors.map((error) => (
-        <p key={error} role="alert" className="text-sm text-red-600">
+        <p key={error} role="alert" className="text-sm text-red-600 dark:text-red-400">
           {error}
         </p>
       ))}

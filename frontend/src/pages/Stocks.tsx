@@ -23,17 +23,17 @@ export default function Stocks() {
       <h1 className="mb-6 text-2xl font-semibold">Stocks</h1>
 
       <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div className="rounded border p-3">
-          <div className="text-xs text-gray-500">Références</div>
+        <div className="rounded border p-3 dark:border-gray-700">
+          <div className="text-xs text-gray-500 dark:text-gray-400">Références</div>
           <div className="text-xl font-semibold tabular-nums">{summary.references}</div>
         </div>
-        <div className="rounded border p-3">
-          <div className="text-xs text-gray-500">Quantité totale</div>
+        <div className="rounded border p-3 dark:border-gray-700">
+          <div className="text-xs text-gray-500 dark:text-gray-400">Quantité totale</div>
           <div className="text-xl font-semibold tabular-nums">{summary.quantity}</div>
         </div>
-        <div className="rounded border p-3">
-          <div className="text-xs text-gray-500">Sous le seuil</div>
-          <div className="text-xl font-semibold tabular-nums text-red-700">{summary.alerts}</div>
+        <div className="rounded border p-3 dark:border-gray-700">
+          <div className="text-xs text-gray-500 dark:text-gray-400">Sous le seuil</div>
+          <div className="text-xl font-semibold tabular-nums text-red-700 dark:text-red-400">{summary.alerts}</div>
         </div>
       </div>
 
@@ -48,7 +48,7 @@ export default function Stocks() {
             placeholder="Steak haché"
             value={filters.search}
             onChange={(event) => setFilters({ ...filters, search: event.target.value })}
-            className="w-full rounded border px-2 py-1"
+            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
           />
         </div>
 
@@ -60,7 +60,7 @@ export default function Stocks() {
             id="stock-location"
             value={filters.locationId}
             onChange={(event) => setFilters({ ...filters, locationId: event.target.value })}
-            className="w-full rounded border px-2 py-1"
+            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
           >
             <option value="">Tous</option>
             {locations.map((location) => (
@@ -83,7 +83,7 @@ export default function Stocks() {
 
       {loading && <p>Chargement des stocks...</p>}
       {!loading && error !== null && (
-        <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700">
+        <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
           {error}
         </p>
       )}
