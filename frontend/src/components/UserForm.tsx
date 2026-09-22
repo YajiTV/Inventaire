@@ -48,7 +48,7 @@ export function UserForm({ onSubmit }: UserFormProps) {
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="w-full rounded border px-2 py-1"
+            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
           />
         </div>
 
@@ -60,7 +60,7 @@ export function UserForm({ onSubmit }: UserFormProps) {
             id="user-full-name"
             value={fullName}
             onChange={(event) => setFullName(event.target.value)}
-            className="w-full rounded border px-2 py-1"
+            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
           />
         </div>
 
@@ -73,7 +73,7 @@ export function UserForm({ onSubmit }: UserFormProps) {
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="w-full rounded border px-2 py-1"
+            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
           />
         </div>
 
@@ -85,7 +85,7 @@ export function UserForm({ onSubmit }: UserFormProps) {
             id="user-role"
             value={role}
             onChange={(event) => setRole(event.target.value as UserRole)}
-            className="w-full rounded border px-2 py-1"
+            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
           >
             <option value="operator">Opérateur</option>
             <option value="admin">Admin</option>
@@ -94,13 +94,13 @@ export function UserForm({ onSubmit }: UserFormProps) {
       </div>
 
       <div>
-        <button type="submit" className="rounded border px-3 py-1 hover:bg-gray-50">
+        <button type="submit" className="rounded border px-3 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">
           Ajouter
         </button>
       </div>
 
       {errors.map((error) => (
-        <p key={error} role="alert" className="text-sm text-red-600">
+        <p key={error} role="alert" className="text-sm text-red-600 dark:text-red-400">
           {error}
         </p>
       ))}

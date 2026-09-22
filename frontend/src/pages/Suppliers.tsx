@@ -142,7 +142,7 @@ export default function Fournisseurs() {
                 />
                 <FormField id="phone" label="Téléphone" value={phone} onChange={setPhone} placeholder="0102030405" />
                 <FormField id="address" label="Adresse" value={address} onChange={setAddress} />
-                <button type="submit" className="self-end border rounded px-3 py-1">
+                <button type="submit" className="self-end border rounded px-3 py-1 dark:border-gray-600">
                     Ajouter
                 </button>
             </form>
@@ -154,11 +154,11 @@ export default function Fournisseurs() {
                 emptyMessage="Aucun fournisseur"
             />
             {apiError && (
-                <p role="alert" className="text-red-600">
+                <p role="alert" className="text-red-600 dark:text-red-400">
                     {apiError}
                 </p>
             )}
-            {successMessage && <p className="text-green-600">{successMessage}</p>}
+            {successMessage && <p className="text-green-600 dark:text-green-400">{successMessage}</p>}
 
             {!loading && !error && fournisseurs.length > 0 && (
                 <DataTable

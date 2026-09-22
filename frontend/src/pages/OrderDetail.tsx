@@ -23,13 +23,13 @@ export default function OrderDetail() {
             {loading && <p>Chargement de la commande...</p>}
 
             {!loading && error !== null && (
-                <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700">
+                <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
                     {error}
                 </p>
             )}
 
             {!loading && error === null && order === null && (
-                <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700">
+                <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
                     Commande introuvable
                 </p>
             )}
@@ -37,12 +37,12 @@ export default function OrderDetail() {
             {!loading && error === null && order !== null && (
                 <>
                     <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <div className="rounded border p-3">
-                            <div className="text-xs text-gray-500">Statut</div>
+                        <div className="rounded border p-3 dark:border-gray-700">
+                            <div className="text-xs text-gray-500 dark:text-gray-400">Statut</div>
                             <div className="text-xl font-semibold">{orderStatusLabel(order.status)}</div>
                         </div>
-                        <div className="rounded border p-3">
-                            <div className="text-xs text-gray-500">Total</div>
+                        <div className="rounded border p-3 dark:border-gray-700">
+                            <div className="text-xs text-gray-500 dark:text-gray-400">Total</div>
                             <div className="text-xl font-semibold tabular-nums">{order.total_price} €</div>
                         </div>
                     </div>
