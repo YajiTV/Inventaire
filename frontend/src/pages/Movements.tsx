@@ -36,7 +36,7 @@ export default function Movements() {
             id="filter-product"
             value={filters.productId}
             onChange={(event) => setFilters({ ...filters, productId: event.target.value })}
-            className="w-full rounded border px-2 py-1"
+            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
           >
             <option value="">Tous</option>
             {produits.map((produit) => (
@@ -55,7 +55,7 @@ export default function Movements() {
             id="filter-location"
             value={filters.locationId}
             onChange={(event) => setFilters({ ...filters, locationId: event.target.value })}
-            className="w-full rounded border px-2 py-1"
+            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
           />
         </div>
 
@@ -67,7 +67,7 @@ export default function Movements() {
             id="filter-type"
             value={filters.type}
             onChange={(event) => setFilters({ ...filters, type: event.target.value })}
-            className="w-full rounded border px-2 py-1"
+            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
           >
             <option value="">Tous</option>
             <option value="in">Entrée</option>
@@ -79,7 +79,7 @@ export default function Movements() {
 
       {loading && <p>Chargement des mouvements...</p>}
       {!loading && error !== null && (
-        <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700">
+        <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
           {error}
         </p>
       )}

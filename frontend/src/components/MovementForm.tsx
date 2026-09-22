@@ -46,7 +46,7 @@ export function MovementForm({ onSubmit }: MovementFormProps) {
                         id="type"
                         value={type}
                         onChange={event => setType(event.target.value as MovementType)}
-                        className="w-full rounded border px-2 py-1"
+                        className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
                     >
                         <option value="in">Entrée</option>
                         <option value="out">Sortie</option>
@@ -62,7 +62,7 @@ export function MovementForm({ onSubmit }: MovementFormProps) {
                         id="product"
                         value={productId}
                         onChange={event => setProductId(event.target.value)}
-                        className="w-full rounded border px-2 py-1"
+                        className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
                     />
                 </div>
 
@@ -74,7 +74,7 @@ export function MovementForm({ onSubmit }: MovementFormProps) {
                         id="quantity"
                         value={quantity}
                         onChange={event => setQuantity(event.target.value)}
-                        className="w-full rounded border px-2 py-1"
+                        className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
                     />
                 </div>
 
@@ -87,7 +87,7 @@ export function MovementForm({ onSubmit }: MovementFormProps) {
                             id="source"
                             value={sourceId}
                             onChange={event => setSourceId(event.target.value)}
-                            className="w-full rounded border px-2 py-1"
+                            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
                         />
                     </div>
                 )}
@@ -101,14 +101,14 @@ export function MovementForm({ onSubmit }: MovementFormProps) {
                             id="target"
                             value={targetId}
                             onChange={event => setTargetId(event.target.value)}
-                            className="w-full rounded border px-2 py-1"
+                            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
                         />
                     </div>
                 )}
             </div>
 
             {errors.length > 0 && (
-                <ul className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-red-700">
+                <ul className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
                     {errors.map(error => (
                         <li key={error} role="alert">
                             {error}
@@ -117,7 +117,7 @@ export function MovementForm({ onSubmit }: MovementFormProps) {
                 </ul>
             )}
 
-            <button type="submit" className="rounded bg-gray-900 px-4 py-2 text-white hover:bg-gray-700">
+            <button type="submit" className="rounded bg-gray-900 px-4 py-2 text-white hover:bg-gray-700 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-300">
                 Enregistrer
             </button>
         </form>

@@ -19,9 +19,9 @@ export function DashboardCard({ to, label, value, loading = false, error = null 
   }
 
   return (
-    <Link to={to} className="flex flex-col items-center justify-center gap-1 rounded-xl border bg-white p-4 text-center">
+    <Link to={to} className="flex flex-col items-center justify-center gap-1 rounded-xl border bg-white p-4 text-center dark:border-gray-700 dark:bg-gray-800">
       <span className="text-2xl font-semibold">{display}</span>
-      <span className="text-xs text-gray-500">{label}</span>
+      <span className="text-xs text-gray-500 dark:text-gray-400">{label}</span>
     </Link>
   )
 }
