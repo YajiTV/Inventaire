@@ -27,29 +27,33 @@ interface DataTableProps<T> {
 // changent d'une page à l'autre.
 export function DataTable<T>({ columns, rows, getRowId, renderActions }: DataTableProps<T>) {
     return (
-        <table className="w-full border-collapse">
-            <thead>
-                <tr>
-                    {columns.map((column) => (
-                        <th key={column.header} className="py-1 pr-6 text-left">
-                            {column.header}
-                        </th>
-                    ))}
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {rows.map((row) => (
-                    <tr key={getRowId(row)}>
+        <div className="overflow-x-auto rounded border dark:border-gray-700">
+            <table className="w-full border-collapse text-sm">
+                <thead className="bg-gray-50 text-left dark:bg-gray-800">
+                    <tr>
                         {columns.map((column) => (
-                            <td key={column.header} className="py-1 pr-6 text-left">
-                                {column.render(row)}
-                            </td>
+                            <th key={column.header} className="px-3 py-2 font-medium">
+                                {column.header}
+                            </th>
                         ))}
-                        <td>{renderActions(row)}</td>
+                        <th className="px-3 py-2 font-medium"></th>
                     </tr>
-                ))}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {rows.map((row) => (
+                        <tr key={getRowId(row)} className="border-t dark:border-gray-700">
+                            {columns.map((column) => (
+                                <td key={column.header} className="px-3 py-2">
+                                    {column.render(row)}
+                                </td>
+                            ))}
+                            <td className="px-3 py-2">
+                                <div className="flex gap-2">{renderActions(row)}</div>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
     );
 }

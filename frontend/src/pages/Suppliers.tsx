@@ -168,13 +168,13 @@ export default function Fournisseurs() {
                     renderActions={(f) =>
                         editingId === f.id ? (
                             <>
-                                <button onClick={() => saveEdit(f.id)}>Enregistrer</button>
-                                <button onClick={() => setEditingId(null)}>Annuler</button>
+                                <button onClick={() => saveEdit(f.id)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Enregistrer</button>
+                                <button onClick={() => setEditingId(null)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Annuler</button>
                             </>
                         ) : (
                             <>
-                                <button onClick={() => startEdit(f)}>Modifier</button>
-                                <button onClick={() => handleDelete(f.id)}>Supprimer</button>
+                                <button onClick={() => startEdit(f)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Modifier</button>
+                                <button onClick={() => handleDelete(f.id)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Supprimer</button>
                             </>
                         )
                     }
