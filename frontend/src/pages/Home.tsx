@@ -4,7 +4,8 @@ import { useReplenishment } from '../hooks/useReplenishment'
 import { usePurchaseOrders } from '../hooks/usePurchaseOrders'
 import { useStockMovements } from '../hooks/useStockMovements'
 import { useStocks } from '../hooks/useStocks'
-import { useProducts } from '../hooks/useProducts'
+import { useAllProducts } from '../hooks/useProducts'
+import { useLocations } from '../hooks/useLocations'
 import { EMPTY_MOVEMENT_FILTERS } from '../api/stockMovements'
 import { sortMovements } from '../lib/stockMovements'
 import { orderStatusLabel } from '../lib/purchaseOrders'
@@ -27,7 +28,7 @@ const FEATURES = [
   { title: 'Réapprovisionnement', text: 'Alertes sous le seuil et commandes fournisseur.' },
 ]
 
-const CARD = 'rounded-xl border bg-white p-4 dark:border-gray-700 dark:bg-gray-800'
+const CARD = 'min-w-0 rounded-xl border bg-white p-4 dark:border-gray-700 dark:bg-gray-800'
 const BUTTON = 'rounded border px-3 py-2 text-sm hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700'
 
 export default function Home() {
@@ -71,7 +72,8 @@ function Dashboard() {
   const { orders, loading: ordersLoading, error: ordersError } = usePurchaseOrders()
   const { movements, loading: movementsLoading, error: movementsError } = useStockMovements(EMPTY_MOVEMENT_FILTERS)
   const { stocks, loading: stocksLoading, error: stocksError } = useStocks()
-  const { products, loading: productsLoading, error: productsError } = useProducts()
+  const { products, loading: productsLoading, error: productsError } = useAllProducts()
+  const { locations, loading: locationsLoading, error: locationsError } = useLocations()
 
   const pendingOrders = orders.filter((order) => order.status === 'draft' || order.status === 'sent')
   const recentMovements = sortMovements(movements).slice(0, PREVIEW_SIZE)
@@ -153,11 +155,14 @@ function Dashboard() {
           )}
         </Panel>
 
-        <div className="lg:col-span-2">
+        <div className="min-w-0 lg:col-span-2">
           <Panel title="Derniers mouvements" to="/movements">
-            <StatusMessage loading={movementsLoading || productsLoading} error={movementsError ?? productsError} />
-            {!movementsLoading && !productsLoading && !movementsError && !productsError && (
-              <MovementsTable movements={recentMovements} products={products} />
+            <StatusMessage
+              loading={movementsLoading || productsLoading || locationsLoading}
+              error={movementsError ?? productsError ?? locationsError}
+            />
+            {!movementsLoading && !productsLoading && !locationsLoading && !movementsError && !productsError && !locationsError && (
+              <MovementsTable movements={recentMovements} products={products} locations={locations} />
             )}
           </Panel>
         </div>

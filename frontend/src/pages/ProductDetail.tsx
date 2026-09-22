@@ -46,7 +46,7 @@ export default function ProductDetail() {
                     </div>
                     <div className="rounded border p-3 dark:border-gray-700">
                         <dt className="text-xs text-gray-500 dark:text-gray-400">Catégorie</dt>
-                        <dd>{category?.name ?? product.category_id}</dd>
+                        <dd>{category?.name ?? "Inconnue"}</dd>
                     </div>
                     <div className="rounded border p-3 dark:border-gray-700">
                         <dt className="text-xs text-gray-500 dark:text-gray-400">Fournisseur</dt>
