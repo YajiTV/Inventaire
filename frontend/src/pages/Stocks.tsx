@@ -2,19 +2,19 @@ import { useMemo, useState } from 'react'
 import { StockTable } from '../components/StockTable'
 import { useStocks } from '../hooks/useStocks'
 import { useLocations } from '../hooks/useLocations'
-import { useProduits } from '../hooks/useProduct'
+import { useProducts } from '../hooks/useProducts'
 import { EMPTY_STOCK_FILTERS, buildStockRows, filterStockRows, summarize } from '../lib/stocks'
 
 export default function Stocks() {
   const { stocks, loading: stocksLoading, error: stocksError } = useStocks()
-  const { produits, loading: productsLoading, error: productsError } = useProduits()
+  const { products, loading: productsLoading, error: productsError } = useProducts()
   const { locations, loading: locationsLoading, error: locationsError } = useLocations()
   const [filters, setFilters] = useState(EMPTY_STOCK_FILTERS)
 
   const loading = stocksLoading || productsLoading || locationsLoading
   const error = stocksError ?? productsError ?? locationsError
 
-  const rows = useMemo(() => buildStockRows(stocks, produits, locations), [stocks, produits, locations])
+  const rows = useMemo(() => buildStockRows(stocks, products, locations), [stocks, products, locations])
   const visibleRows = useMemo(() => filterStockRows(rows, filters), [rows, filters])
   const summary = summarize(visibleRows)
 

@@ -4,7 +4,7 @@ import { useReplenishment } from '../hooks/useReplenishment'
 import { usePurchaseOrders } from '../hooks/usePurchaseOrders'
 import { useStockMovements } from '../hooks/useStockMovements'
 import { useStocks } from '../hooks/useStocks'
-import { useProduits } from '../hooks/useProduct'
+import { useProducts } from '../hooks/useProducts'
 import { EMPTY_MOVEMENT_FILTERS } from '../api/stockMovements'
 import { sortMovements } from '../lib/stockMovements'
 import { orderStatusLabel } from '../lib/purchaseOrders'
@@ -74,7 +74,7 @@ function Dashboard() {
   const { orders, loading: ordersLoading, error: ordersError } = usePurchaseOrders()
   const { movements, loading: movementsLoading, error: movementsError } = useStockMovements(EMPTY_MOVEMENT_FILTERS)
   const { stocks, loading: stocksLoading, error: stocksError } = useStocks()
-  const { produits, loading: productsLoading, error: productsError } = useProduits()
+  const { products, loading: productsLoading, error: productsError } = useProducts()
 
   const pendingOrders = orders.filter((order) => order.status === 'draft' || order.status === 'sent')
   const recentMovements = sortMovements(movements).slice(0, PREVIEW_SIZE)
@@ -160,7 +160,7 @@ function Dashboard() {
           <Panel title="Derniers mouvements" to="/movements">
             <StatusMessage loading={movementsLoading || productsLoading} error={movementsError ?? productsError} />
             {!movementsLoading && !productsLoading && !movementsError && !productsError && (
-              <MovementsTable movements={recentMovements} products={produits} />
+              <MovementsTable movements={recentMovements} products={products} />
             )}
           </Panel>
         </div>

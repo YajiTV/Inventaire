@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { buildStockRows, filterStockRows, summarize } from './stocks'
 import type { LocationRead, StockRead } from '../types/api'
-import type { Produit } from '../types/product'
+import type { ProductRead } from '../types/api'
 
 const products = [
   {
@@ -28,7 +28,7 @@ const products = [
     reorder_threshold: 10,
     total_quantity: 80,
   },
-] satisfies Produit[]
+] satisfies ProductRead[]
 
 const locations: LocationRead[] = [
   { id: 1, code: 'CONG-01', name: 'Congélateur' },

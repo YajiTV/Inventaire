@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useFournisseurs } from "../hooks/useSuppliers";
-import type { Fournisseur } from "../types/supplier";
+import { useSuppliers } from "../hooks/useSuppliers";
+import type { SupplierRead } from "../types/api";
 import { ApiError } from "../lib/api";
 import { DataTable } from "../components/DataTable";
 import type { DataTableColumn } from "../components/DataTable";
@@ -18,9 +18,9 @@ import { StatusMessage } from "../components/StatusMessage";
 
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+$/;
 
-export default function Fournisseurs() {
-    const { fournisseurs, loading, error, addFournisseur, editFournisseur, removeFournisseur } =
-        useFournisseurs();
+export default function Suppliers() {
+    const { suppliers, loading, error, addSupplier, editSupplier, removeSupplier } =
+        useSuppliers();
 
     // Champs du formulaire de création
     const [name, setName] = useState("");
@@ -56,7 +56,7 @@ export default function Fournisseurs() {
         if (!validate()) return;
 
         try {
-            await addFournisseur({
+            await addSupplier({
                 name,
                 email: email || null,
                 phone: phone || null,
@@ -73,7 +73,7 @@ export default function Fournisseurs() {
         }
     }
 
-    function startEdit(f: Fournisseur) {
+    function startEdit(f: SupplierRead) {
         setEditingId(f.id);
         setEditName(f.name);
     }
@@ -88,7 +88,7 @@ export default function Fournisseurs() {
         }
 
         try {
-            await editFournisseur(id, { name: editName });
+            await editSupplier(id, { name: editName });
             setEditingId(null);
             setSuccessMessage("Fournisseur modifié avec succès");
         } catch (err) {
@@ -100,7 +100,7 @@ export default function Fournisseurs() {
         setApiError(null);
         setSuccessMessage(null);
         try {
-            await removeFournisseur(id);
+            await removeSupplier(id);
             setSuccessMessage("Fournisseur supprimé avec succès");
         } catch (err) {
             setApiError(err instanceof ApiError ? err.message : "Erreur inattendue");
@@ -110,7 +110,7 @@ export default function Fournisseurs() {
     // Colonnes du DataTable : seule "Nom" est éditable inline (comportement
     // identique à la version précédente), les autres colonnes sont en lecture
     // seule dans ce tableau.
-    const columns: DataTableColumn<Fournisseur>[] = [
+    const columns: DataTableColumn<SupplierRead>[] = [
         {
             header: "Nom",
             render: (f) =>
@@ -150,7 +150,7 @@ export default function Fournisseurs() {
             <StatusMessage
                 loading={loading}
                 error={error}
-                isEmpty={!loading && !error && fournisseurs.length === 0}
+                isEmpty={!loading && !error && suppliers.length === 0}
                 emptyMessage="Aucun fournisseur"
             />
             {apiError && (
@@ -160,10 +160,10 @@ export default function Fournisseurs() {
             )}
             {successMessage && <p className="text-green-600 dark:text-green-400">{successMessage}</p>}
 
-            {!loading && !error && fournisseurs.length > 0 && (
+            {!loading && !error && suppliers.length > 0 && (
                 <DataTable
                     columns={columns}
-                    rows={fournisseurs}
+                    rows={suppliers}
                     getRowId={(f) => f.id}
                     renderActions={(f) =>
                         editingId === f.id ? (

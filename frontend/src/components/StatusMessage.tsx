@@ -1,4 +1,4 @@
-// Message d'état réutilisable pour une page de liste (produits, fournisseurs,
+// Message d'état réutilisable pour une page de liste (produits, suppliers,
 // catégories, ...) : affiche soit le chargement, soit une erreur, soit un
 // message "liste vide", dans cet ordre de priorité. N'affiche rien si aucun
 // des trois cas ne s'applique (données chargées, sans erreur, non vides) :
