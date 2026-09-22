@@ -22,7 +22,7 @@ export default function ProductDetail() {
     const supplier = fournisseurs.find((f) => f.id === produit?.supplier_id);
 
     return (
-        <section className="p-8">
+        <section className="p-4 sm:p-8">
             <div className="mb-6 flex items-center justify-between">
                 <h1 className="text-2xl font-semibold">{produit !== null ? produit.name : "Produit"}</h1>
                 <Link to="/products" className="underline">

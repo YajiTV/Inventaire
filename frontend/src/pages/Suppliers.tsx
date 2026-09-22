@@ -126,8 +126,8 @@ export default function Fournisseurs() {
     ];
 
     return (
-        <div className="p-8">
-            <h1>Fournisseurs</h1>
+        <div className="p-4 sm:p-8">
+            <h1 className="mb-6 text-2xl font-semibold">Fournisseurs</h1>
 
             <form onSubmit={handleSubmit} className="mb-4 flex flex-wrap gap-2">
                 <FormField id="name" label="Nom" value={name} onChange={setName} error={errors.name} required />
