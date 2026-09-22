@@ -126,8 +126,8 @@ export default function Fournisseurs() {
     ];
 
     return (
-        <div className="p-8">
-            <h1>Fournisseurs</h1>
+        <div className="p-4 sm:p-8">
+            <h1 className="mb-6 text-2xl font-semibold">Fournisseurs</h1>
 
             <form onSubmit={handleSubmit} className="mb-4 flex flex-wrap gap-2">
                 <FormField id="name" label="Nom" value={name} onChange={setName} error={errors.name} required />
@@ -142,7 +142,7 @@ export default function Fournisseurs() {
                 />
                 <FormField id="phone" label="Téléphone" value={phone} onChange={setPhone} placeholder="0102030405" />
                 <FormField id="address" label="Adresse" value={address} onChange={setAddress} />
-                <button type="submit" className="self-end border rounded px-3 py-1">
+                <button type="submit" className="self-end border rounded px-3 py-1 dark:border-gray-600">
                     Ajouter
                 </button>
             </form>
@@ -154,11 +154,11 @@ export default function Fournisseurs() {
                 emptyMessage="Aucun fournisseur"
             />
             {apiError && (
-                <p role="alert" className="text-red-600">
+                <p role="alert" className="text-red-600 dark:text-red-400">
                     {apiError}
                 </p>
             )}
-            {successMessage && <p className="text-green-600">{successMessage}</p>}
+            {successMessage && <p className="text-green-600 dark:text-green-400">{successMessage}</p>}
 
             {!loading && !error && fournisseurs.length > 0 && (
                 <DataTable
@@ -168,13 +168,13 @@ export default function Fournisseurs() {
                     renderActions={(f) =>
                         editingId === f.id ? (
                             <>
-                                <button onClick={() => saveEdit(f.id)}>Enregistrer</button>
-                                <button onClick={() => setEditingId(null)}>Annuler</button>
+                                <button onClick={() => saveEdit(f.id)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Enregistrer</button>
+                                <button onClick={() => setEditingId(null)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Annuler</button>
                             </>
                         ) : (
                             <>
-                                <button onClick={() => startEdit(f)}>Modifier</button>
-                                <button onClick={() => handleDelete(f.id)}>Supprimer</button>
+                                <button onClick={() => startEdit(f)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Modifier</button>
+                                <button onClick={() => handleDelete(f.id)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Supprimer</button>
                             </>
                         )
                     }

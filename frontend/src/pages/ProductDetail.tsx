@@ -22,7 +22,7 @@ export default function ProductDetail() {
     const supplier = fournisseurs.find((f) => f.id === produit?.supplier_id);
 
     return (
-        <section className="p-8">
+        <section className="p-4 sm:p-8">
             <div className="mb-6 flex items-center justify-between">
                 <h1 className="text-2xl font-semibold">{produit !== null ? produit.name : "Produit"}</h1>
                 <Link to="/products" className="underline">
@@ -34,7 +34,7 @@ export default function ProductDetail() {
             {loading && <p>Chargement du produit...</p>}
 
             {!loading && error !== null && (
-                <p role="alert" className="text-red-600">
+                <p role="alert" className="text-red-600 dark:text-red-400">
                     {error}
                 </p>
             )}
@@ -42,41 +42,41 @@ export default function ProductDetail() {
             {/* On teste produit !== null : avant la réponse du serveur il vaut null */}
             {!loading && error === null && produit !== null && (
                 <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <div className="rounded border p-3">
-                        <dt className="text-xs text-gray-500">SKU</dt>
+                    <div className="rounded border p-3 dark:border-gray-700">
+                        <dt className="text-xs text-gray-500 dark:text-gray-400">SKU</dt>
                         <dd>{produit.sku}</dd>
                     </div>
-                    <div className="rounded border p-3">
-                        <dt className="text-xs text-gray-500">Code-barres</dt>
+                    <div className="rounded border p-3 dark:border-gray-700">
+                        <dt className="text-xs text-gray-500 dark:text-gray-400">Code-barres</dt>
                         <dd>{produit.barcode ?? "Non renseigné"}</dd>
                     </div>
-                    <div className="rounded border p-3">
-                        <dt className="text-xs text-gray-500">Prix unitaire</dt>
+                    <div className="rounded border p-3 dark:border-gray-700">
+                        <dt className="text-xs text-gray-500 dark:text-gray-400">Prix unitaire</dt>
                         <dd>{produit.unit_price} €</dd>
                     </div>
-                    <div className="rounded border p-3">
-                        <dt className="text-xs text-gray-500">Catégorie</dt>
+                    <div className="rounded border p-3 dark:border-gray-700">
+                        <dt className="text-xs text-gray-500 dark:text-gray-400">Catégorie</dt>
                         <dd>{category?.name ?? produit.category_id}</dd>
                     </div>
-                    <div className="rounded border p-3">
-                        <dt className="text-xs text-gray-500">Fournisseur</dt>
+                    <div className="rounded border p-3 dark:border-gray-700">
+                        <dt className="text-xs text-gray-500 dark:text-gray-400">Fournisseur</dt>
                         <dd>{supplier?.name ?? "Aucun"}</dd>
                     </div>
-                    <div className="rounded border p-3">
-                        <dt className="text-xs text-gray-500">Stock total</dt>
+                    <div className="rounded border p-3 dark:border-gray-700">
+                        <dt className="text-xs text-gray-500 dark:text-gray-400">Stock total</dt>
                         <dd>
                             {produit.total_quantity}{" "}
                             {produit.total_quantity <= produit.reorder_threshold && (
-                                <span className="text-red-600">(sous le seuil)</span>
+                                <span className="text-red-600 dark:text-red-400">(sous le seuil)</span>
                             )}
                         </dd>
                     </div>
-                    <div className="rounded border p-3">
-                        <dt className="text-xs text-gray-500">Seuil de réapprovisionnement</dt>
+                    <div className="rounded border p-3 dark:border-gray-700">
+                        <dt className="text-xs text-gray-500 dark:text-gray-400">Seuil de réapprovisionnement</dt>
                         <dd>{produit.reorder_threshold}</dd>
                     </div>
-                    <div className="rounded border p-3 sm:col-span-2">
-                        <dt className="text-xs text-gray-500">Description</dt>
+                    <div className="rounded border p-3 sm:col-span-2 dark:border-gray-700">
+                        <dt className="text-xs text-gray-500 dark:text-gray-400">Description</dt>
                         <dd>{produit.description ?? "Aucune description"}</dd>
                     </div>
                 </dl>

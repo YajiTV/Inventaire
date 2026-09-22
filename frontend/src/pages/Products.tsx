@@ -196,7 +196,7 @@ export default function Produits() {
             header: "Stock",
             render: (p) =>
                 p.total_quantity <= p.reorder_threshold ? (
-                    <span className="text-red-600">{p.total_quantity} (sous le seuil)</span>
+                    <span className="text-red-600 dark:text-red-400">{p.total_quantity} (sous le seuil)</span>
                 ) : (
                     p.total_quantity
                 ),
@@ -204,8 +204,8 @@ export default function Produits() {
     ];
 
     return (
-        <div className="p-8">
-            <h1>Produits</h1>
+        <div className="p-4 sm:p-8">
+            <h1 className="mb-6 text-2xl font-semibold">Produits</h1>
 
             {/* Barre de filtres : chaque changement met à jour l'objet filters,
                 ce qui relance le chargement de la liste (voir useProduits) */}
@@ -223,7 +223,7 @@ export default function Produits() {
                         id="filter-category"
                         value={filters.categoryId}
                         onChange={(e) => updateFilters({ ...filters, categoryId: e.target.value })}
-                        className="border rounded px-2 py-1"
+                        className="border rounded px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
                     >
                         <option value="">Toutes</option>
                         {categories.map((c) => (
@@ -239,7 +239,7 @@ export default function Produits() {
                         id="filter-supplier"
                         value={filters.supplierId}
                         onChange={(e) => updateFilters({ ...filters, supplierId: e.target.value })}
-                        className="border rounded px-2 py-1"
+                        className="border rounded px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
                     >
                         <option value="">Tous</option>
                         {fournisseurs.map((f) => (
@@ -285,7 +285,7 @@ export default function Produits() {
                     error={errors.categoryId}
                     required
                 />
-                <button type="submit" className="self-end border rounded px-3 py-1">
+                <button type="submit" className="self-end border rounded px-3 py-1 dark:border-gray-600">
                     Ajouter
                 </button>
             </form>
@@ -297,11 +297,11 @@ export default function Produits() {
                 emptyMessage="Aucun produit ne correspond"
             />
             {apiError && (
-                <p role="alert" className="text-red-600">
+                <p role="alert" className="text-red-600 dark:text-red-400">
                     {apiError}
                 </p>
             )}
-            {successMessage && <p className="text-green-600">{successMessage}</p>}
+            {successMessage && <p className="text-green-600 dark:text-green-400">{successMessage}</p>}
 
             {!loading && !error && produits.length > 0 && (
                 <DataTable
@@ -311,13 +311,13 @@ export default function Produits() {
                     renderActions={(p) =>
                         editingId === p.id ? (
                             <>
-                                <button onClick={() => saveEdit(p.id)}>Enregistrer</button>
-                                <button onClick={() => setEditingId(null)}>Annuler</button>
+                                <button onClick={() => saveEdit(p.id)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Enregistrer</button>
+                                <button onClick={() => setEditingId(null)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Annuler</button>
                             </>
                         ) : (
                             <>
-                                <button onClick={() => startEdit(p)}>Modifier</button>
-                                <button onClick={() => handleDelete(p.id)}>Supprimer</button>
+                                <button onClick={() => startEdit(p)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Modifier</button>
+                                <button onClick={() => handleDelete(p.id)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Supprimer</button>
                             </>
                         )
                     }
@@ -329,7 +329,7 @@ export default function Produits() {
                 <button
                     onClick={() => setOffset(offset - PRODUITS_PAGE_SIZE)}
                     disabled={offset === 0}
-                    className="border rounded px-3 py-1 disabled:opacity-50"
+                    className="border rounded px-3 py-1 disabled:opacity-50 dark:border-gray-600"
                 >
                     Précédent
                 </button>
@@ -339,7 +339,7 @@ export default function Produits() {
                 <button
                     onClick={() => setOffset(offset + PRODUITS_PAGE_SIZE)}
                     disabled={currentPage >= totalPages}
-                    className="border rounded px-3 py-1 disabled:opacity-50"
+                    className="border rounded px-3 py-1 disabled:opacity-50 dark:border-gray-600"
                 >
                     Suivant
                 </button>
