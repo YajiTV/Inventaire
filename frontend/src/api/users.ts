@@ -21,3 +21,7 @@ export async function updateUser(id: number, data: UserUpdate): Promise<UserRead
   })
   return response.json()
 }
+
+export async function deleteUser(id: number): Promise<void> {
+  await apiFetch(`/users/${id}`, { method: 'DELETE' })
+}
