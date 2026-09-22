@@ -1,5 +1,3 @@
-// Jointure et filtrage des stocks cote client : l'API /stocks ne renvoie que des
-// identifiants, les noms viennent de /products et /locations.
 import type { LocationRead, StockRead } from '../types/api'
 import type { ProductRead } from '../types/api'
 

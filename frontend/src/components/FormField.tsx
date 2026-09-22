@@ -1,12 +1,5 @@
 import type { InputHTMLAttributes } from "react";
 
-// Champ de formulaire réutilisable : label + input contrôlé + message
-// d'erreur optionnel. Le composant ne connaît rien du domaine (produit,
-// fournisseur, catégorie...) : il reçoit sa valeur et un callback de
-// changement, toute la logique (validation, soumission) reste dans le
-// composant parent. Si "label" est vide, aucun <label> n'est affiché : utile
-// pour les inputs d'édition inline dans un tableau, où le label serait
-// redondant avec l'en-tête de colonne.
 interface FormFieldProps {
     id: string;
     label: string;

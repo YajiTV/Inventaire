@@ -19,7 +19,7 @@ export function AuthProvider({children}: {children: ReactNode}) {
         const data: TokenResponse = await response.json()
         setAccessToken(data.access_token)
 
-        // header manuel : le state accessToken n'est pas encore a jour ici
+        // accessToken state is not updated yet, so pass the token explicitly
         const meResponse = await apiFetch('/auth/me', {
             headers: {Authorization: `Bearer ${data.access_token}`}
         })
@@ -47,7 +47,6 @@ export function AuthProvider({children}: {children: ReactNode}) {
         setUser(updated)
     }
 
-    // Pose un nouveau access token a partir du cookie refresh, renvoie le token
     async function refresh(): Promise<string | null> {
         try {
             const response = await apiFetch('/auth/refresh', {method: 'POST'})
@@ -72,8 +71,6 @@ export function AuthProvider({children}: {children: ReactNode}) {
         setUser(null)
     }
 
-    // Tente de restaurer une session existante au chargement (fonction async :
-    // les setState arrivent apres la reponse, pas pendant l'effet)
     useEffect(() => {
         const restore = async () => {
             await refresh()
@@ -82,7 +79,7 @@ export function AuthProvider({children}: {children: ReactNode}) {
         restore()
     }, [])
 
-    // Donne a apiFetch (hors React) le token courant et les fonctions refresh/logout
+    // No deps on purpose: keeps apiFetch (outside React) in sync with the latest token
     useEffect(() => {
         registerAuth(accessToken, refresh, handleSessionExpired)
     })

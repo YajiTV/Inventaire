@@ -23,7 +23,6 @@ export const userHandlers = [
 
     http.post('*/users', async ({request}) => {
         const payload = (await request.json()) as UserCreate
-        // UserCreate contient un password : on ne le fait pas passer dans UserRead, qui ne l'expose jamais.
         const created: UserRead = {
             id: nextId++,
             email: payload.email,

@@ -1,4 +1,3 @@
-// Regroupe les suggestions par fournisseur : une commande générée ne peut porter que sur un seul fournisseur
 import type { ReplenishmentSuggestion } from '../types/api'
 
 export function groupBySupplier(suggestions: ReplenishmentSuggestion[]): {

@@ -2,7 +2,6 @@ import type { ErrorResponse } from '../types/api'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
 
-// Rempli par AuthContext via registerAuth (apiFetch n'est pas un hook)
 let currentToken: string | null = null
 let refreshToken: (() => Promise<string | null>) | null = null
 let onSessionExpired: (() => void) | null = null
@@ -17,8 +16,6 @@ export function registerAuth(
   onSessionExpired = sessionExpired
 }
 
-// Porte le code HTTP jusqu'aux appelants : sans lui, un 409 ne se distingue
-// pas d'un 500 et les ecrans ne peuvent pas reagir au cas metier.
 export class ApiError extends Error {
   status: number
 
@@ -36,7 +33,7 @@ async function readErrorMessage(response: Response, path: string): Promise<strin
       return body.detail
     }
   } catch {
-    // Corps vide ou non JSON : on retombe sur le message generique.
+    // empty or non-JSON body: fall back to the generic message
   }
 
   return `Erreur API ${response.status} sur ${path}`
@@ -45,7 +42,7 @@ async function readErrorMessage(response: Response, path: string): Promise<strin
 async function callApi(path: string, options: RequestInit, token: string | null): Promise<Response> {
   return fetch(`${API_BASE_URL}${path}`, {
     ...options,
-    credentials: 'include', // envoie/reçoit le cookie refresh token httpOnly
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -57,12 +54,10 @@ async function callApi(path: string, options: RequestInit, token: string | null)
 export async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const response = await callApi(path, options, currentToken)
 
-  // Pas d'intercepteur sur /auth/* : sinon un refresh qui echoue en 401
-  // relancerait un refresh a l'infini.
+  // Never retry /auth/*: a failing refresh would otherwise trigger refreshes forever
   const isAuthRoute = path.startsWith('/auth/')
 
   if (response.status === 401 && !isAuthRoute && refreshToken) {
-    // Token expire : on tente un refresh puis on rejoue la requete une fois
     const newToken = await refreshToken()
 
     if (!newToken) {

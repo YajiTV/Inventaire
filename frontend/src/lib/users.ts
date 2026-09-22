@@ -5,7 +5,6 @@ const PASSWORD_MIN_LENGTH = 8
 const PASSWORD_MAX_LENGTH = 128
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-// Reprend les contraintes de UserBase/UserCreate (backend/app/schemas/user.py) : full_name 1-120, password 8-128, email au format standard.
 export function validateUserCreate(user: UserCreate): string[] {
   const errors: string[] = []
   const fullName = user.full_name.trim()
@@ -42,8 +41,6 @@ export function validateFullName(fullName: string): string[] {
   return errors
 }
 
-// Initiales pour l'avatar : premiere lettre des deux premiers mots du nom,
-// l'email en secours tant que le nom est vide.
 export function getInitials(fullName: string, email: string): string {
   return (fullName || email)
     .split(' ')

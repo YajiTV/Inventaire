@@ -7,28 +7,17 @@ import type { DataTableColumn } from "../components/DataTable";
 import { FormField } from "../components/FormField";
 import { StatusMessage } from "../components/StatusMessage";
 
-// Page CRUD fournisseurs : liste + formulaire d'ajout + édition/suppression
-// inline sur chaque ligne. Pas de librairie de formulaire, juste du useState
-// simple pour rester lisible pour la fiche de révision React/TS.
-//
-// Le tableau (DataTable), les champs (FormField) et les messages
-// chargement/erreur/liste vide (StatusMessage) sont des composants partagés
-// avec Produits, pour ne pas dupliquer la structure "form + table +
-// édition inline" entre les deux pages.
-
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+$/;
 
 export default function Suppliers() {
     const { suppliers, loading, error, addSupplier, editSupplier, removeSupplier } =
         useSuppliers();
 
-    // Champs du formulaire de création
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [address, setAddress] = useState("");
 
-    // Id du fournisseur en cours d'édition (null = aucune ligne en édition)
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editName, setEditName] = useState("");
 
@@ -107,9 +96,6 @@ export default function Suppliers() {
         }
     }
 
-    // Colonnes du DataTable : seule "Nom" est éditable inline (comportement
-    // identique à la version précédente), les autres colonnes sont en lecture
-    // seule dans ce tableau.
     const columns: DataTableColumn<SupplierRead>[] = [
         {
             header: "Nom",

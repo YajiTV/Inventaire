@@ -1,4 +1,3 @@
-// Filtres de la liste des produits (etat de la page, pas un type de l'API)
 export interface ProductFilters {
     search: string;
     categoryId: string;

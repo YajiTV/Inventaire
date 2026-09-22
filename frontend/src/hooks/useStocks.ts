@@ -8,8 +8,6 @@ export function useStocks() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Le composant peut etre demonte avant la reponse : on ignore alors le resultat
-    // plutot que de poser un state sur un composant qui n'existe plus.
     let cancelled = false
 
     fetchStocks()

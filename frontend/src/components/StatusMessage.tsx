@@ -1,8 +1,3 @@
-// Message d'état réutilisable pour une page de liste (produits, suppliers,
-// catégories, ...) : affiche soit le chargement, soit une erreur, soit un
-// message "liste vide", dans cet ordre de priorité. N'affiche rien si aucun
-// des trois cas ne s'applique (données chargées, sans erreur, non vides) :
-// c'est dans ce cas-là que la page appelante doit afficher son DataTable.
 interface StatusMessageProps {
     loading?: boolean;
     error?: string | null;

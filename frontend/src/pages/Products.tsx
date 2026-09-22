@@ -12,59 +12,38 @@ import type { DataTableColumn } from "../components/DataTable";
 import { FormField } from "../components/FormField";
 import { StatusMessage } from "../components/StatusMessage";
 
-// Page CRUD produits : filtres + liste paginée + formulaire d'ajout +
-// édition/suppression inline sur chaque ligne. category_id est saisi en brut
-// dans le formulaire d'ajout (le sélecteur viendra avec la tâche "formulaire").
-//
-// Le tableau (DataTable), les champs (FormField) et les messages
-// chargement/erreur/liste vide (StatusMessage) sont des composants partagés
-// avec Fournisseurs.
-
-// Même format que le backend (backend/app/schemas/product.py) : majuscules, chiffres et tirets uniquement
 const SKU_PATTERN = /^[A-Z0-9-]+$/;
 
 export default function Products() {
-    // Filtres (un seul objet) et position dans la liste (0 = page 1, 5 = page 2...)
     const [filters, setFilters] = useState<ProductFilters>(EMPTY_PRODUCT_FILTERS);
     const [offset, setOffset] = useState(0);
 
-    // Le hook recharge la liste dès que filters ou offset changent
     const { products, total, loading, error, addProduct, editProduct, removeProduct } = useProducts(filters, offset);
 
-    // Listes pour remplir les <select> de filtre et afficher les noms
     const { categories } = useCategories();
     const { suppliers } = useSuppliers();
 
-    // Champs du formulaire de création
     const [sku, setSku] = useState("");
     const [name, setName] = useState("");
     const [unitPrice, setUnitPrice] = useState("");
     const [categoryId, setCategoryId] = useState("");
 
-    // Id du produit en cours d'édition (null = aucune ligne en édition)
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editName, setEditName] = useState("");
     const [editUnitPrice, setEditUnitPrice] = useState("");
 
-    //Erreurs de validation, une par champ (absente = pas d'erreur)
     const [errors, setErrors] = useState<{sku?: string; name?: string; unitPrice?: string; categoryId?: string}>({});
-    // Erreur renvoyée par l'API lors d'un ajout/modif/suppression (422, 409, etc.)
     const [apiError, setApiError] = useState<string | null>(null);
-    // Message affiché après une action réussie
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    // Calcul de la pagination à partir du total renvoyé par le serveur
     const totalPages = Math.max(1, Math.ceil(total / PRODUCTS_PAGE_SIZE));
     const currentPage = offset / PRODUCTS_PAGE_SIZE + 1;
 
-    // Quand un filtre change, on revient toujours à la page 1 : sinon on
-    // pourrait se retrouver page 3 d'une liste qui n'a plus que 1 page.
     function updateFilters(newFilters: ProductFilters) {
         setFilters(newFilters);
         setOffset(0);
     }
 
-    // Retrouve le nom d'une catégorie à partir de son id (sinon on affiche l'id)
     function categoryName(id: number): string {
         return categories.find((c) => c.id === id)?.name ?? String(id);
     }
@@ -88,7 +67,7 @@ export default function Products() {
         }
 
         setErrors(newErrors);
-        return Object.keys(newErrors).length === 0; // true = pas d'erreurs
+        return Object.keys(newErrors).length === 0;
     }
 
     async function handleSubmit(e: React.FormEvent) {
@@ -96,13 +75,13 @@ export default function Products() {
         setApiError(null);
         setSuccessMessage(null);
 
-        if (!validate()) return; // stoppe si un champ est invalide
+        if (!validate()) return;
 
         try {
             await addProduct({
                 sku,
                 name,
-                unit_price: unitPrice, // plus de "|| '0'" : le prix est vérifié avant
+                unit_price: unitPrice,
                 category_id: Number(categoryId),
                 reorder_threshold: 0,
             });
@@ -150,8 +129,7 @@ export default function Products() {
         setSuccessMessage(null);
         try {
             await removeProduct(id);
-            // Si on vient de supprimer le dernier produit d'une page (autre que
-            // la première), on recule d'une page pour ne pas afficher une page vide.
+            // Deleted the last item of a page: go back one page instead of showing an empty one
             if (products.length === 1 && offset > 0) {
                 setOffset(offset - PRODUCTS_PAGE_SIZE);
             }
@@ -161,9 +139,6 @@ export default function Products() {
         }
     }
 
-    // Colonnes du DataTable : chaque render() affiche soit la valeur brute,
-    // soit un FormField d'édition si la ligne est celle en cours d'édition
-    // (label vide car l'en-tête de colonne fait déjà office de label).
     const columns: DataTableColumn<ProductRead>[] = [
         { header: "SKU", render: (p) => p.sku },
         {
@@ -172,7 +147,6 @@ export default function Products() {
                 editingId === p.id ? (
                     <FormField id={`edit-name-${p.id}`} label="" value={editName} onChange={setEditName} />
                 ) : (
-                    // Le nom est un lien vers la page détail /products/:id
                     <Link to={`/products/${p.id}`} className="underline">
                         {p.name}
                     </Link>
@@ -208,8 +182,6 @@ export default function Products() {
         <div className="p-4 sm:p-8">
             <h1 className="mb-6 text-2xl font-semibold">Produits</h1>
 
-            {/* Barre de filtres : chaque changement met à jour l'objet filters,
-                ce qui relance le chargement de la liste (voir useProducts) */}
             <div className="mb-4 flex flex-wrap items-end gap-2">
                 <FormField
                     id="filter-search"
@@ -325,7 +297,6 @@ export default function Products() {
                 />
             )}
 
-            {/* Pagination : Précédent/Suivant modifient offset, le hook recharge la page */}
             <div className="mt-4 flex items-center gap-4">
                 <button
                     onClick={() => setOffset(offset - PRODUCTS_PAGE_SIZE)}

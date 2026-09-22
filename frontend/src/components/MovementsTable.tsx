@@ -16,7 +16,6 @@ export function MovementsTable({ movements, products }: MovementsTableProps) {
         );
     }
 
-    // L'API /stock-movements ne renvoie que product_id : le nom vient de /products.
     const productsById = new Map(products.map(product => [product.id, product]));
 
     return (

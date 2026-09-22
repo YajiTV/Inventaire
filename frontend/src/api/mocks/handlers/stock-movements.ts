@@ -10,7 +10,6 @@ let stockMovements: StockMovementRead[] = loadMock("stock-movements", [...seedMo
 let nextId = nextIdFrom(stockMovements);
 
 export const stockMovementHandlers = [
-    // Pas de PATCH/DELETE : un mouvement de stock est un evenement, pas une ressource modifiable
     http.get("*/stock-movements", ({ request }) => {
         const url = new URL(request.url);
         const productId = url.searchParams.get("product_id");
@@ -35,8 +34,6 @@ export const stockMovementHandlers = [
     http.post("*/stock-movements", async ({ request }) => {
         const payload = (await request.json()) as StockMovementCreate;
 
-        // Une sortie ou un transfert ne peut pas prendre plus que ce qui est en rayon :
-        // le backend repond 409 dans ce cas, le mock doit faire pareil.
         if (payload.type !== "in") {
             const line = getStocks().find(
                 s => s.product_id === payload.product_id && s.location_id === payload.source_location_id,
@@ -54,7 +51,7 @@ export const stockMovementHandlers = [
             source_location_id: payload.source_location_id ?? null,
             target_location_id: payload.target_location_id ?? null,
             reason: payload.reason ?? null,
-            user_id: 1, // aligne sur MOCK_USER dans auth.ts
+            user_id: 1,
             created_at: new Date().toISOString(),
         };
         stockMovements.push(created);

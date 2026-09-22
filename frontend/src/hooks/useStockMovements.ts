@@ -7,12 +7,12 @@ export function useStockMovements(filters: MovementFilters) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Depend on primitives, not on the filters object: a new reference each render would refetch in a loop
   const { productId, locationId, type } = filters
 
   useEffect(() => {
     let cancelled = false
 
-    // Un changement de filtre relance une requete : on repasse en chargement.
     // oxlint-disable-next-line react/set-state-in-effect
     setLoading(true)
     fetchMovements({ productId, locationId, type })
@@ -31,8 +31,6 @@ export function useStockMovements(filters: MovementFilters) {
     return () => {
       cancelled = true
     }
-    // Depend des trois valeurs et non de l'objet : une nouvelle reference a chaque
-    // rendu relancerait la requete en boucle.
   }, [productId, locationId, type])
 
   return { movements, loading, error }

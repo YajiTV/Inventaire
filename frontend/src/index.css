@@ -1,11 +1,8 @@
 @import "tailwindcss";
 
-/* Bascule dark: sur la presence de la classe .dark (posee par ThemeContext)
-   plutot que sur prefers-color-scheme, pour permettre un toggle manuel. */
+/* dark: follows the .dark class set by ThemeContext, not prefers-color-scheme */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Fond/texte de base au niveau body : couvre aussi les pages hors <Layout>
-   (Login, Register) qui n'heritent pas du fond pose dans Layout.tsx. */
 body {
   @apply bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100;
 }
