@@ -1,0 +1,96 @@
+import { useState, type FormEvent } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
+import { ThemeToggle } from '../components/ThemeToggle'
+
+export default function Login() {
+  const { login } = useAuth()
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault()
+    setError(null)
+
+    if (!email.trim() || !password) {
+      setError("L'email et le mot de passe sont obligatoires.")
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      await login(email.trim(), password)
+      navigate('/')
+    } catch {
+      setError('Email ou mot de passe incorrect')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="p-4 sm:p-8">
+      <div className="mx-auto flex max-w-sm justify-end">
+        <ThemeToggle />
+      </div>
+
+      <div className="mx-auto mt-4 max-w-sm rounded border p-6 shadow-sm dark:border-gray-700">
+        <h1 className="mb-1 text-2xl font-semibold">Connexion</h1>
+        <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">Connecte-toi pour accéder à l'inventaire.</p>
+
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="email" className="text-sm text-gray-700 dark:text-gray-300">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              placeholder="vous@exemple.fr"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:focus:ring-gray-600"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label htmlFor="password" className="text-sm text-gray-700 dark:text-gray-300">
+              Mot de passe
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:focus:ring-gray-600"
+            />
+          </div>
+
+          {error !== null && (
+            <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+              {error}
+            </p>
+          )}
+
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:gap-4">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="rounded bg-gray-900 px-4 py-2 text-white hover:bg-gray-700 disabled:cursor-not-allowed disabled:bg-gray-400 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-300 dark:disabled:bg-gray-700"
+            >
+              {isSubmitting ? 'Connexion...' : 'Se connecter'}
+            </button>
+            <Link to="/register" className="text-sm underline">
+              S'enregistrer
+            </Link>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
