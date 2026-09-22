@@ -11,7 +11,8 @@ const links = [
   { to: '/categories', label: 'Catégories' },
   { to: '/orders', label: 'Commandes' },
   { to: '/users', label: 'Utilisateurs' },
-    { to: '/profile', label: 'Profil' },
+  { to: '/profile', label: 'Profil' },
+  { to: '/locations', label: 'Emplacements' },
 ]
 
 export function Layout() {
