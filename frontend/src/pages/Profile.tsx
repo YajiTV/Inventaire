@@ -45,7 +45,7 @@ export default function Profile() {
     <div className="p-4 sm:p-8">
       <div className="mx-auto mt-10 max-w-sm rounded border p-6 shadow-sm sm:mt-20 dark:border-gray-700">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gray-900 text-xl font-semibold text-white">
+          <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gray-900 dark:bg-white text-xl font-semibold text-white dark:text-black">
             {initials}
           </div>
           <h1 className="text-2xl font-semibold">{user.full_name}</h1>
