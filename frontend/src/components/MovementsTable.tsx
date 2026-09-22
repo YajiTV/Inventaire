@@ -1,10 +1,10 @@
 import { movementLabel, sortMovements } from "../lib/stockMovements";
 import type { StockMovementRead } from "../types/api";
-import type { Produit } from "../types/product";
+import type { ProductRead } from "../types/api";
 
 type MovementsTableProps = {
     movements: StockMovementRead[];
-    products: Produit[];
+    products: ProductRead[];
 };
 
 export function MovementsTable({ movements, products }: MovementsTableProps) {

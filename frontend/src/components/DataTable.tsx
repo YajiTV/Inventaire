@@ -13,7 +13,7 @@ export interface DataTableColumn<T> {
 interface DataTableProps<T> {
     // Les colonnes à afficher, dans l'ordre.
     columns: DataTableColumn<T>[];
-    // Les lignes de données (produits, fournisseurs, catégories, ...).
+    // Les lignes de données (produits, suppliers, catégories, ...).
     rows: T[];
     // Comment extraire une clé unique d'une ligne, pour la prop "key" de React.
     getRowId: (row: T) => number | string;

@@ -1,7 +1,7 @@
 // Jointure et filtrage des stocks cote client : l'API /stocks ne renvoie que des
 // identifiants, les noms viennent de /products et /locations.
 import type { LocationRead, StockRead } from '../types/api'
-import type { Produit } from '../types/product'
+import type { ProductRead } from '../types/api'
 
 export interface StockRow {
   id: number
@@ -30,7 +30,7 @@ export const EMPTY_STOCK_FILTERS: StockFilters = {
 
 export function buildStockRows(
   stocks: StockRead[],
-  products: Produit[],
+  products: ProductRead[],
   locations: LocationRead[],
 ): StockRow[] {
   const productsById = new Map(products.map((product) => [product.id, product]))

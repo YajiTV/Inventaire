@@ -1,12 +1,12 @@
 import { apiFetch } from "../lib/api";
-import type { Fournisseur, FournisseurCreate, FournisseurUpdate } from "../types/supplier";
+import type { SupplierRead, SupplierCreate, SupplierUpdate } from "../types/api";
 
-export async function getFournisseurs(): Promise<Fournisseur[]> {
+export async function getSuppliers(): Promise<SupplierRead[]> {
     const res = await apiFetch("/suppliers");
     return res.json();
 }
 
-export async function createFournisseur(data: FournisseurCreate): Promise<Fournisseur> {
+export async function createSupplier(data: SupplierCreate): Promise<SupplierRead> {
     const res = await apiFetch("/suppliers", {
         method: "POST",
         body: JSON.stringify(data),
@@ -14,7 +14,7 @@ export async function createFournisseur(data: FournisseurCreate): Promise<Fourni
     return res.json();
 }
 
-export async function updateFournisseur(id: number, data: FournisseurUpdate): Promise<Fournisseur> {
+export async function updateSupplier(id: number, data: SupplierUpdate): Promise<SupplierRead> {
     const res = await apiFetch(`/suppliers/${id}`, {
         method: "PATCH",
         body: JSON.stringify(data),
@@ -22,6 +22,6 @@ export async function updateFournisseur(id: number, data: FournisseurUpdate): Pr
     return res.json();
 }
 
-export async function deleteFournisseur(id: number): Promise<void> {
+export async function deleteSupplier(id: number): Promise<void> {
     await apiFetch(`/suppliers/${id}`, { method: "DELETE" });
 }

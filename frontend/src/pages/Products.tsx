@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useProduits } from "../hooks/useProduct";
+import { useProducts } from "../hooks/useProducts";
 import { useCategories } from "../hooks/useCategories";
-import { useFournisseurs } from "../hooks/useSuppliers";
-import { EMPTY_PRODUIT_FILTERS, PRODUITS_PAGE_SIZE } from "../types/product";
-import type { Produit, ProduitFilters } from "../types/product";
+import { useSuppliers } from "../hooks/useSuppliers";
+import { EMPTY_PRODUCT_FILTERS, PRODUCTS_PAGE_SIZE } from "../lib/products";
+import type { ProductFilters } from "../lib/products";
+import type { ProductRead } from "../types/api";
 import { ApiError } from "../lib/api";
 import { DataTable } from "../components/DataTable";
 import type { DataTableColumn } from "../components/DataTable";
@@ -22,17 +23,17 @@ import { StatusMessage } from "../components/StatusMessage";
 // Même format que le backend (backend/app/schemas/product.py) : majuscules, chiffres et tirets uniquement
 const SKU_PATTERN = /^[A-Z0-9-]+$/;
 
-export default function Produits() {
+export default function Products() {
     // Filtres (un seul objet) et position dans la liste (0 = page 1, 5 = page 2...)
-    const [filters, setFilters] = useState<ProduitFilters>(EMPTY_PRODUIT_FILTERS);
+    const [filters, setFilters] = useState<ProductFilters>(EMPTY_PRODUCT_FILTERS);
     const [offset, setOffset] = useState(0);
 
     // Le hook recharge la liste dès que filters ou offset changent
-    const { produits, total, loading, error, addProduit, editProduit, removeProduit } = useProduits(filters, offset);
+    const { products, total, loading, error, addProduct, editProduct, removeProduct } = useProducts(filters, offset);
 
     // Listes pour remplir les <select> de filtre et afficher les noms
     const { categories } = useCategories();
-    const { fournisseurs } = useFournisseurs();
+    const { suppliers } = useSuppliers();
 
     // Champs du formulaire de création
     const [sku, setSku] = useState("");
@@ -53,12 +54,12 @@ export default function Produits() {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     // Calcul de la pagination à partir du total renvoyé par le serveur
-    const totalPages = Math.max(1, Math.ceil(total / PRODUITS_PAGE_SIZE));
-    const currentPage = offset / PRODUITS_PAGE_SIZE + 1;
+    const totalPages = Math.max(1, Math.ceil(total / PRODUCTS_PAGE_SIZE));
+    const currentPage = offset / PRODUCTS_PAGE_SIZE + 1;
 
     // Quand un filtre change, on revient toujours à la page 1 : sinon on
     // pourrait se retrouver page 3 d'une liste qui n'a plus que 1 page.
-    function updateFilters(newFilters: ProduitFilters) {
+    function updateFilters(newFilters: ProductFilters) {
         setFilters(newFilters);
         setOffset(0);
     }
@@ -98,7 +99,7 @@ export default function Produits() {
         if (!validate()) return; // stoppe si un champ est invalide
 
         try {
-            await addProduit({
+            await addProduct({
                 sku,
                 name,
                 unit_price: unitPrice, // plus de "|| '0'" : le prix est vérifié avant
@@ -116,7 +117,7 @@ export default function Produits() {
         }
     }
 
-    function startEdit(p: Produit) {
+    function startEdit(p: ProductRead) {
         setEditingId(p.id);
         setEditName(p.name);
         setEditUnitPrice(String(p.unit_price));
@@ -136,7 +137,7 @@ export default function Produits() {
         }
 
         try {
-            await editProduit(id, { name: editName, unit_price: editUnitPrice });
+            await editProduct(id, { name: editName, unit_price: editUnitPrice });
             setEditingId(null);
             setSuccessMessage("Produit modifié avec succès");
         } catch (err) {
@@ -148,11 +149,11 @@ export default function Produits() {
         setApiError(null);
         setSuccessMessage(null);
         try {
-            await removeProduit(id);
+            await removeProduct(id);
             // Si on vient de supprimer le dernier produit d'une page (autre que
             // la première), on recule d'une page pour ne pas afficher une page vide.
-            if (produits.length === 1 && offset > 0) {
-                setOffset(offset - PRODUITS_PAGE_SIZE);
+            if (products.length === 1 && offset > 0) {
+                setOffset(offset - PRODUCTS_PAGE_SIZE);
             }
             setSuccessMessage("Produit supprimé avec succès");
         } catch (err) {
@@ -163,7 +164,7 @@ export default function Produits() {
     // Colonnes du DataTable : chaque render() affiche soit la valeur brute,
     // soit un FormField d'édition si la ligne est celle en cours d'édition
     // (label vide car l'en-tête de colonne fait déjà office de label).
-    const columns: DataTableColumn<Produit>[] = [
+    const columns: DataTableColumn<ProductRead>[] = [
         { header: "SKU", render: (p) => p.sku },
         {
             header: "Nom",
@@ -208,7 +209,7 @@ export default function Produits() {
             <h1 className="mb-6 text-2xl font-semibold">Produits</h1>
 
             {/* Barre de filtres : chaque changement met à jour l'objet filters,
-                ce qui relance le chargement de la liste (voir useProduits) */}
+                ce qui relance le chargement de la liste (voir useProducts) */}
             <div className="mb-4 flex flex-wrap items-end gap-2">
                 <FormField
                     id="filter-search"
@@ -242,7 +243,7 @@ export default function Produits() {
                         className="border rounded px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
                     >
                         <option value="">Tous</option>
-                        {fournisseurs.map((f) => (
+                        {suppliers.map((f) => (
                             <option key={f.id} value={f.id}>
                                 {f.name}
                             </option>
@@ -293,7 +294,7 @@ export default function Produits() {
             <StatusMessage
                 loading={loading}
                 error={error}
-                isEmpty={!loading && !error && produits.length === 0}
+                isEmpty={!loading && !error && products.length === 0}
                 emptyMessage="Aucun produit ne correspond"
             />
             {apiError && (
@@ -303,10 +304,10 @@ export default function Produits() {
             )}
             {successMessage && <p className="text-green-600 dark:text-green-400">{successMessage}</p>}
 
-            {!loading && !error && produits.length > 0 && (
+            {!loading && !error && products.length > 0 && (
                 <DataTable
                     columns={columns}
-                    rows={produits}
+                    rows={products}
                     getRowId={(p) => p.id}
                     renderActions={(p) =>
                         editingId === p.id ? (
@@ -327,7 +328,7 @@ export default function Produits() {
             {/* Pagination : Précédent/Suivant modifient offset, le hook recharge la page */}
             <div className="mt-4 flex items-center gap-4">
                 <button
-                    onClick={() => setOffset(offset - PRODUITS_PAGE_SIZE)}
+                    onClick={() => setOffset(offset - PRODUCTS_PAGE_SIZE)}
                     disabled={offset === 0}
                     className="border rounded px-3 py-1 disabled:opacity-50 dark:border-gray-600"
                 >
@@ -337,7 +338,7 @@ export default function Produits() {
                     Page {currentPage} / {totalPages} ({total} produits)
                 </span>
                 <button
-                    onClick={() => setOffset(offset + PRODUITS_PAGE_SIZE)}
+                    onClick={() => setOffset(offset + PRODUCTS_PAGE_SIZE)}
                     disabled={currentPage >= totalPages}
                     className="border rounded px-3 py-1 disabled:opacity-50 dark:border-gray-600"
                 >
