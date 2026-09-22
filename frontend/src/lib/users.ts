@@ -41,3 +41,13 @@ export function validateFullName(fullName: string): string[] {
 
   return errors
 }
+
+// Initiales pour l'avatar : premiere lettre des deux premiers mots du nom,
+// l'email en secours tant que le nom est vide.
+export function getInitials(fullName: string, email: string): string {
+  return (fullName || email)
+    .split(' ')
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join('')
+}
