@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* dark: follows the .dark class set by ThemeContext, not prefers-color-scheme */
+@custom-variant dark (&:where(.dark, .dark *));
+
+body {
+  @apply bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+}
+
+@layer base {
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}

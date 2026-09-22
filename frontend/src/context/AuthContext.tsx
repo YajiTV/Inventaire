@@ -1,0 +1,100 @@
+import { useEffect, useState, type ReactNode } from 'react'
+import type { AuthContextValue, User } from '../types/auth'
+import { AuthContext } from './auth'
+import { apiFetch, registerAuth } from '../lib/api'
+import type { TokenResponse } from '../types/api'
+import {updateUser} from "../api/users";
+import type {UserUpdate} from "../types/api";
+
+export function AuthProvider({children}: {children: ReactNode}) {
+    const [accessToken, setAccessToken] = useState<string | null>(null)
+    const [user, setUser] = useState<User | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
+
+    async function login(email: string, password: string) {
+        const response = await apiFetch('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({email, password})
+        })
+        const data: TokenResponse = await response.json()
+        setAccessToken(data.access_token)
+
+        // accessToken state is not updated yet, so pass the token explicitly
+        const meResponse = await apiFetch('/auth/me', {
+            headers: {Authorization: `Bearer ${data.access_token}`}
+        })
+        setUser(await meResponse.json())
+    }
+
+    async function register(pseudo: string, email: string, password: string, confirm: string) {
+        if (password !== confirm)
+            throw new Error('Les mots de passe ne correspondent pas')
+        await apiFetch('/users', {
+            method: 'POST',
+            body: JSON.stringify({full_name: pseudo, email, password})
+        })
+        await login(email, password)
+    }
+
+    async function logout() {
+        await apiFetch('/auth/logout', {method: 'POST'})
+        setAccessToken(null)
+        setUser(null)
+    }
+    async function updateProfile(data: UserUpdate): Promise<void> {
+        if (user === null) return
+        const updated = await updateUser(user.id, data)
+        setUser(updated)
+    }
+
+    async function refresh(): Promise<string | null> {
+        try {
+            const response = await apiFetch('/auth/refresh', {method: 'POST'})
+            const data: TokenResponse = await response.json()
+            setAccessToken(data.access_token)
+
+            const meResponse = await apiFetch('/auth/me', {
+                headers: {Authorization: `Bearer ${data.access_token}`}
+            })
+            setUser(await meResponse.json())
+
+            return data.access_token
+        } catch {
+            setAccessToken(null)
+            setUser(null)
+            return null
+        }
+    }
+
+    function handleSessionExpired() {
+        setAccessToken(null)
+        setUser(null)
+    }
+
+    useEffect(() => {
+        const restore = async () => {
+            await refresh()
+            setIsLoading(false)
+        }
+        restore()
+    }, [])
+
+    // No deps on purpose: keeps apiFetch (outside React) in sync with the latest token
+    useEffect(() => {
+        registerAuth(accessToken, refresh, handleSessionExpired)
+    })
+
+    const value: AuthContextValue = {
+        user,
+        accessToken,
+        isAuthenticated: accessToken !== null,
+        isLoading,
+        login,
+        register,
+        logout,
+        refresh,
+        updateProfile
+    }
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}
