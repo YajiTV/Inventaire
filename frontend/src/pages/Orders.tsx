@@ -18,19 +18,19 @@ export default function Orders() {
 
             {loading && <p>Chargement des commandes...</p>}
             {!loading && error !== null && (
-                <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700">
+                <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
                     {error}
                 </p>
             )}
 
             {!loading && error === null && orders.length === 0 && (
-                <p className="rounded border border-dashed p-6 text-center text-gray-600">Aucune commande.</p>
+                <p className="rounded border border-dashed p-6 text-center text-gray-600 dark:border-gray-600 dark:text-gray-400">Aucune commande.</p>
             )}
 
             {!loading && error === null && orders.length > 0 && (
-                <div className="overflow-x-auto rounded border">
+                <div className="overflow-x-auto rounded border dark:border-gray-700">
                     <table className="w-full border-collapse text-sm">
-                        <thead className="bg-gray-50 text-left">
+                        <thead className="bg-gray-50 text-left dark:bg-gray-800">
                             <tr>
                                 <th className="px-3 py-2 font-medium">Référence</th>
                                 <th className="px-3 py-2 font-medium">Statut</th>
@@ -39,7 +39,7 @@ export default function Orders() {
                         </thead>
                         <tbody>
                             {orders.map(order => (
-                                <tr key={order.id} className="border-t">
+                                <tr key={order.id} className="border-t dark:border-gray-700">
                                     <td className="px-3 py-2 font-medium">{order.reference}</td>
                                     <td className="px-3 py-2">{orderStatusLabel(order.status)}</td>
                                     <td className="px-3 py-2 text-right">

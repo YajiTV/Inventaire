@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { ThemeToggle } from '../components/ThemeToggle'
 
 export default function Login() {
   const { login } = useAuth()
@@ -22,13 +23,17 @@ export default function Login() {
 
   return (
     <div className="p-4 sm:p-8">
-      <div className="mx-auto mt-10 max-w-sm rounded border p-6 shadow-sm sm:mt-20">
+      <div className="mx-auto flex max-w-sm justify-end">
+        <ThemeToggle />
+      </div>
+
+      <div className="mx-auto mt-4 max-w-sm rounded border p-6 shadow-sm dark:border-gray-700">
         <h1 className="mb-1 text-2xl font-semibold">Connexion</h1>
-        <p className="mb-6 text-sm text-gray-500">Connecte-toi pour accéder à l'inventaire.</p>
+        <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">Connecte-toi pour accéder à l'inventaire.</p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <label htmlFor="email" className="text-sm text-gray-700">
+            <label htmlFor="email" className="text-sm text-gray-700 dark:text-gray-300">
               Email
             </label>
             <input
@@ -38,12 +43,12 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              className="w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:focus:ring-gray-600"
             />
           </div>
 
           <div className="flex flex-col gap-1">
-            <label htmlFor="password" className="text-sm text-gray-700">
+            <label htmlFor="password" className="text-sm text-gray-700 dark:text-gray-300">
               Mot de passe
             </label>
             <input
@@ -52,12 +57,12 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              className="w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:focus:ring-gray-600"
             />
           </div>
 
           {error !== null && (
-            <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
               {error}
             </p>
           )}
@@ -65,7 +70,7 @@ export default function Login() {
           <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:gap-4">
             <button
               type="submit"
-              className="rounded bg-gray-900 px-4 py-2 text-white hover:bg-gray-700"
+              className="rounded bg-gray-900 px-4 py-2 text-white hover:bg-gray-700 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-300"
             >
               Se connecter
             </button>

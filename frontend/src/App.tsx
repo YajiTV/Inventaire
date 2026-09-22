@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import { ThemeProvider } from './context/ThemeContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Layout } from './components/Layout'
 import Login from './pages/Login'
@@ -21,29 +22,31 @@ import Profile from './pages/Profile'
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route element={<Layout />}>
-            <Route path="/" element={<Home />} />
-            <Route element={<ProtectedRoute />}>
-              <Route path="/stocks" element={<Stocks />} />
-              <Route path="/movements" element={<Movements />} />
-              <Route path="/movements/new" element={<NewMovement />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/products/:id" element={<ProductDetail />} />
-              <Route path="/suppliers" element={<Suppliers />} />
-              <Route path="/categories" element={<Categories />} />
-              <Route path="/replenishment" element={<Replenishment />} />
-              <Route path="/orders" element={<Orders />} />
-              <Route path="/orders/:id" element={<OrderDetail />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/profile" element={<Profile />} />
+      <ThemeProvider>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route element={<Layout />}>
+              <Route path="/" element={<Home />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/stocks" element={<Stocks />} />
+                <Route path="/movements" element={<Movements />} />
+                <Route path="/movements/new" element={<NewMovement />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/products/:id" element={<ProductDetail />} />
+                <Route path="/suppliers" element={<Suppliers />} />
+                <Route path="/categories" element={<Categories />} />
+                <Route path="/replenishment" element={<Replenishment />} />
+                <Route path="/orders" element={<Orders />} />
+                <Route path="/orders/:id" element={<OrderDetail />} />
+                <Route path="/users" element={<Users />} />
+                <Route path="/profile" element={<Profile />} />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
-      </AuthProvider>
+          </Routes>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   )
 }
