@@ -17,11 +17,16 @@ export function useProduits(filters: ProduitFilters = EMPTY_PRODUIT_FILTERS, off
     const [produits, setProduits] = useState<Produit[]>([]);
     // Nombre total de produits correspondant aux filtres (toutes pages confondues)
     const [total, setTotal] = useState(0);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     // Compteur qu'on incrémente pour forcer un rechargement (après un ajout
     // ou une suppression, la page affichée doit être recalculée par le serveur)
     const [reloadKey, setReloadKey] = useState(0);
+
+    // Chargement déduit plutôt que stocké : on compare la requête demandée
+    // (filtres + page + reloadKey) à la dernière requête terminée.
+    const requestKey = JSON.stringify([filters, offset, reloadKey]);
+    const [loadedKey, setLoadedKey] = useState<string | null>(null);
+    const loading = loadedKey !== requestKey;
 
     // Le tableau de dépendances contient les filtres, la page et reloadKey :
     // dès que l'un des trois change, l'effet se relance et recharge la liste.
@@ -29,7 +34,6 @@ export function useProduits(filters: ProduitFilters = EMPTY_PRODUIT_FILTERS, off
         // Drapeau anti "réponse en retard" : si l'utilisateur change de filtre
         // avant que la réponse précédente n'arrive, on ignore l'ancienne réponse.
         let cancelled = false;
-        setLoading(true);
 
         getProduits(filters, offset)
             .then((page) => {
@@ -42,14 +46,14 @@ export function useProduits(filters: ProduitFilters = EMPTY_PRODUIT_FILTERS, off
                 if (!cancelled) setError(err instanceof Error ? err.message : "Erreur inconnue");
             })
             .finally(() => {
-                if (!cancelled) setLoading(false);
+                if (!cancelled) setLoadedKey(requestKey);
             });
 
         // Fonction de nettoyage : exécutée avant le prochain effet ou au démontage
         return () => {
             cancelled = true;
         };
-    }, [filters, offset, reloadKey]);
+    }, [filters, offset, reloadKey, requestKey]);
 
     // Création : on recharge la liste plutôt que d'ajouter à la main, car le
     // nouveau produit peut ne pas appartenir à la page/aux filtres affichés.
@@ -77,12 +81,13 @@ export function useProduits(filters: ProduitFilters = EMPTY_PRODUIT_FILTERS, off
 // (l'id vient de l'URL /products/:id, lu avec useParams dans la page).
 export function useProduit(id: number) {
     const [produit, setProduit] = useState<Produit | null>(null);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    // Même principe que useProduits : en chargement tant que l'id affiché n'est pas celui chargé
+    const [loadedId, setLoadedId] = useState<number | null>(null);
+    const loading = loadedId !== id;
 
     useEffect(() => {
         let cancelled = false;
-        setLoading(true);
 
         getProduit(id)
             .then((data) => {
@@ -94,7 +99,7 @@ export function useProduit(id: number) {
                 if (!cancelled) setError(err instanceof Error ? err.message : "Erreur inconnue");
             })
             .finally(() => {
-                if (!cancelled) setLoading(false);
+                if (!cancelled) setLoadedId(id);
             });
 
         return () => {
