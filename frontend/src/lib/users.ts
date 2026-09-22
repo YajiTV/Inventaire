@@ -1,4 +1,4 @@
-import type { UserCreate } from '../types/api'
+import type { UserCreate, UserRole } from '../types/api'
 
 const FULL_NAME_MAX_LENGTH = 120
 const PASSWORD_MIN_LENGTH = 8
@@ -47,4 +47,13 @@ export function getInitials(fullName: string, email: string): string {
     .slice(0, 2)
     .map((word) => word.charAt(0).toUpperCase())
     .join('')
+}
+
+export const ROLE_OPTIONS: { value: UserRole; label: string }[] = [
+  { value: 'operator', label: 'Opérateur' },
+  { value: 'admin', label: 'Admin' },
+]
+
+export function roleLabel(role: UserRole): string {
+  return role === 'admin' ? 'Admin' : 'Opérateur'
 }

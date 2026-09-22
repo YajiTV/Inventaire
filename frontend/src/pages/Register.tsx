@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { ThemeToggle } from '../components/ThemeToggle'
+import { validateUserCreate } from '../lib/users'
 
 export default function Register() {
   const { register } = useAuth()
@@ -18,17 +19,19 @@ export default function Register() {
     event.preventDefault()
     setError(null)
 
-    if (password !== confirm) {
-      setError('Les mots de passe ne correspondent pas')
+    const found = validateUserCreate({ email: email.trim(), full_name: pseudo, password })
+    if (password !== confirm) found.push('Les mots de passe ne correspondent pas.')
+    if (found.length > 0) {
+      setError(found.join(' '))
       return
     }
 
     setIsSubmitting(true)
     try {
-      await register(pseudo, email, password, confirm)
+      await register(pseudo.trim(), email.trim(), password, confirm)
       navigate('/')
-    } catch {
-      setError('Erreur dans les champs requis')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Inscription impossible')
     } finally {
       setIsSubmitting(false)
     }
@@ -44,7 +47,7 @@ export default function Register() {
         <h1 className="mb-1 text-2xl font-semibold">Créer un compte</h1>
         <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">Renseigne tes informations pour t'enregistrer.</p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <label htmlFor="pseudo" className="text-sm text-gray-700 dark:text-gray-300">
               Pseudo

@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useSuppliers } from "../hooks/useSuppliers";
 import type { SupplierRead } from "../types/api";
-import { ApiError } from "../lib/api";
+import { useActionFeedback } from "../hooks/useActionFeedback";
 import { DataTable } from "../components/DataTable";
 import type { DataTableColumn } from "../components/DataTable";
 import { FormField } from "../components/FormField";
 import { StatusMessage } from "../components/StatusMessage";
+import { ActionFeedback } from "../components/ActionFeedback";
+import { ErrorList } from "../components/ErrorList";
+import { Button } from "../components/Button";
 
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+$/;
 
@@ -22,8 +25,8 @@ export default function Suppliers() {
     const [editName, setEditName] = useState("");
 
     const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
-    const [apiError, setApiError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [editErrors, setEditErrors] = useState<string[]>([]);
+    const feedback = useActionFeedback();
 
     function validate(): boolean {
         const newErrors: typeof errors = {};
@@ -39,61 +42,48 @@ export default function Suppliers() {
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        setApiError(null);
-        setSuccessMessage(null);
+        feedback.clear();
 
         if (!validate()) return;
 
-        try {
-            await addSupplier({
-                name,
-                email: email || null,
-                phone: phone || null,
-                address: address || null,
-            });
+        const added = await feedback.run(
+            () =>
+                addSupplier({
+                    name: name.trim(),
+                    email: email.trim() || null,
+                    phone: phone.trim() || null,
+                    address: address.trim() || null,
+                }),
+            "Fournisseur ajouté avec succès.",
+        );
+        if (added) {
             setName("");
             setEmail("");
             setPhone("");
             setAddress("");
-            setErrors({});
-            setSuccessMessage("Fournisseur ajouté avec succès");
-        } catch (err) {
-            setApiError(err instanceof ApiError ? err.message : "Erreur inattendue");
         }
     }
 
     function startEdit(f: SupplierRead) {
         setEditingId(f.id);
         setEditName(f.name);
+        setEditErrors([]);
     }
 
     async function saveEdit(id: number) {
-        setApiError(null);
-        setSuccessMessage(null);
-
         if (!editName.trim()) {
-            setApiError("Le nom est obligatoire");
+            setEditErrors(["Le nom est obligatoire."]);
             return;
         }
+        setEditErrors([]);
 
-        try {
-            await editSupplier(id, { name: editName });
-            setEditingId(null);
-            setSuccessMessage("Fournisseur modifié avec succès");
-        } catch (err) {
-            setApiError(err instanceof ApiError ? err.message : "Erreur inattendue");
-        }
+        const saved = await feedback.run(() => editSupplier(id, { name: editName.trim() }), "Fournisseur modifié avec succès.");
+        if (saved) setEditingId(null);
     }
 
-    async function handleDelete(id: number) {
-        setApiError(null);
-        setSuccessMessage(null);
-        try {
-            await removeSupplier(id);
-            setSuccessMessage("Fournisseur supprimé avec succès");
-        } catch (err) {
-            setApiError(err instanceof ApiError ? err.message : "Erreur inattendue");
-        }
+    async function handleDelete(f: SupplierRead) {
+        if (!window.confirm(`Supprimer le fournisseur "${f.name}" ?`)) return;
+        await feedback.run(() => removeSupplier(f.id), "Fournisseur supprimé avec succès.");
     }
 
     const columns: DataTableColumn<SupplierRead>[] = [
@@ -115,7 +105,7 @@ export default function Suppliers() {
         <div className="p-4 sm:p-8">
             <h1 className="mb-6 text-2xl font-semibold">Fournisseurs</h1>
 
-            <form onSubmit={handleSubmit} className="mb-4 flex flex-wrap gap-2">
+            <form onSubmit={handleSubmit} noValidate className="mb-4 flex flex-wrap gap-2">
                 <FormField id="name" label="Nom" value={name} onChange={setName} error={errors.name} required />
                 <FormField
                     id="email"
@@ -128,9 +118,7 @@ export default function Suppliers() {
                 />
                 <FormField id="phone" label="Téléphone" value={phone} onChange={setPhone} placeholder="0102030405" />
                 <FormField id="address" label="Adresse" value={address} onChange={setAddress} />
-                <button type="submit" className="self-end border rounded px-3 py-1 dark:border-gray-600">
-                    Ajouter
-                </button>
+                <Button type="submit">Ajouter</Button>
             </form>
 
             <StatusMessage
@@ -139,12 +127,8 @@ export default function Suppliers() {
                 isEmpty={!loading && !error && suppliers.length === 0}
                 emptyMessage="Aucun fournisseur"
             />
-            {apiError && (
-                <p role="alert" className="text-red-600 dark:text-red-400">
-                    {apiError}
-                </p>
-            )}
-            {successMessage && <p className="text-green-600 dark:text-green-400">{successMessage}</p>}
+            <ActionFeedback error={feedback.error} success={feedback.success} />
+            <ErrorList errors={editErrors} />
 
             {!loading && !error && suppliers.length > 0 && (
                 <DataTable
@@ -154,13 +138,13 @@ export default function Suppliers() {
                     renderActions={(f) =>
                         editingId === f.id ? (
                             <>
-                                <button onClick={() => saveEdit(f.id)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Enregistrer</button>
-                                <button onClick={() => setEditingId(null)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Annuler</button>
+                                <Button onClick={() => saveEdit(f.id)}>Enregistrer</Button>
+                                <Button onClick={() => setEditingId(null)}>Annuler</Button>
                             </>
                         ) : (
                             <>
-                                <button onClick={() => startEdit(f)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Modifier</button>
-                                <button onClick={() => handleDelete(f.id)} className="whitespace-nowrap rounded border px-2 py-1 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800">Supprimer</button>
+                                <Button onClick={() => startEdit(f)}>Modifier</Button>
+                                <Button onClick={() => handleDelete(f)}>Supprimer</Button>
                             </>
                         )
                     }

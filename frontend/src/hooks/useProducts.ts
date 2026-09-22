@@ -1,48 +1,26 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
     getProducts,
+    getAllProducts,
     getProduct,
     createProduct,
     updateProduct,
     deleteProduct,
 } from "../api/products";
-import { EMPTY_PRODUCT_FILTERS } from "../lib/products";
+import { EMPTY_PRODUCT_FILTERS, PRODUCTS_PAGE_SIZE } from "../lib/products";
 import type { ProductFilters } from "../lib/products";
-import type { ProductRead, ProductCreate, ProductUpdate } from "../types/api";
+import type { PageProductRead, ProductRead, ProductCreate, ProductUpdate } from "../types/api";
+import { useFetch } from "./useFetch";
+
+const EMPTY_PAGE: PageProductRead = { items: [], total: 0, limit: PRODUCTS_PAGE_SIZE, offset: 0 };
 
 export function useProducts(filters: ProductFilters = EMPTY_PRODUCT_FILTERS, offset = 0) {
-    const [products, setProducts] = useState<ProductRead[]>([]);
-    const [total, setTotal] = useState(0);
-    const [error, setError] = useState<string | null>(null);
     const [reloadKey, setReloadKey] = useState(0);
-
-    // Loading is derived: true until the latest requested key has finished loading
-    const requestKey = JSON.stringify([filters, offset, reloadKey]);
-    const [loadedKey, setLoadedKey] = useState<string | null>(null);
-    const loading = loadedKey !== requestKey;
-
-    useEffect(() => {
-        // Ignore responses that arrive after the filters changed or the component unmounted
-        let cancelled = false;
-
-        getProducts(filters, offset)
-            .then((page) => {
-                if (cancelled) return;
-                setProducts(page.items);
-                setTotal(page.total);
-                setError(null);
-            })
-            .catch((err) => {
-                if (!cancelled) setError(err instanceof Error ? err.message : "Erreur inconnue");
-            })
-            .finally(() => {
-                if (!cancelled) setLoadedKey(requestKey);
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [filters, offset, reloadKey, requestKey]);
+    const { data: page, setData: setPage, loading, error } = useFetch(
+        () => getProducts(filters, offset),
+        EMPTY_PAGE,
+        JSON.stringify([filters, offset, reloadKey]),
+    );
 
     async function addProduct(data: ProductCreate) {
         await createProduct(data);
@@ -50,8 +28,8 @@ export function useProducts(filters: ProductFilters = EMPTY_PRODUCT_FILTERS, off
     }
 
     async function editProduct(id: number, data: ProductUpdate) {
-        const maj = await updateProduct(id, data);
-        setProducts((prev) => prev.map((p) => (p.id === id ? maj : p)));
+        const updated = await updateProduct(id, data);
+        setPage((prev) => ({ ...prev, items: prev.items.map((p) => (p.id === id ? updated : p)) }));
     }
 
     async function removeProduct(id: number) {
@@ -59,35 +37,15 @@ export function useProducts(filters: ProductFilters = EMPTY_PRODUCT_FILTERS, off
         setReloadKey((k) => k + 1);
     }
 
-    return { products, total, loading, error, addProduct, editProduct, removeProduct };
+    return { products: page.items, total: page.total, loading, error, addProduct, editProduct, removeProduct };
+}
+
+export function useAllProducts() {
+    const { data: products, loading, error } = useFetch<ProductRead[]>(getAllProducts, []);
+    return { products, loading, error };
 }
 
 export function useProduct(id: number) {
-    const [product, setProduct] = useState<ProductRead | null>(null);
-    const [error, setError] = useState<string | null>(null);
-    const [loadedId, setLoadedId] = useState<number | null>(null);
-    const loading = loadedId !== id;
-
-    useEffect(() => {
-        let cancelled = false;
-
-        getProduct(id)
-            .then((data) => {
-                if (cancelled) return;
-                setProduct(data);
-                setError(null);
-            })
-            .catch((err) => {
-                if (!cancelled) setError(err instanceof Error ? err.message : "Erreur inconnue");
-            })
-            .finally(() => {
-                if (!cancelled) setLoadedId(id);
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [id]);
-
+    const { data: product, loading, error } = useFetch<ProductRead | null>(() => getProduct(id), null, id);
     return { product, loading, error };
 }

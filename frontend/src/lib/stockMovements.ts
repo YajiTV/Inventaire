@@ -3,8 +3,12 @@ import type { MovementType, StockMovementCreate, StockMovementRead, StockRead } 
 export function validateMovement(movement: StockMovementCreate): string[] {
     const errors: string[] = [];
 
-    if (movement.quantity <= 0) {
-        errors.push("La quantité doit être supérieure à 0.");
+    if (!movement.product_id) {
+        errors.push("Le produit est obligatoire.");
+    }
+
+    if (!Number.isInteger(movement.quantity) || movement.quantity <= 0) {
+        errors.push("La quantité doit être un nombre entier supérieur à 0.");
     }
 
     if (movement.type === "in" && movement.target_location_id == null) {
