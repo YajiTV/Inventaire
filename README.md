@@ -67,6 +67,18 @@ python3 -m venv .venv
 .venv/bin/uvicorn app.main:app --reload
 ```
 
+Avec fish + Lancement docker
+
+````
+docker compose up -d
+
+cd backend
+source .venv/bin/activate.fish
+pip install -r requirements.txt
+alembic upgrade head
+uvicorn app.main:app --reload
+
+
 API : http://localhost:8000
 Documentation : http://localhost:8000/docs
 
@@ -76,7 +88,7 @@ Documentation : http://localhost:8000/docs
 cd frontend
 npm install
 npm run dev
-```
+````
 
 Application : http://localhost:5173
 
