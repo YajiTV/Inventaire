@@ -4,5 +4,6 @@ from app.models.order_line import OrderLine
 from app.models.product import Product
 from app.models.purchase_order import PurchaseOrder
 from app.models.stock import Stock
+from app.models.stock_movement import StockMovement
 from app.models.supplier import Supplier
 from app.models.user import User
