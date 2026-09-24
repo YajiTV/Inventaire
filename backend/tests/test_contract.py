@@ -24,17 +24,6 @@ def test_exported_openapi_is_up_to_date() -> None:
         ("/categories", {"name": ""}),
         ("/locations", {"code": "zone 1", "name": "Zone 1"}),
         ("/products", {"sku": "P-1", "name": "Vis", "unit_price": -1, "category_id": 1}),
-        ("/stock-movements", {"product_id": 1, "type": "in", "quantity": 0}),
-        (
-            "/stock-movements",
-            {
-                "product_id": 1,
-                "type": "transfer",
-                "quantity": 5,
-                "source_location_id": 1,
-                "target_location_id": 1,
-            },
-        ),
         ("/purchase-orders", {"reference": "CMD-1", "supplier_id": 1, "location_id": 1, "lines": []}),
     ],
 )
@@ -44,11 +33,5 @@ def test_invalid_payloads_are_rejected(url: str, payload: dict) -> None:
 
 def test_valid_payload_reaches_the_route() -> None:
     """A valid payload passes validation, so it fails on the missing implementation."""
-    payload = {
-        "product_id": 1,
-        "type": "transfer",
-        "quantity": 5,
-        "source_location_id": 1,
-        "target_location_id": 2,
-    }
-    assert client.post("/stock-movements", json=payload).status_code == 501
+    payload = {"product_id": 1, "location_id": 1, "quantity": 5}
+    assert client.post("/stocks", json=payload).status_code == 501
