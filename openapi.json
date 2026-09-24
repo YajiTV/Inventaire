@@ -3803,6 +3803,11 @@
             "description": "Validation Error"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "List Stock Movements",
         "tags": [
           "Stock movements"
@@ -3873,6 +3878,11 @@
             "description": "Validation Error"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Create Stock Movement",
         "tags": [
           "Stock movements"
