@@ -1,76 +1,64 @@
-import { Link, useParams } from "react-router-dom";
-import { useProduct } from "../hooks/useProducts";
-import { useCategories } from "../hooks/useCategories";
-import { useSuppliers } from "../hooks/useSuppliers";
+import { Link, useParams } from 'react-router-dom'
+import { FactGrid } from '../components/FactGrid'
+import { PageHeader } from '../components/PageHeader'
+import { Stamp } from '../components/Stamp'
+import { StatusMessage } from '../components/StatusMessage'
+import { useProduct } from '../hooks/useProducts'
+import { useCategories } from '../hooks/useCategories'
+import { useSuppliers } from '../hooks/useSuppliers'
 
 export default function ProductDetail() {
-    const { id } = useParams();
-    const { product, loading, error } = useProduct(Number(id));
+  const { id } = useParams()
+  const { product, loading, error } = useProduct(Number(id))
 
-    const { categories } = useCategories();
-    const { suppliers } = useSuppliers();
+  const { categories } = useCategories()
+  const { suppliers } = useSuppliers()
 
-    const category = categories.find((c) => c.id === product?.category_id);
-    const supplier = suppliers.find((f) => f.id === product?.supplier_id);
+  const category = categories.find((c) => c.id === product?.category_id)
+  const supplier = suppliers.find((f) => f.id === product?.supplier_id)
+  const shortage = product !== null && product.total_quantity <= product.reorder_threshold
 
-    return (
-        <section className="p-4 sm:p-8">
-            <div className="mb-6 flex items-center justify-between">
-                <h1 className="text-2xl font-semibold">{product !== null ? product.name : "Produit"}</h1>
-                <Link to="/products" className="underline">
-                    Retour aux produits
-                </Link>
-            </div>
+  return (
+    <>
+      <PageHeader
+        title={product !== null ? product.name : 'Fiche produit'}
+        serial={product?.sku}
+        back={
+          <Link to="/products" className="font-semibold hover:underline">
+            Retour aux produits
+          </Link>
+        }
+      />
 
-            {loading && <p>Chargement du produit...</p>}
+      <StatusMessage loading={loading} error={error} />
 
-            {!loading && error !== null && (
-                <p role="alert" className="text-red-600 dark:text-red-400">
-                    {error}
-                </p>
-            )}
-
-            {!loading && error === null && product !== null && (
-                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <div className="rounded border p-3 dark:border-gray-700">
-                        <dt className="text-xs text-gray-500 dark:text-gray-400">SKU</dt>
-                        <dd>{product.sku}</dd>
-                    </div>
-                    <div className="rounded border p-3 dark:border-gray-700">
-                        <dt className="text-xs text-gray-500 dark:text-gray-400">Code-barres</dt>
-                        <dd>{product.barcode ?? "Non renseigné"}</dd>
-                    </div>
-                    <div className="rounded border p-3 dark:border-gray-700">
-                        <dt className="text-xs text-gray-500 dark:text-gray-400">Prix unitaire</dt>
-                        <dd>{product.unit_price} €</dd>
-                    </div>
-                    <div className="rounded border p-3 dark:border-gray-700">
-                        <dt className="text-xs text-gray-500 dark:text-gray-400">Catégorie</dt>
-                        <dd>{category?.name ?? "Inconnue"}</dd>
-                    </div>
-                    <div className="rounded border p-3 dark:border-gray-700">
-                        <dt className="text-xs text-gray-500 dark:text-gray-400">Fournisseur</dt>
-                        <dd>{supplier?.name ?? "Aucun"}</dd>
-                    </div>
-                    <div className="rounded border p-3 dark:border-gray-700">
-                        <dt className="text-xs text-gray-500 dark:text-gray-400">Stock total</dt>
-                        <dd>
-                            {product.total_quantity}{" "}
-                            {product.total_quantity <= product.reorder_threshold && (
-                                <span className="text-red-600 dark:text-red-400">(sous le seuil)</span>
-                            )}
-                        </dd>
-                    </div>
-                    <div className="rounded border p-3 dark:border-gray-700">
-                        <dt className="text-xs text-gray-500 dark:text-gray-400">Seuil de réapprovisionnement</dt>
-                        <dd>{product.reorder_threshold}</dd>
-                    </div>
-                    <div className="rounded border p-3 sm:col-span-2 dark:border-gray-700">
-                        <dt className="text-xs text-gray-500 dark:text-gray-400">Description</dt>
-                        <dd>{product.description ?? "Aucune description"}</dd>
-                    </div>
-                </dl>
-            )}
-        </section>
-    );
+      {!loading && error === null && product !== null && (
+        <FactGrid
+          columns={3}
+          facts={[
+            {
+              label: 'Stock total',
+              shortage,
+              value: (
+                <span className="flex items-center gap-3">
+                  <span className="text-3xl leading-none font-extrabold">{product.total_quantity}</span>
+                  {shortage && <Stamp>Sous le seuil</Stamp>}
+                </span>
+              ),
+            },
+            { label: 'Seuil de réapprovisionnement', value: product.reorder_threshold },
+            { label: 'Prix unitaire', value: `${product.unit_price} €` },
+            { label: 'Code-barres', value: product.barcode ?? <span className="text-ink-soft">Non renseigné</span> },
+            { label: 'Catégorie', value: category?.name ?? <span className="text-ink-soft">Inconnue</span> },
+            { label: 'Fournisseur', value: supplier?.name ?? <span className="text-ink-soft">Aucun</span> },
+            {
+              label: 'Description',
+              wide: true,
+              value: product.description ?? <span className="text-ink-soft">Aucune description</span>,
+            },
+          ]}
+        />
+      )}
+    </>
+  )
 }

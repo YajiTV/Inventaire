@@ -10,6 +10,8 @@ import { StatusMessage } from '../components/StatusMessage'
 import { ActionFeedback } from '../components/ActionFeedback'
 import { ErrorList } from '../components/ErrorList'
 import { Button } from '../components/Button'
+import { PageHeader } from '../components/PageHeader'
+import { Workbench } from '../components/Workbench'
 import type { LocationRead } from '../types/api'
 
 export default function Locations() {
@@ -90,72 +92,83 @@ export default function Locations() {
       header: 'Code',
       render: (l) =>
         editingId === l.id ? (
-          <FormField id={`edit-code-${l.id}`} label="" value={editCode} onChange={setEditCode} />
+          <FormField id={`edit-code-${l.id}`} label="Code" value={editCode} onChange={setEditCode} compact />
         ) : (
-          l.code
+          <span className="font-bold whitespace-nowrap font-stretch-condensed text-stamp">{l.code}</span>
         ),
     },
     {
       header: 'Nom',
       render: (l) =>
         editingId === l.id ? (
-          <FormField id={`edit-name-${l.id}`} label="" value={editName} onChange={setEditName} />
+          <FormField id={`edit-name-${l.id}`} label="Nom" value={editName} onChange={setEditName} compact />
         ) : (
-          l.name
+          <span className="font-semibold">{l.name}</span>
         ),
     },
     {
       header: 'Description',
       render: (l) =>
         editingId === l.id ? (
-          <FormField id={`edit-description-${l.id}`} label="" value={editDescription} onChange={setEditDescription} />
+          <FormField id={`edit-description-${l.id}`} label="Description" value={editDescription} onChange={setEditDescription} compact />
         ) : (
-          l.description
+          <span className="text-ink-soft">{l.description}</span>
         ),
     },
   ]
 
   return (
-    <div className="p-4 sm:p-8">
-      <h1 className="mb-6 text-2xl font-semibold">Emplacements</h1>
+    <>
+      <PageHeader title="Emplacements" />
 
-      <form onSubmit={handleSubmit} noValidate className="mb-4 flex flex-wrap gap-2">
-        <FormField id="code" label="Code" value={code} onChange={setCode} placeholder="RESERVE-01" required />
-        <FormField id="name" label="Nom" value={name} onChange={setName} required />
-        <FormField id="description" label="Description" value={description} onChange={setDescription} />
-        <Button type="submit">Ajouter</Button>
-        <ErrorList errors={formErrors} />
-      </form>
-
-      <StatusMessage
-        loading={loading}
-        error={error}
-        isEmpty={!loading && !error && locations.length === 0}
-        emptyMessage="Aucun emplacement"
-      />
-      <ActionFeedback error={feedback.error} success={feedback.success} />
-      <ErrorList errors={editErrors} />
-
-      {!loading && !error && locations.length > 0 && (
-        <DataTable
-          columns={columns}
-          rows={locations}
-          getRowId={(l) => l.id}
-          renderActions={(l) =>
-            editingId === l.id ? (
-              <>
-                <Button onClick={() => saveEdit(l.id)}>Enregistrer</Button>
-                <Button onClick={cancelEdit}>Annuler</Button>
-              </>
-            ) : (
-              <>
-                <Button onClick={() => startEdit(l)}>Modifier</Button>
-                <Button onClick={() => handleDelete(l)}>Supprimer</Button>
-              </>
-            )
-          }
+      <Workbench
+        formTitle="Nouvel emplacement"
+        form={
+          <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
+            <FormField id="code" label="Code" value={code} onChange={setCode} placeholder="RESERVE-01" required />
+            <FormField id="name" label="Nom" value={name} onChange={setName} placeholder="Réserve sèche" required />
+            <FormField id="description" label="Description" value={description} onChange={setDescription} placeholder="Étagères du fond" />
+            <ErrorList errors={formErrors} />
+            <Button type="submit" variant="primary">
+              Ajouter l'emplacement
+            </Button>
+          </form>
+        }
+      >
+        <ActionFeedback error={feedback.error} success={feedback.success} />
+        <ErrorList errors={editErrors} />
+        <StatusMessage
+          loading={loading}
+          error={error}
+          isEmpty={!loading && !error && locations.length === 0}
+          emptyMessage="Aucun emplacement. Ajoutez le premier avec le formulaire."
         />
-      )}
-    </div>
+
+        {!loading && !error && locations.length > 0 && (
+          <DataTable
+            columns={columns}
+            rows={locations}
+            getRowId={(l) => l.id}
+            renderActions={(l) =>
+              editingId === l.id ? (
+                <>
+                  <Button onClick={() => saveEdit(l.id)} variant="primary">
+                    Enregistrer
+                  </Button>
+                  <Button onClick={cancelEdit}>Annuler</Button>
+                </>
+              ) : (
+                <>
+                  <Button onClick={() => startEdit(l)}>Modifier</Button>
+                  <Button onClick={() => handleDelete(l)} variant="danger">
+                    Supprimer
+                  </Button>
+                </>
+              )
+            }
+          />
+        )}
+      </Workbench>
+    </>
   )
 }

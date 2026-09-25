@@ -15,6 +15,10 @@ import { StatusMessage } from "../components/StatusMessage";
 import { ActionFeedback } from "../components/ActionFeedback";
 import { ErrorList } from "../components/ErrorList";
 import { Button } from "../components/Button";
+import { CheckboxField } from "../components/CheckboxField";
+import { PageHeader } from "../components/PageHeader";
+import { Stamp } from "../components/Stamp";
+import { Workbench } from "../components/Workbench";
 
 const SKU_PATTERN = /^[A-Z0-9-]+$/;
 
@@ -139,165 +143,194 @@ export default function Products() {
         }
     }
 
+    const categoryOptions = categories.map((c) => ({ value: c.id, label: c.name }));
+    const supplierOptions = suppliers.map((s) => ({ value: s.id, label: s.name }));
+
     const columns: DataTableColumn<ProductRead>[] = [
-        { header: "SKU", render: (p) => p.sku },
+        { header: "SKU", render: (p) => <span className="whitespace-nowrap text-ink-soft">{p.sku}</span> },
         {
             header: "Nom",
             render: (p) =>
                 editingId === p.id ? (
-                    <FormField id={`edit-name-${p.id}`} label="" value={editName} onChange={setEditName} />
+                    <FormField id={`edit-name-${p.id}`} label="Nom" value={editName} onChange={setEditName} compact />
                 ) : (
-                    <Link to={`/products/${p.id}`} className="underline">
+                    <Link to={`/products/${p.id}`} className="font-semibold hover:underline">
                         {p.name}
                     </Link>
                 ),
         },
         { header: "Catégorie", render: (p) => categoryName(p.category_id) },
-        { header: "Fournisseur", render: (p) => supplierName(p.supplier_id) },
+        { header: "Fournisseur", render: (p) => <span className="text-ink-soft">{supplierName(p.supplier_id)}</span> },
         {
             header: "Prix",
+            align: "right",
             render: (p) =>
                 editingId === p.id ? (
                     <FormField
                         id={`edit-price-${p.id}`}
-                        label=""
+                        label="Prix unitaire"
                         value={editUnitPrice}
                         onChange={setEditUnitPrice}
+                        compact
                     />
                 ) : (
-                    `${p.unit_price} €`
+                    <span className="whitespace-nowrap">{p.unit_price} €</span>
                 ),
         },
         {
             header: "Stock",
+            align: "right",
             render: (p) =>
                 p.total_quantity <= p.reorder_threshold ? (
-                    <span className="text-red-600 dark:text-red-400">{p.total_quantity} (sous le seuil)</span>
+                    <span className="flex items-center justify-end gap-3">
+                        <Stamp>Sous le seuil</Stamp>
+                        <span className="text-base font-bold">{p.total_quantity}</span>
+                    </span>
                 ) : (
-                    p.total_quantity
+                    <span className="text-base font-bold">{p.total_quantity}</span>
                 ),
         },
     ];
 
     return (
-        <div className="p-4 sm:p-8">
-            <h1 className="mb-6 text-2xl font-semibold">Produits</h1>
+        <>
+            <PageHeader title="Produits" />
 
-            <div className="mb-4 flex flex-wrap items-end gap-2">
-                <FormField
-                    id="filter-search"
-                    label="Rechercher"
-                    value={filters.search}
-                    onChange={(value) => updateFilters({ ...filters, search: value })}
-                    placeholder="Nom, SKU ou code-barres"
-                />
-                <SelectField
-                    id="filter-category"
-                    label="Catégorie"
-                    value={filters.categoryId}
-                    onChange={(value) => updateFilters({ ...filters, categoryId: value })}
-                    options={categories.map((c) => ({ value: c.id, label: c.name }))}
-                    placeholder="Toutes"
-                />
-                <SelectField
-                    id="filter-supplier"
-                    label="Fournisseur"
-                    value={filters.supplierId}
-                    onChange={(value) => updateFilters({ ...filters, supplierId: value })}
-                    options={suppliers.map((s) => ({ value: s.id, label: s.name }))}
-                    placeholder="Tous"
-                />
-                <label className="flex items-center gap-2 py-1">
-                    <input
-                        type="checkbox"
-                        checked={filters.belowThreshold}
-                        onChange={(e) => updateFilters({ ...filters, belowThreshold: e.target.checked })}
+            <Workbench
+                formTitle="Nouveau produit"
+                formOnTop
+                form={
+                    <form
+                        onSubmit={handleSubmit}
+                        noValidate
+                        className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-[repeat(5,minmax(0,1fr))_auto]"
+                    >
+                        <FormField
+                            id="sku"
+                            label="SKU"
+                            value={sku}
+                            onChange={setSku}
+                            error={errors.sku}
+                            placeholder="PAIN-BIGM-001"
+                            required
+                        />
+                        <FormField id="name" label="Nom" value={name} onChange={setName} error={errors.name} placeholder="Pain burger sésame" required />
+                        <FormField
+                            id="unit-price"
+                            label="Prix unitaire"
+                            value={unitPrice}
+                            onChange={setUnitPrice}
+                            error={errors.unitPrice}
+                            placeholder="1.50"
+                            required
+                        />
+                        <SelectField
+                            id="category-id"
+                            label="Catégorie"
+                            value={categoryId}
+                            onChange={setCategoryId}
+                            options={categoryOptions}
+                            placeholder="Choisir..."
+                            error={errors.categoryId}
+                        />
+                        <SelectField
+                            id="supplier-id"
+                            label="Fournisseur"
+                            value={supplierId}
+                            onChange={setSupplierId}
+                            options={supplierOptions}
+                            placeholder="Aucun"
+                        />
+                        <div className="flex h-full items-end">
+                            <Button type="submit" variant="primary">
+                                Ajouter le produit
+                            </Button>
+                        </div>
+                    </form>
+                }
+            >
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto]">
+                    <FormField
+                        id="filter-search"
+                        label="Rechercher"
+                        type="search"
+                        value={filters.search}
+                        onChange={(value) => updateFilters({ ...filters, search: value })}
+                        placeholder="Steak haché"
                     />
-                    Sous le seuil uniquement
-                </label>
-            </div>
+                    <SelectField
+                        id="filter-category"
+                        label="Catégorie"
+                        value={filters.categoryId}
+                        onChange={(value) => updateFilters({ ...filters, categoryId: value })}
+                        options={categoryOptions}
+                        placeholder="Toutes"
+                    />
+                    <SelectField
+                        id="filter-supplier"
+                        label="Fournisseur"
+                        value={filters.supplierId}
+                        onChange={(value) => updateFilters({ ...filters, supplierId: value })}
+                        options={supplierOptions}
+                        placeholder="Tous"
+                    />
+                    <CheckboxField
+                        id="filter-below"
+                        label="Sous le seuil uniquement"
+                        checked={filters.belowThreshold}
+                        onChange={(checked) => updateFilters({ ...filters, belowThreshold: checked })}
+                    />
+                </div>
 
-            <form onSubmit={handleSubmit} noValidate className="mb-4 flex flex-wrap gap-2">
-                <FormField
-                    id="sku"
-                    label="SKU"
-                    value={sku}
-                    onChange={setSku}
-                    error={errors.sku}
-                    placeholder="PAIN-BIGM-001"
-                    required
+                <ActionFeedback error={feedback.error} success={feedback.success} />
+                <ErrorList errors={editErrors} />
+                <StatusMessage
+                    loading={loading}
+                    error={error}
+                    isEmpty={!loading && !error && products.length === 0}
+                    emptyMessage="Aucun produit ne correspond."
                 />
-                <FormField id="name" label="Nom" value={name} onChange={setName} error={errors.name} required />
-                <FormField
-                    id="unit-price"
-                    label="Prix unitaire"
-                    value={unitPrice}
-                    onChange={setUnitPrice}
-                    error={errors.unitPrice}
-                    placeholder="1.50"
-                    required
-                />
-                <SelectField
-                    id="category-id"
-                    label="Catégorie"
-                    value={categoryId}
-                    onChange={setCategoryId}
-                    options={categories.map((c) => ({ value: c.id, label: c.name }))}
-                    placeholder="Choisir..."
-                    error={errors.categoryId}
-                />
-                <SelectField
-                    id="supplier-id"
-                    label="Fournisseur"
-                    value={supplierId}
-                    onChange={setSupplierId}
-                    options={suppliers.map((s) => ({ value: s.id, label: s.name }))}
-                    placeholder="Aucun"
-                />
-                <Button type="submit">Ajouter</Button>
-            </form>
 
-            <StatusMessage
-                loading={loading}
-                error={error}
-                isEmpty={!loading && !error && products.length === 0}
-                emptyMessage="Aucun produit ne correspond"
-            />
-            <ActionFeedback error={feedback.error} success={feedback.success} />
-            <ErrorList errors={editErrors} />
+                {!loading && !error && products.length > 0 && (
+                    <DataTable
+                        columns={columns}
+                        rows={products}
+                        getRowId={(p) => p.id}
+                        isShortage={(p) => p.total_quantity <= p.reorder_threshold}
+                        renderActions={(p) =>
+                            editingId === p.id ? (
+                                <>
+                                    <Button onClick={() => saveEdit(p.id)} variant="primary">
+                                        Enregistrer
+                                    </Button>
+                                    <Button onClick={() => setEditingId(null)}>Annuler</Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Button onClick={() => startEdit(p)}>Modifier</Button>
+                                    <Button onClick={() => handleDelete(p)} variant="danger">
+                                        Supprimer
+                                    </Button>
+                                </>
+                            )
+                        }
+                    />
+                )}
 
-            {!loading && !error && products.length > 0 && (
-                <DataTable
-                    columns={columns}
-                    rows={products}
-                    getRowId={(p) => p.id}
-                    renderActions={(p) =>
-                        editingId === p.id ? (
-                            <>
-                                <Button onClick={() => saveEdit(p.id)}>Enregistrer</Button>
-                                <Button onClick={() => setEditingId(null)}>Annuler</Button>
-                            </>
-                        ) : (
-                            <>
-                                <Button onClick={() => startEdit(p)}>Modifier</Button>
-                                <Button onClick={() => handleDelete(p)}>Supprimer</Button>
-                            </>
-                        )
-                    }
-                />
-            )}
-
-            <div className="mt-4 flex items-center gap-4">
-                <Button onClick={() => setOffset(offset - PRODUCTS_PAGE_SIZE)} disabled={offset === 0}>
-                    Précédent
-                </Button>
-                <span>
-                    Page {currentPage} / {totalPages} ({total} produits)
-                </span>
-                <Button onClick={() => setOffset(offset + PRODUCTS_PAGE_SIZE)} disabled={currentPage >= totalPages}>
-                    Suivant
-                </Button>
-            </div>
-        </div>
+                <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+                    <span className="text-ink-soft">
+                        Page <span className="font-semibold text-ink">{currentPage}</span> sur {totalPages}, {total} produits
+                    </span>
+                    <div className="flex gap-2">
+                        <Button onClick={() => setOffset(offset - PRODUCTS_PAGE_SIZE)} disabled={offset === 0}>
+                            Précédent
+                        </Button>
+                        <Button onClick={() => setOffset(offset + PRODUCTS_PAGE_SIZE)} disabled={currentPage >= totalPages}>
+                            Suivant
+                        </Button>
+                    </div>
+                </div>
+            </Workbench>
+        </>
     );
 }
