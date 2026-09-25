@@ -1,3 +1,5 @@
+import { Stamp } from './Stamp'
+
 interface ActionFeedbackProps {
   error: string | null
   success: string | null
@@ -6,17 +8,21 @@ interface ActionFeedbackProps {
 export function ActionFeedback({ error, success }: ActionFeedbackProps) {
   if (error) {
     return (
-      <p role="alert" className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
-        {error}
-      </p>
+      <div role="alert" className="flex flex-wrap items-center gap-3 border border-stamp/50 bg-rose/50 px-3 py-2.5 text-sm">
+        <Stamp>Refusé</Stamp>
+        <span>{error}</span>
+      </div>
     )
   }
 
   if (success) {
     return (
-      <p role="status" className="mb-4 rounded border border-green-200 bg-green-50 p-3 text-green-700 dark:border-green-900 dark:bg-green-950 dark:text-green-400">
-        {success}
-      </p>
+      <div role="status" className="flex flex-wrap items-center gap-3 border border-rule-strong bg-paper-2 px-3 py-2.5 text-sm">
+        <Stamp tone="ink" fresh key={success}>
+          Enregistré
+        </Stamp>
+        <span>{success}</span>
+      </div>
     )
   }
 
