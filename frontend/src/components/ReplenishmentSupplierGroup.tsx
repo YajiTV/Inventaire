@@ -59,7 +59,9 @@ export function ReplenishmentSupplierGroup({
             {pending ? 'Génération...' : 'Générer la commande'}
           </Button>
         ) : (
-          <Stamp fresh>Commande générée</Stamp>
+          <Stamp tone="ink" fresh>
+            Commande générée
+          </Stamp>
         )}
       </div>
 
