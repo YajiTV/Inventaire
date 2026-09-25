@@ -42,7 +42,7 @@ export default function Stocks() {
           totals={[
             { label: 'Références', value: summary.references, loading },
             { label: 'Quantité totale', value: summary.quantity, loading },
-            { label: 'Sous le seuil', value: summary.alerts, loading, shortage: true },
+            { label: 'Lignes sous le seuil', value: summary.alerts, loading, shortage: true },
           ]}
         />
 

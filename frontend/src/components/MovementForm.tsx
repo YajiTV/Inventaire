@@ -93,7 +93,7 @@ export function MovementForm({ products, locations, onSubmit }: MovementFormProp
           value={productId}
           onChange={setProductId}
           options={productOptions}
-          placeholder="Choisir..."
+          placeholder="Choisir…"
         />
         <FormField id="quantity" label="Quantité" type="number" value={quantity} onChange={setQuantity} placeholder="30" />
 
@@ -104,7 +104,7 @@ export function MovementForm({ products, locations, onSubmit }: MovementFormProp
             value={sourceId}
             onChange={setSourceId}
             options={locationOptions}
-            placeholder="Choisir..."
+            placeholder="Choisir…"
           />
         )}
 
@@ -115,7 +115,7 @@ export function MovementForm({ products, locations, onSubmit }: MovementFormProp
             value={targetId}
             onChange={setTargetId}
             options={locationOptions}
-            placeholder="Choisir..."
+            placeholder="Choisir…"
           />
         )}
       </div>

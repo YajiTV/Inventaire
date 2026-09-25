@@ -1,6 +1,7 @@
 import { lineTotal } from '../lib/purchaseOrders'
 import type { OrderLineRead, ProductRead } from '../types/api'
 import { Ledger, Td, Th, Tr } from './Ledger'
+import { formatMoney, formatQuantity } from '../lib/format'
 
 type OrderLinesTableProps = {
   lines: OrderLineRead[]
@@ -35,11 +36,11 @@ export function OrderLinesTable({ lines, products, total }: OrderLinesTableProps
                 {products.find((product) => product.id === line.product_id)?.name ?? 'Produit supprimé'}
               </span>
             </Td>
-            <Td align="right">{line.quantity}</Td>
+            <Td align="right">{formatQuantity(line.quantity)}</Td>
             <Td align="right" muted>
-              {Number(line.unit_price).toFixed(2)} €
+              {formatMoney(line.unit_price)}
             </Td>
-            <Td align="right">{lineTotal(line).toFixed(2)} €</Td>
+            <Td align="right">{formatMoney(lineTotal(line))}</Td>
           </Tr>
         ))}
       </tbody>
@@ -48,7 +49,7 @@ export function OrderLinesTable({ lines, products, total }: OrderLinesTableProps
           <td colSpan={3} className="px-3 py-3 text-right text-[11px] font-bold uppercase tracking-wider font-stretch-condensed text-print">
             Total commande
           </td>
-          <td className="px-3 py-3 text-right text-lg font-extrabold tabular-nums">{total} €</td>
+          <td className="px-3 py-3 text-right text-lg font-extrabold tabular-nums">{formatMoney(total)}</td>
         </tr>
       </tfoot>
     </Ledger>

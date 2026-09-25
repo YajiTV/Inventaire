@@ -19,6 +19,7 @@ import { CheckboxField } from "../components/CheckboxField";
 import { PageHeader } from "../components/PageHeader";
 import { Stamp } from "../components/Stamp";
 import { Workbench } from "../components/Workbench";
+import { formatMoney, formatQuantity } from "../lib/format";
 
 const SKU_PATTERN = /^[A-Z0-9-]+$/;
 
@@ -174,7 +175,7 @@ export default function Products() {
                         compact
                     />
                 ) : (
-                    <span className="whitespace-nowrap">{p.unit_price} €</span>
+                    <span className="whitespace-nowrap">{formatMoney(p.unit_price)}</span>
                 ),
         },
         {
@@ -184,10 +185,10 @@ export default function Products() {
                 p.total_quantity <= p.reorder_threshold ? (
                     <span className="flex items-center justify-end gap-3">
                         <Stamp>Sous le seuil</Stamp>
-                        <span className="text-base font-bold">{p.total_quantity}</span>
+                        <span className="text-base font-bold">{formatQuantity(p.total_quantity)}</span>
                     </span>
                 ) : (
-                    <span className="text-base font-bold">{p.total_quantity}</span>
+                    <span className="text-base font-bold">{formatQuantity(p.total_quantity)}</span>
                 ),
         },
     ];
@@ -230,7 +231,7 @@ export default function Products() {
                             value={categoryId}
                             onChange={setCategoryId}
                             options={categoryOptions}
-                            placeholder="Choisir..."
+                            placeholder="Choisir…"
                             error={errors.categoryId}
                         />
                         <SelectField

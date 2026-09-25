@@ -6,6 +6,7 @@ import { PageHeader } from '../components/PageHeader'
 import { StatusMessage } from '../components/StatusMessage'
 import { usePurchaseOrders } from '../hooks/usePurchaseOrders'
 import { useSuppliers } from '../hooks/useSuppliers'
+import { formatMoney } from '../lib/format'
 
 export default function Orders() {
   const { orders, loading: ordersLoading, error: ordersError } = usePurchaseOrders()
@@ -55,7 +56,7 @@ export default function Orders() {
                   <OrderStatusStamp status={order.status} />
                 </Td>
                 <Td align="right">
-                  <span className="font-semibold whitespace-nowrap">{order.total_price} €</span>
+                  <span className="font-semibold whitespace-nowrap">{formatMoney(order.total_price)}</span>
                 </Td>
               </Tr>
             ))}

@@ -10,7 +10,7 @@ export type ButtonVariant = 'primary' | 'secondary' | 'danger'
 export const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   primary: `${BUTTON_BASE} bg-ink text-paper hover:bg-ink/85`,
   secondary: `${BUTTON_BASE} border border-rule-strong bg-paper text-ink hover:bg-paper-2`,
-  danger: `${BUTTON_BASE} border border-rule-strong bg-paper text-stamp hover:bg-rose`,
+  danger: `${BUTTON_BASE} border border-rule-strong bg-paper text-stamp hover:bg-paper-2`,
 }
 
 export const FIELD_BOX =
