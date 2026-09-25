@@ -125,4 +125,9 @@
   :root {
     --animate-stamp: none;
   }
+
+  /* Keep colour feedback, drop the press movement */
+  :active {
+    scale: none !important;
+  }
 }
