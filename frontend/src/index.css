@@ -3,12 +3,126 @@
 /* dark: follows the .dark class set by ThemeContext, not prefers-color-scheme */
 @custom-variant dark (&:where(.dark, .dark *));
 
-body {
-  @apply bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+/*
+  Carbon-copy order pad palette.
+  Colour law: paper = stock, canary = stock in, rose = stock out or shortage, sky = transfer.
+  Every token switches in .dark, so components never need dark: variants.
+*/
+:root {
+  --paper: #ffffff;
+  --paper-2: #f3f4fb;
+  --ink: #1d2566;
+  --ink-soft: #4b5288;
+  --print: #5a64a0;
+  --rule: #d6d9ee;
+  --rule-strong: #a9b0d6;
+  --cover: #1d2566;
+  --cover-2: #2a347c;
+  --cover-ink: #e6e8f7;
+  --canary: #f8e36b;
+  --rose: #f7c3cf;
+  --sky: #c9ddf6;
+  --stamp: #c62f2a;
+}
+
+.dark {
+  --paper: #151a38;
+  --paper-2: #1b2145;
+  --ink: #e3e6f8;
+  --ink-soft: #a9afd6;
+  --print: #939bd0;
+  --rule: #2c3463;
+  --rule-strong: #454e8a;
+  --cover: #0d1128;
+  --cover-2: #1a2048;
+  --cover-ink: #c9cdeb;
+  --canary: #574c17;
+  --rose: #5a2638;
+  --sky: #1e3a5f;
+  --stamp: #ff7a70;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-print: var(--print);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-cover: var(--cover);
+  --color-cover-2: var(--cover-2);
+  --color-cover-ink: var(--cover-ink);
+  --color-canary: var(--canary);
+  --color-rose: var(--rose);
+  --color-sky: var(--sky);
+  --color-stamp: var(--stamp);
+}
+
+@theme {
+  --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --animate-stamp: stamp 220ms var(--ease-out-strong) both;
+
+  @keyframes stamp {
+    from {
+      opacity: 0;
+      scale: 1.3;
+    }
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+}
+
+/* Row of punched holes between the stub and the sheet */
+@utility perforation {
+  height: 6px;
+  background-image: radial-gradient(circle, var(--rule-strong) 1.5px, transparent 2px);
+  background-size: 10px 6px;
+  background-repeat: repeat-x;
 }
 
 @layer base {
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background: var(--canary);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  a {
+    text-underline-offset: 3px;
+  }
+
   button:not(:disabled) {
     cursor: pointer;
+  }
+
+  * {
+    scrollbar-color: var(--rule-strong) transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --animate-stamp: none;
   }
 }
