@@ -1,5 +1,13 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { BUTTON_VARIANTS } from '../lib/ui'
+import { CheckboxField } from '../components/CheckboxField'
+import { FormField } from '../components/FormField'
+import { PageHeader } from '../components/PageHeader'
+import { SelectField } from '../components/SelectField'
+import { StatusMessage } from '../components/StatusMessage'
 import { StockTable } from '../components/StockTable'
+import { TotalsStrip } from '../components/TotalsStrip'
 import { useStocks } from '../hooks/useStocks'
 import { useLocations } from '../hooks/useLocations'
 import { useAllProducts } from '../hooks/useProducts'
@@ -19,75 +27,53 @@ export default function Stocks() {
   const summary = summarize(visibleRows)
 
   return (
-    <section className="p-4 sm:p-8">
-      <h1 className="mb-6 text-2xl font-semibold">Stocks</h1>
+    <>
+      <PageHeader
+        title="Stocks"
+        actions={
+          <Link to="/movements/new" className={BUTTON_VARIANTS.primary}>
+            Saisir un mouvement
+          </Link>
+        }
+      />
 
-      <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div className="rounded border p-3 dark:border-gray-700">
-          <div className="text-xs text-gray-500 dark:text-gray-400">Références</div>
-          <div className="text-xl font-semibold tabular-nums">{summary.references}</div>
-        </div>
-        <div className="rounded border p-3 dark:border-gray-700">
-          <div className="text-xs text-gray-500 dark:text-gray-400">Quantité totale</div>
-          <div className="text-xl font-semibold tabular-nums">{summary.quantity}</div>
-        </div>
-        <div className="rounded border p-3 dark:border-gray-700">
-          <div className="text-xs text-gray-500 dark:text-gray-400">Sous le seuil</div>
-          <div className="text-xl font-semibold tabular-nums text-red-700 dark:text-red-400">{summary.alerts}</div>
-        </div>
-      </div>
+      <div className="flex flex-col gap-6">
+        <TotalsStrip
+          totals={[
+            { label: 'Références', value: summary.references, loading },
+            { label: 'Quantité totale', value: summary.quantity, loading },
+            { label: 'Sous le seuil', value: summary.alerts, loading, shortage: true },
+          ]}
+        />
 
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end">
-        <div className="flex-1">
-          <label htmlFor="stock-search" className="mb-1 block text-sm">
-            Rechercher
-          </label>
-          <input
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto]">
+          <FormField
             id="stock-search"
+            label="Rechercher"
             type="search"
             placeholder="Steak haché"
             value={filters.search}
-            onChange={(event) => setFilters({ ...filters, search: event.target.value })}
-            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
+            onChange={(value) => setFilters({ ...filters, search: value })}
           />
-        </div>
-
-        <div>
-          <label htmlFor="stock-location" className="mb-1 block text-sm">
-            Emplacement
-          </label>
-          <select
+          <SelectField
             id="stock-location"
+            label="Emplacement"
             value={filters.locationId}
-            onChange={(event) => setFilters({ ...filters, locationId: event.target.value })}
-            className="w-full rounded border px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
-          >
-            <option value="">Tous</option>
-            {locations.map((location) => (
-              <option key={location.id} value={location.id}>
-                {location.name} ({location.code})
-              </option>
-            ))}
-          </select>
+            onChange={(value) => setFilters({ ...filters, locationId: value })}
+            options={locations.map((location) => ({ value: location.id, label: `${location.name} (${location.code})` }))}
+            placeholder="Tous"
+          />
+          <CheckboxField
+            id="stock-below"
+            label="Sous le seuil uniquement"
+            checked={filters.onlyBelowThreshold}
+            onChange={(checked) => setFilters({ ...filters, onlyBelowThreshold: checked })}
+          />
         </div>
 
-        <label className="flex items-center gap-2 py-1 text-sm">
-          <input
-            type="checkbox"
-            checked={filters.onlyBelowThreshold}
-            onChange={(event) => setFilters({ ...filters, onlyBelowThreshold: event.target.checked })}
-          />
-          Sous le seuil uniquement
-        </label>
+        <StatusMessage loading={loading} error={error} />
+        {!loading && error === null && <StockTable rows={visibleRows} />}
       </div>
-
-      {loading && <p>Chargement des stocks...</p>}
-      {!loading && error !== null && (
-        <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
-          {error}
-        </p>
-      )}
-      {!loading && error === null && <StockTable rows={visibleRows} />}
-    </section>
+    </>
   )
 }

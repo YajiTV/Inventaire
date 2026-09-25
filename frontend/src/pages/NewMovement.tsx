@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { ActionFeedback } from '../components/ActionFeedback'
 import { MovementForm } from '../components/MovementForm'
+import { PageHeader } from '../components/PageHeader'
 import { StatusMessage } from '../components/StatusMessage'
 import { createMovement } from '../api/stockMovements'
 import { useAllProducts } from '../hooks/useProducts'
@@ -19,32 +21,29 @@ export default function NewMovement() {
   async function handleSubmit(movement: StockMovementCreate) {
     setServerError(null)
     try {
-      await createMovement(movement)
-      navigate('/movements')
+      const created = await createMovement(movement)
+      navigate('/movements', { state: { freshId: created.id } })
     } catch (err) {
       setServerError((err as Error).message)
     }
   }
 
   return (
-    <section className="p-4 sm:p-8">
-      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold">Nouveau mouvement de stock</h1>
-        <div className="flex gap-4 text-sm">
-          <Link to="/movements" className="underline">
+    <>
+      <PageHeader
+        title="Bon de mouvement"
+        back={
+          <Link to="/movements" className="font-semibold hover:underline">
             Retour aux mouvements
           </Link>
-        </div>
+        }
+      />
+
+      <div className="flex max-w-3xl flex-col gap-4">
+        <ActionFeedback error={serverError} success={null} />
+        <StatusMessage loading={loading} error={error} />
+        {!loading && !error && <MovementForm products={products} locations={locations} onSubmit={handleSubmit} />}
       </div>
-
-      {serverError !== null && (
-        <p role="alert" className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
-          {serverError}
-        </p>
-      )}
-
-      <StatusMessage loading={loading} error={error} />
-      {!loading && !error && <MovementForm products={products} locations={locations} onSubmit={handleSubmit} />}
-    </section>
+    </>
   )
 }
