@@ -87,7 +87,7 @@ export function MovementsTable({ movements, products, locations, freshId, framed
         <Ledger framed={framed}>
           <thead>
             <tr>
-              <Th>N°</Th>
+              <Th>Bon</Th>
               <Th>Date</Th>
               <Th>Type</Th>
               <Th>Produit</Th>
