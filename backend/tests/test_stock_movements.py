@@ -2,30 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from app.models.user import User
 from app.repositories import stock_repository
-from app.schemas.enums import UserRole
-from app.services.password import hash_password
-
-
-@pytest.fixture()
-def auth(client: TestClient, db_session: Session) -> dict[str, str]:
-    """Authorization header of an operator: every movement is attributed to a user."""
-    user = User(
-        email="operateur@inventaire.fr",
-        full_name="Operateur",
-        hashed_password=hash_password("s3cret-pass"),
-        role=UserRole.OPERATOR,
-        is_active=True,
-    )
-    db_session.add(user)
-    db_session.commit()
-
-    response = client.post(
-        "/auth/login", json={"email": "operateur@inventaire.fr", "password": "s3cret-pass"}
-    )
-    assert response.status_code == 200
-    return {"Authorization": f"Bearer {response.json()['access_token']}"}
 
 
 def create_product(client: TestClient, sku: str = "CAFE-001") -> int:

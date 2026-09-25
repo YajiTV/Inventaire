@@ -2900,6 +2900,16 @@
             },
             "description": "The orders, each one with its lines and its computed total"
           },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid token"
+          },
           "404": {
             "description": "Not returned by this route"
           },
@@ -2917,6 +2927,11 @@
             "description": "Invalid body, rejected by Pydantic"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "List purchase orders",
         "tags": [
           "Purchase orders"
@@ -2946,6 +2961,16 @@
             },
             "description": "The created order, in status draft, with its lines"
           },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid token"
+          },
           "404": {
             "content": {
               "application/json": {
@@ -2970,6 +2995,11 @@
             "description": "Invalid body, rejected by Pydantic"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Create a purchase order",
         "tags": [
           "Purchase orders"
@@ -2995,6 +3025,16 @@
           "204": {
             "description": "Deleted, no body returned"
           },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid token"
+          },
           "404": {
             "content": {
               "application/json": {
@@ -3019,6 +3059,11 @@
             "description": "Invalid body, rejected by Pydantic"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Delete a draft purchase order",
         "tags": [
           "Purchase orders"
@@ -3049,6 +3094,16 @@
             },
             "description": "The order with its lines and its computed total"
           },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid token"
+          },
           "404": {
             "content": {
               "application/json": {
@@ -3066,6 +3121,11 @@
             "description": "Invalid body, rejected by Pydantic"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Get a purchase order",
         "tags": [
           "Purchase orders"
@@ -3106,6 +3166,16 @@
             },
             "description": "The updated order"
           },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid token"
+          },
           "404": {
             "content": {
               "application/json": {
@@ -3130,6 +3200,11 @@
             "description": "Invalid body, rejected by Pydantic"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Update the status or the location of an order",
         "tags": [
           "Purchase orders"
@@ -3165,6 +3240,16 @@
             },
             "description": "Successful Response"
           },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid token"
+          },
           "404": {
             "content": {
               "application/json": {
@@ -3189,6 +3274,11 @@
             "description": "Invalid body, rejected by Pydantic"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "List Order Lines",
         "tags": [
           "Purchase orders"
@@ -3228,6 +3318,16 @@
             },
             "description": "Successful Response"
           },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid token"
+          },
           "404": {
             "content": {
               "application/json": {
@@ -3252,6 +3352,11 @@
             "description": "Invalid body, rejected by Pydantic"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Create Order Line",
         "tags": [
           "Purchase orders"
@@ -3285,6 +3390,16 @@
           "204": {
             "description": "Successful Response"
           },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid token"
+          },
           "404": {
             "content": {
               "application/json": {
@@ -3309,6 +3424,11 @@
             "description": "Invalid body, rejected by Pydantic"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Delete Order Line",
         "tags": [
           "Purchase orders"
@@ -3357,6 +3477,16 @@
             },
             "description": "Successful Response"
           },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid token"
+          },
           "404": {
             "content": {
               "application/json": {
@@ -3381,6 +3511,11 @@
             "description": "Invalid body, rejected by Pydantic"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Update Order Line",
         "tags": [
           "Purchase orders"

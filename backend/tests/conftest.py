@@ -7,6 +7,9 @@ from sqlalchemy.pool import StaticPool
 from app.db.base import Base
 from app.db.session import get_db
 from app.main import app
+from app.models.user import User
+from app.schemas.enums import UserRole
+from app.services.password import hash_password
 
 # SQLite en memoire, une connexion partagee (StaticPool) pour que toutes les
 # sessions de test voient les memes tables le temps du test.
@@ -39,3 +42,23 @@ def client(db_session: Session):
         yield TestClient(app, base_url="https://testserver")
     finally:
         app.dependency_overrides.clear()
+
+
+@pytest.fixture()
+def auth(client: TestClient, db_session: Session) -> dict[str, str]:
+    """Authorization header of an operator, for the routes that need a token."""
+    user = User(
+        email="operateur@inventaire.fr",
+        full_name="Operateur",
+        hashed_password=hash_password("s3cret-pass"),
+        role=UserRole.OPERATOR,
+        is_active=True,
+    )
+    db_session.add(user)
+    db_session.commit()
+
+    response = client.post(
+        "/auth/login", json={"email": "operateur@inventaire.fr", "password": "s3cret-pass"}
+    )
+    assert response.status_code == 200
+    return {"Authorization": f"Bearer {response.json()['access_token']}"}
