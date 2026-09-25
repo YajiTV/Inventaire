@@ -1,4 +1,17 @@
+import pytest
 from fastapi.testclient import TestClient
+
+
+@pytest.fixture(autouse=True)
+def _authenticated(client: TestClient, auth: dict[str, str]) -> None:
+    """Every purchase order route needs a token, helpers below included."""
+    client.headers.update(auth)
+
+
+def test_purchase_orders_require_authentication(client: TestClient) -> None:
+    client.headers.pop("Authorization")
+    assert client.get("/purchase-orders").status_code == 401
+    assert client.post("/purchase-orders", json={}).status_code == 401
 
 
 def create_supplier(client: TestClient, name: str = "Metro") -> int:
