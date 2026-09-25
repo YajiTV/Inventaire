@@ -1,42 +1,56 @@
-import { lineTotal } from "../lib/purchaseOrders";
-import type { OrderLineRead, ProductRead } from "../types/api";
+import { lineTotal } from '../lib/purchaseOrders'
+import type { OrderLineRead, ProductRead } from '../types/api'
+import { Ledger, Td, Th, Tr } from './Ledger'
 
 type OrderLinesTableProps = {
-    lines: OrderLineRead[];
-    products: ProductRead[];
-};
+  lines: OrderLineRead[]
+  products: ProductRead[]
+  total: string
+}
 
-export function OrderLinesTable({ lines, products }: OrderLinesTableProps) {
-    if (lines.length === 0) {
-        return (
-            <p className="rounded border border-dashed p-6 text-center text-gray-600 dark:border-gray-600 dark:text-gray-400">
-                Aucune ligne sur cette commande.
-            </p>
-        );
-    }
-
+export function OrderLinesTable({ lines, products, total }: OrderLinesTableProps) {
+  if (lines.length === 0) {
     return (
-        <div className="overflow-x-auto rounded border dark:border-gray-700">
-            <table className="w-full border-collapse text-sm">
-                <thead className="bg-gray-50 text-left dark:bg-gray-800">
-                    <tr>
-                        <th className="px-3 py-2 font-medium">Produit</th>
-                        <th className="px-3 py-2 font-medium text-right">Quantité</th>
-                        <th className="px-3 py-2 font-medium text-right">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {lines.map(line => (
-                        <tr key={line.id} className="border-t dark:border-gray-700">
-                            <td className="px-3 py-2">
-                                {products.find(product => product.id === line.product_id)?.name ?? "Produit supprimé"}
-                            </td>
-                            <td className="px-3 py-2 text-right tabular-nums">{line.quantity}</td>
-                            <td className="px-3 py-2 text-right tabular-nums">{lineTotal(line).toFixed(2)} €</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
+      <p className="border border-dashed border-rule-strong px-4 py-10 text-center text-sm text-ink-soft">
+        Aucune ligne sur cette commande.
+      </p>
+    )
+  }
+
+  return (
+    <Ledger>
+      <thead>
+        <tr>
+          <Th>Produit</Th>
+          <Th align="right">Quantité</Th>
+          <Th align="right">Prix unitaire</Th>
+          <Th align="right">Total</Th>
+        </tr>
+      </thead>
+      <tbody>
+        {lines.map((line) => (
+          <Tr key={line.id}>
+            <Td>
+              <span className="font-semibold">
+                {products.find((product) => product.id === line.product_id)?.name ?? 'Produit supprimé'}
+              </span>
+            </Td>
+            <Td align="right">{line.quantity}</Td>
+            <Td align="right" muted>
+              {Number(line.unit_price).toFixed(2)} €
+            </Td>
+            <Td align="right">{lineTotal(line).toFixed(2)} €</Td>
+          </Tr>
+        ))}
+      </tbody>
+      <tfoot>
+        <tr className="border-t-2 border-ink">
+          <td colSpan={3} className="px-3 py-3 text-right text-[11px] font-bold uppercase tracking-wider font-stretch-condensed text-print">
+            Total commande
+          </td>
+          <td className="px-3 py-3 text-right text-lg font-extrabold tabular-nums">{total} €</td>
+        </tr>
+      </tfoot>
+    </Ledger>
+  )
 }

@@ -1,6 +1,11 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import type { PurchaseOrderRead, ReplenishmentSuggestion } from '../types/api'
 import { validateTrigger } from '../lib/replenishment'
+import { Button } from './Button'
+import { ErrorList } from './ErrorList'
+import { Ledger, Td, Th, Tr } from './Ledger'
+import { Stamp } from './Stamp'
 
 type ReplenishmentSupplierGroupProps = {
   supplierId: number
@@ -10,6 +15,7 @@ type ReplenishmentSupplierGroupProps = {
   onTrigger: (supplierId: number, productIds: number[], locationId: number) => Promise<PurchaseOrderRead>
 }
 
+// A draft purchase order for one supplier, stamped once generated
 export function ReplenishmentSupplierGroup({
   supplierId,
   supplierName,
@@ -44,52 +50,64 @@ export function ReplenishmentSupplierGroup({
   }
 
   return (
-    <div className="mb-6 rounded border p-4 dark:border-gray-700">
-      <h2 className="mb-3 font-semibold">{supplierName}</h2>
-
-      <div className="mb-3 overflow-x-auto rounded border dark:border-gray-700">
-        <table className="w-full border-collapse text-sm">
-          <thead className="bg-gray-50 text-left dark:bg-gray-800">
-            <tr>
-              <th className="px-3 py-2 font-medium">Produit</th>
-              <th className="px-3 py-2 font-medium text-right">Quantité actuelle</th>
-              <th className="px-3 py-2 font-medium text-right">Seuil</th>
-              <th className="px-3 py-2 font-medium text-right">Quantité suggérée</th>
-            </tr>
-          </thead>
-          <tbody>
-            {suggestions.map((s) => (
-              <tr key={s.product_id} className="border-t dark:border-gray-700">
-                <td className="px-3 py-2 font-medium">{s.product_name}</td>
-                <td className="px-3 py-2 text-right tabular-nums">{s.current_quantity}</td>
-                <td className="px-3 py-2 text-right tabular-nums text-gray-600 dark:text-gray-400">{s.reorder_threshold}</td>
-                <td className="px-3 py-2 text-right tabular-nums">{s.suggested_quantity}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <section className="border border-rule-strong">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-rule-strong bg-paper-2 px-4 py-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wider font-stretch-condensed text-print">Fournisseur</p>
+          <h2 className="text-lg leading-tight font-extrabold uppercase tracking-tight font-stretch-condensed">{supplierName}</h2>
+        </div>
+        {result === null ? (
+          <Button variant="primary" onClick={handleGenerate} disabled={pending}>
+            {pending ? 'Génération...' : 'Générer la commande'}
+          </Button>
+        ) : (
+          <Stamp fresh>Commande générée</Stamp>
+        )}
       </div>
 
-      <button
-        type="button"
-        onClick={handleGenerate}
-        disabled={pending}
-        className="rounded border px-3 py-1 hover:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-800 dark:disabled:text-gray-600"
-      >
-        {pending ? 'Génération...' : 'Générer la commande'}
-      </button>
+      <Ledger framed={false}>
+        <thead>
+          <tr>
+            <Th>Produit</Th>
+            <Th align="right">Quantité actuelle</Th>
+            <Th align="right">Seuil</Th>
+            <Th align="right">À commander</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {suggestions.map((s) => (
+            <Tr key={s.product_id} shortage={result === null}>
+              <Td>
+                <span className="font-semibold">{s.product_name}</span>
+              </Td>
+              <Td align="right">{s.current_quantity}</Td>
+              <Td align="right" muted>
+                {s.reorder_threshold}
+              </Td>
+              <Td align="right">
+                <span className="text-base font-bold">{s.suggested_quantity}</span>
+              </Td>
+            </Tr>
+          ))}
+        </tbody>
+      </Ledger>
 
-      {errors.map((error) => (
-        <p key={error} role="alert" className="mt-2 text-sm text-red-600 dark:text-red-400">
-          {error}
-        </p>
-      ))}
+      {errors.length > 0 && (
+        <div className="p-3">
+          <ErrorList errors={errors} />
+        </div>
+      )}
 
       {result !== null && (
-        <p role="status" className="mt-2 text-sm text-green-700 dark:text-green-400">
-          Commande {result.reference} générée ({result.lines.length} ligne(s), total {result.total_price} €).
+        <p role="status" className="flex flex-wrap items-center gap-x-2 border-t border-rule-strong px-4 py-3 text-sm">
+          <Link to={`/orders/${result.id}`} className="font-bold text-stamp underline">
+            {result.reference}
+          </Link>
+          <span className="text-ink-soft">
+            {result.lines.length} ligne(s), total {result.total_price} €
+          </span>
         </p>
       )}
-    </div>
+    </section>
   )
 }
