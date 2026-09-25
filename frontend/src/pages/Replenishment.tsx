@@ -37,7 +37,7 @@ export default function Replenishment() {
             value={locationId === null ? '' : String(locationId)}
             onChange={(value) => setLocationId(value === '' ? null : Number(value))}
             options={locations.map((location) => ({ value: location.id, label: `${location.name} (${location.code})` }))}
-            placeholder="Choisir..."
+            placeholder="Choisir…"
             disabled={locationsLoading}
           />
         </div>

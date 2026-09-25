@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { formatQuantity } from '../lib/format'
 
 export interface Total {
   label: string
@@ -21,7 +22,7 @@ export function TotalsStrip({ totals }: { totals: Total[] }) {
               {total.label}
             </dt>
             <dd className="mt-1 text-3xl leading-none font-extrabold tabular-nums">
-              {total.error ? '—' : total.loading ? <span className="text-rule-strong">…</span> : total.value}
+              {total.error ? '—' : total.loading ? <span className="text-rule-strong">…</span> : formatQuantity(total.value)}
             </dd>
           </>
         )

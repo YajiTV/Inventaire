@@ -8,6 +8,7 @@ import { usePurchaseOrder } from '../hooks/usePurchaseOrder'
 import { useAllProducts } from '../hooks/useProducts'
 import { useSuppliers } from '../hooks/useSuppliers'
 import { useLocations } from '../hooks/useLocations'
+import { formatMoney } from '../lib/format'
 
 export default function OrderDetail() {
   const { id } = useParams()
@@ -42,7 +43,7 @@ export default function OrderDetail() {
               { label: 'Fournisseur', value: supplier?.name ?? 'Inconnu' },
               { label: 'Livraison', value: location?.name ?? 'Inconnu' },
               { label: 'Statut', value: <OrderStatusStamp status={order.status} /> },
-              { label: 'Total', value: <span className="text-2xl font-extrabold">{order.total_price} €</span> },
+              { label: 'Total', value: <span className="text-2xl font-extrabold">{formatMoney(order.total_price)}</span> },
             ]}
           />
           <OrderLinesTable lines={order.lines} products={products} total={order.total_price} />

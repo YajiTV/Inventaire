@@ -17,6 +17,7 @@ import { PageHeader } from '../components/PageHeader'
 import { Section } from '../components/Section'
 import { StatusMessage } from '../components/StatusMessage'
 import { TotalsStrip } from '../components/TotalsStrip'
+import { formatMoney, formatQuantity } from '../lib/format'
 
 const PREVIEW_SIZE = 5
 
@@ -116,7 +117,6 @@ function SamplePad() {
 }
 
 function Dashboard() {
-  const { user } = useAuth()
   const { suggestions, loading: replenishmentLoading, error: replenishmentError } = useReplenishment()
   const { orders, loading: ordersLoading, error: ordersError } = usePurchaseOrders()
   const { movements, loading: movementsLoading, error: movementsError } = useStockMovements(EMPTY_MOVEMENT_FILTERS)
@@ -128,9 +128,7 @@ function Dashboard() {
   const pendingOrders = orders.filter((order) => order.status === 'draft' || order.status === 'sent')
   const recentMovements = sortMovements(movements).slice(0, PREVIEW_SIZE)
   const now = new Date()
-  const today = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
-  const serial = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-  const firstName = user?.full_name.split(' ')[0]
+  const serial = now.toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })
 
   const tableLoading = movementsLoading || productsLoading || locationsLoading
   const tableError = movementsError ?? productsError ?? locationsError
@@ -140,7 +138,6 @@ function Dashboard() {
       <PageHeader
         title="Feuille du jour"
         serial={serial}
-        subtitle={`Bonjour ${firstName}, nous sommes ${today}.`}
         actions={
           <>
             <Link to="/replenishment" className={BUTTON_VARIANTS.secondary}>
@@ -190,7 +187,7 @@ function Dashboard() {
                       {s.product_name}
                     </Link>
                     <span className="text-sm whitespace-nowrap text-ink-soft">
-                      <span className="text-base font-bold text-ink">{s.current_quantity}</span> sur {s.reorder_threshold}
+                      <span className="text-base font-bold text-ink">{formatQuantity(s.current_quantity)}</span> sur {formatQuantity(s.reorder_threshold)}
                     </span>
                   </li>
                 ))}
@@ -219,7 +216,7 @@ function Dashboard() {
                     </span>
                     <span className="flex items-center gap-3">
                       <OrderStatusStamp status={order.status} />
-                      <span className="font-semibold tabular-nums">{order.total_price} €</span>
+                      <span className="font-semibold tabular-nums">{formatMoney(order.total_price)}</span>
                     </span>
                   </li>
                 ))}

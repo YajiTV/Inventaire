@@ -6,6 +6,7 @@ import { Button } from './Button'
 import { ErrorList } from './ErrorList'
 import { Ledger, Td, Th, Tr } from './Ledger'
 import { Stamp } from './Stamp'
+import { formatMoney, formatQuantity } from '../lib/format'
 
 type ReplenishmentSupplierGroupProps = {
   supplierId: number
@@ -52,10 +53,7 @@ export function ReplenishmentSupplierGroup({
   return (
     <section className="border border-rule-strong">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-rule-strong bg-paper-2 px-4 py-3">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider font-stretch-condensed text-print">Fournisseur</p>
-          <h2 className="text-lg leading-tight font-extrabold uppercase tracking-tight font-stretch-condensed">{supplierName}</h2>
-        </div>
+        <h2 className="text-lg leading-tight font-extrabold uppercase tracking-tight font-stretch-condensed">{supplierName}</h2>
         {result === null ? (
           <Button variant="primary" onClick={handleGenerate} disabled={pending}>
             {pending ? 'Génération...' : 'Générer la commande'}
@@ -80,12 +78,12 @@ export function ReplenishmentSupplierGroup({
               <Td>
                 <span className="font-semibold">{s.product_name}</span>
               </Td>
-              <Td align="right">{s.current_quantity}</Td>
+              <Td align="right">{formatQuantity(s.current_quantity)}</Td>
               <Td align="right" muted>
-                {s.reorder_threshold}
+                {formatQuantity(s.reorder_threshold)}
               </Td>
               <Td align="right">
-                <span className="text-base font-bold">{s.suggested_quantity}</span>
+                <span className="text-base font-bold">{formatQuantity(s.suggested_quantity)}</span>
               </Td>
             </Tr>
           ))}
@@ -104,7 +102,7 @@ export function ReplenishmentSupplierGroup({
             {result.reference}
           </Link>
           <span className="text-ink-soft">
-            {result.lines.length} ligne(s), total {result.total_price} €
+            {result.lines.length} ligne(s), total {formatMoney(result.total_price)}
           </span>
         </p>
       )}

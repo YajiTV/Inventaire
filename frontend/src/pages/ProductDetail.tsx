@@ -6,6 +6,7 @@ import { StatusMessage } from '../components/StatusMessage'
 import { useProduct } from '../hooks/useProducts'
 import { useCategories } from '../hooks/useCategories'
 import { useSuppliers } from '../hooks/useSuppliers'
+import { formatMoney, formatQuantity } from '../lib/format'
 
 export default function ProductDetail() {
   const { id } = useParams()
@@ -41,13 +42,13 @@ export default function ProductDetail() {
               shortage,
               value: (
                 <span className="flex items-center gap-3">
-                  <span className="text-3xl leading-none font-extrabold">{product.total_quantity}</span>
+                  <span className="text-3xl leading-none font-extrabold">{formatQuantity(product.total_quantity)}</span>
                   {shortage && <Stamp>Sous le seuil</Stamp>}
                 </span>
               ),
             },
-            { label: 'Seuil de réapprovisionnement', value: product.reorder_threshold },
-            { label: 'Prix unitaire', value: `${product.unit_price} €` },
+            { label: 'Seuil de réapprovisionnement', value: formatQuantity(product.reorder_threshold) },
+            { label: 'Prix unitaire', value: formatMoney(product.unit_price) },
             { label: 'Code-barres', value: product.barcode ?? <span className="text-ink-soft">Non renseigné</span> },
             { label: 'Catégorie', value: category?.name ?? <span className="text-ink-soft">Inconnue</span> },
             { label: 'Fournisseur', value: supplier?.name ?? <span className="text-ink-soft">Aucun</span> },
