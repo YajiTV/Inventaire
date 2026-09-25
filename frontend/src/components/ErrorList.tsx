@@ -3,13 +3,15 @@ interface ErrorListProps {
 }
 
 export function ErrorList({ errors }: ErrorListProps) {
+  if (errors.length === 0) return null
+
   return (
-    <>
+    <ul className="flex w-full flex-col gap-1 border border-stamp/50 bg-rose/50 px-3 py-2 text-sm">
       {errors.map((error) => (
-        <p key={error} role="alert" className="w-full text-sm text-red-600 dark:text-red-400">
+        <li key={error} role="alert">
           {error}
-        </p>
+        </li>
       ))}
-    </>
+    </ul>
   )
 }
