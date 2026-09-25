@@ -2845,9 +2845,11 @@
     },
     "/purchase-orders": {
       "get": {
+        "description": "Returns every purchase order, newest first.\n\nBoth filters are optional and combine with each other. An unknown supplier\nid is not an error here: it simply matches no order and returns an empty\nlist.",
         "operationId": "list_purchase_orders_purchase_orders_get",
         "parameters": [
           {
+            "description": "Keep only the orders of this supplier",
             "in": "query",
             "name": "supplier_id",
             "required": false,
@@ -2860,10 +2862,12 @@
                   "type": "null"
                 }
               ],
+              "description": "Keep only the orders of this supplier",
               "title": "Supplier Id"
             }
           },
           {
+            "description": "Keep only the orders in this status",
             "in": "query",
             "name": "order_status",
             "required": false,
@@ -2876,6 +2880,7 @@
                   "type": "null"
                 }
               ],
+              "description": "Keep only the orders in this status",
               "title": "Order Status"
             }
           }
@@ -2893,7 +2898,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The orders, each one with its lines and its computed total"
           },
           "401": {
             "content": {
@@ -2903,17 +2908,10 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
           },
           "409": {
             "content": {
@@ -2923,25 +2921,24 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "The order life cycle forbids the operation"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "List Purchase Orders",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List purchase orders",
         "tags": [
           "Purchase orders"
         ]
       },
       "post": {
+        "description": "Creates an order and its lines in one call.\n\nThe order always starts in status `draft`, whatever the payload asks for,\nand at least one line is required. The reference must be unique across\nevery order. `total_price` is computed from the lines and never stored.",
         "operationId": "create_purchase_order_purchase_orders_post",
         "requestBody": {
           "content": {
@@ -2962,7 +2959,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created order, in status draft, with its lines"
           },
           "401": {
             "content": {
@@ -2972,7 +2969,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -2982,7 +2979,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown supplier, location or product"
           },
           "409": {
             "content": {
@@ -2992,20 +2989,18 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Reference already used by another order"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Create Purchase Order",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create a purchase order",
         "tags": [
           "Purchase orders"
         ]
@@ -3013,6 +3008,7 @@
     },
     "/purchase-orders/{order_id}": {
       "delete": {
+        "description": "Deletes an order and its lines.\n\nOnly a `draft` or `cancelled` order can be deleted. A `sent` or `received`\norder is part of the stock history and must be cancelled instead.",
         "operationId": "delete_purchase_order_purchase_orders__order_id__delete",
         "parameters": [
           {
@@ -3027,7 +3023,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Successful Response"
+            "description": "Deleted, no body returned"
           },
           "401": {
             "content": {
@@ -3037,7 +3033,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3047,7 +3043,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown order"
           },
           "409": {
             "content": {
@@ -3057,25 +3053,24 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "The order is already sent or received"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Delete Purchase Order",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete a draft purchase order",
         "tags": [
           "Purchase orders"
         ]
       },
       "get": {
+        "description": "Returns one order, its lines included.",
         "operationId": "get_purchase_order_purchase_orders__order_id__get",
         "parameters": [
           {
@@ -3097,7 +3092,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The order with its lines and its computed total"
           },
           "401": {
             "content": {
@@ -3107,7 +3102,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3117,36 +3112,27 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown order"
           },
           "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Conflict"
+            "description": "Not returned by this route"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Get Purchase Order",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get a purchase order",
         "tags": [
           "Purchase orders"
         ]
       },
       "patch": {
-        "description": "Changing the status to \"received\" generates the incoming stock movements.",
+        "description": "Moves the order along its life cycle, or changes its delivery location.\n\nAllowed transitions: `draft` -> `sent` -> `received`, and `draft` or `sent`\n-> `cancelled`. Any other transition returns 409, and a `received` or\n`cancelled` order is closed: neither its status nor its location can change\nany more.\n\nMoving to `received` is the side of the feature that touches the stock: it\ngenerates one incoming movement per line and stamps `received_at`.",
         "operationId": "update_purchase_order_purchase_orders__order_id__patch",
         "parameters": [
           {
@@ -3178,7 +3164,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The updated order"
           },
           "401": {
             "content": {
@@ -3188,7 +3174,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3198,7 +3184,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown order or location"
           },
           "409": {
             "content": {
@@ -3208,20 +3194,18 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Invalid status transition, or order already closed"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Update Purchase Order",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update the status or the location of an order",
         "tags": [
           "Purchase orders"
         ]
@@ -3264,7 +3248,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3274,7 +3258,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Resource not found"
           },
           "409": {
             "content": {
@@ -3284,19 +3268,17 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "The order life cycle forbids the operation"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "List Order Lines",
         "tags": [
           "Purchase orders"
@@ -3344,7 +3326,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3354,7 +3336,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Resource not found"
           },
           "409": {
             "content": {
@@ -3364,19 +3346,17 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "The order life cycle forbids the operation"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Create Order Line",
         "tags": [
           "Purchase orders"
@@ -3418,7 +3398,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3428,7 +3408,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Resource not found"
           },
           "409": {
             "content": {
@@ -3438,19 +3418,17 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "The order life cycle forbids the operation"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Delete Order Line",
         "tags": [
           "Purchase orders"
@@ -3507,7 +3485,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3517,7 +3495,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Resource not found"
           },
           "409": {
             "content": {
@@ -3527,19 +3505,17 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "The order life cycle forbids the operation"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "summary": "Update Order Line",
         "tags": [
           "Purchase orders"
@@ -3684,9 +3660,11 @@
     },
     "/stock-movements": {
       "get": {
+        "description": "Returns the movement history, most recent first.\n\nEvery filter is optional and they combine with each other. A `location_id`\nmatches a movement whether that location is its source or its destination,\nso a transfer shows up on both sides.",
         "operationId": "list_stock_movements_stock_movements_get",
         "parameters": [
           {
+            "description": "Keep only the movements of this product",
             "in": "query",
             "name": "product_id",
             "required": false,
@@ -3699,10 +3677,12 @@
                   "type": "null"
                 }
               ],
+              "description": "Keep only the movements of this product",
               "title": "Product Id"
             }
           },
           {
+            "description": "Keep only the movements whose source or destination is this location",
             "in": "query",
             "name": "location_id",
             "required": false,
@@ -3715,10 +3695,12 @@
                   "type": "null"
                 }
               ],
+              "description": "Keep only the movements whose source or destination is this location",
               "title": "Location Id"
             }
           },
           {
+            "description": "Keep only this kind of movement",
             "in": "query",
             "name": "type",
             "required": false,
@@ -3731,15 +3713,18 @@
                   "type": "null"
                 }
               ],
+              "description": "Keep only this kind of movement",
               "title": "Type"
             }
           },
           {
+            "description": "How many movements to return",
             "in": "query",
             "name": "limit",
             "required": false,
             "schema": {
               "default": 50,
+              "description": "How many movements to return",
               "maximum": 200,
               "minimum": 1,
               "title": "Limit",
@@ -3760,7 +3745,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The movements, most recent first"
           },
           "401": {
             "content": {
@@ -3770,37 +3755,16 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
           },
           "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Conflict"
+            "description": "Not returned by this route"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
         "security": [
@@ -3808,13 +3772,13 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "List Stock Movements",
+        "summary": "List the stock movements",
         "tags": [
           "Stock movements"
         ]
       },
       "post": {
-        "description": "Records a movement and updates the stock of the locations involved.\nReturns 409 when the source location does not hold enough quantity.",
+        "description": "Records a movement and updates the stock of the locations involved.\n\nThree kinds of movement, each one with its own required locations:\n\n- `incoming`: needs `to_location_id`, adds the quantity, creates the stock\n  line if that product had none at that location yet.\n- `outgoing`: needs `from_location_id`, removes the quantity.\n- `transfer`: needs both, removes on one side and adds on the other.\n\nStock never goes negative: an `outgoing` or a `transfer` larger than what\nthe source holds is refused with 409 and nothing is written. The movement\nis stamped with the authenticated user, so the history says who did what.",
         "operationId": "create_stock_movement_stock_movements_post",
         "requestBody": {
           "content": {
@@ -3835,7 +3799,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The recorded movement, quantities already applied"
           },
           "401": {
             "content": {
@@ -3845,7 +3809,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3855,7 +3819,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown product or location"
           },
           "409": {
             "content": {
@@ -3865,17 +3829,10 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "The source location does not hold enough quantity"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
         "security": [
@@ -3883,7 +3840,7 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Create Stock Movement",
+        "summary": "Record a stock movement",
         "tags": [
           "Stock movements"
         ]
