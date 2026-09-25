@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
+from app.core.security import get_current_user
 from app.db.session import get_db
 from app.routers._stub import not_implemented
 from app.schemas.common import ErrorResponse
@@ -21,7 +22,11 @@ from app.services import (
 router = APIRouter(
     prefix="/purchase-orders",
     tags=["Purchase orders"],
+    # Applied to every route below, order lines included: an order carries
+    # supplier prices, it is not public data.
+    dependencies=[Depends(get_current_user)],
     responses={
+        401: {"model": ErrorResponse, "description": "Missing or invalid token"},
         404: {"model": ErrorResponse, "description": "Resource not found"},
         409: {"model": ErrorResponse, "description": "The order life cycle forbids the operation"},
         422: {"description": "Invalid body, rejected by Pydantic"},
