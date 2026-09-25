@@ -18,6 +18,10 @@ eggs/
 AGENTS.md
 CLAUDE.md
 .ai/
+/PRODUCT.md
+/DESIGN.md
+.impeccable/
+.claude/
 /lib64/
 parts/
 sdist/
