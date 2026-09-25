@@ -54,21 +54,21 @@ export function CategoryTable({ categories, onUpdate, onDelete }: CategoryTableP
     {
       header: 'Nom',
       render: (c) =>
-        editingId === c.id ? <FormField id={`edit-name-${c.id}`} label="" value={editName} onChange={setEditName} /> : c.name,
+        editingId === c.id ? <FormField id={`edit-name-${c.id}`} label="Nom" value={editName} onChange={setEditName} compact /> : <span className="font-semibold">{c.name}</span>,
     },
     {
       header: 'Description',
       render: (c) =>
         editingId === c.id ? (
-          <FormField id={`edit-description-${c.id}`} label="" value={editDescription} onChange={setEditDescription} />
+          <FormField id={`edit-description-${c.id}`} label="Description" value={editDescription} onChange={setEditDescription} compact />
         ) : (
-          c.description
+          <span className="text-ink-soft">{c.description}</span>
         ),
     },
   ]
 
   return (
-    <>
+    <div className="flex flex-col gap-3">
       <ErrorList errors={editErrors} />
       <DataTable
         columns={columns}
@@ -77,17 +77,21 @@ export function CategoryTable({ categories, onUpdate, onDelete }: CategoryTableP
         renderActions={(c) =>
           editingId === c.id ? (
             <>
-              <Button onClick={() => saveEdit(c.id)}>Enregistrer</Button>
+              <Button onClick={() => saveEdit(c.id)} variant="primary">
+                Enregistrer
+              </Button>
               <Button onClick={cancelEdit}>Annuler</Button>
             </>
           ) : (
             <>
               <Button onClick={() => startEdit(c)}>Modifier</Button>
-              <Button onClick={() => handleDelete(c)}>Supprimer</Button>
+              <Button onClick={() => handleDelete(c)} variant="danger">
+                Supprimer
+              </Button>
             </>
           )
         }
       />
-    </>
+    </div>
   )
 }

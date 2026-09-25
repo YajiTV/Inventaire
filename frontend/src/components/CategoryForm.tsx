@@ -34,11 +34,13 @@ export function CategoryForm({ onSubmit }: CategoryFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="mb-4 flex flex-wrap gap-2">
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
       <FormField id="category-name" label="Nom" value={name} onChange={setName} placeholder="Surgelés" required />
-      <FormField id="category-description" label="Description" value={description} onChange={setDescription} />
-      <Button type="submit">Ajouter</Button>
+      <FormField id="category-description" label="Description" value={description} onChange={setDescription} placeholder="Viandes et frites" />
       <ErrorList errors={errors} />
+      <Button type="submit" variant="primary">
+        Ajouter la catégorie
+      </Button>
     </form>
   )
 }
