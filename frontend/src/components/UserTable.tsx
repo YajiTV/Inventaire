@@ -7,6 +7,7 @@ import { FormField } from './FormField'
 import { SelectField } from './SelectField'
 import { ErrorList } from './ErrorList'
 import { Button } from './Button'
+import { Stamp } from './Stamp'
 
 type UserTableProps = {
   users: UserRead[]
@@ -47,14 +48,14 @@ export function UserTable({ users, onUpdate }: UserTableProps) {
   }
 
   const columns: DataTableColumn<UserRead>[] = [
-    { header: 'Email', render: (u) => u.email },
+    { header: 'Email', render: (u) => <span className="text-ink-soft">{u.email}</span> },
     {
       header: 'Nom complet',
       render: (u) =>
         editingId === u.id ? (
-          <FormField id={`edit-full-name-${u.id}`} label="" value={editFullName} onChange={setEditFullName} />
+          <FormField id={`edit-full-name-${u.id}`} label="Nom complet" value={editFullName} onChange={setEditFullName} compact />
         ) : (
-          u.full_name
+          <span className="font-semibold">{u.full_name}</span>
         ),
     },
     {
@@ -63,30 +64,43 @@ export function UserTable({ users, onUpdate }: UserTableProps) {
         editingId === u.id ? (
           <SelectField
             id={`edit-role-${u.id}`}
-            label=""
+            label="Rôle"
+            compact
             value={editRole}
             onChange={(value) => setEditRole(value as UserRole)}
             options={ROLE_OPTIONS}
           />
         ) : (
-          roleLabel(u.role)
+          <span
+            className={`inline-block px-2 py-0.5 text-xs font-semibold uppercase tracking-wider font-stretch-condensed ${u.role === 'admin' ? 'bg-ink text-paper' : 'border border-rule-strong'}`}
+          >
+            {roleLabel(u.role)}
+          </span>
         ),
     },
     {
       header: 'Actif',
       render: (u) =>
         editingId === u.id ? (
-          <input type="checkbox" checked={editIsActive} onChange={(event) => setEditIsActive(event.target.checked)} />
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={editIsActive}
+              onChange={(event) => setEditIsActive(event.target.checked)}
+              className="size-4 accent-ink"
+            />
+            Actif
+          </label>
         ) : u.is_active ? (
-          <span className="text-xs text-green-700 dark:text-green-400">Oui</span>
+          'Oui'
         ) : (
-          <span className="text-xs text-red-700 dark:text-red-400">Non</span>
+          <Stamp>Inactif</Stamp>
         ),
     },
   ]
 
   return (
-    <>
+    <div className="flex flex-col gap-3">
       <ErrorList errors={editErrors} />
       <DataTable
         columns={columns}
@@ -95,7 +109,9 @@ export function UserTable({ users, onUpdate }: UserTableProps) {
         renderActions={(u) =>
           editingId === u.id ? (
             <>
-              <Button onClick={() => saveEdit(u.id)}>Enregistrer</Button>
+              <Button onClick={() => saveEdit(u.id)} variant="primary">
+                Enregistrer
+              </Button>
               <Button onClick={cancelEdit}>Annuler</Button>
             </>
           ) : (
@@ -103,6 +119,6 @@ export function UserTable({ users, onUpdate }: UserTableProps) {
           )
         }
       />
-    </>
+    </div>
   )
 }
