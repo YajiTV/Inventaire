@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
+from app.clients import openfoodfacts
 from app.db.session import get_db
-from app.routers._stub import not_implemented
 from app.schemas.common import ErrorResponse, Page
 from app.schemas.product import ProductCreate, ProductLookup, ProductRead, ProductUpdate
 from app.services import product_service
@@ -47,11 +47,23 @@ def create_product(payload: ProductCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fournisseur introuvable") from exc
 
 
-# GET /products/lookup/{barcode} -> Open Food Facts (tâche mise de côté pour plus tard)
-@router.get("/lookup/{barcode}", response_model=ProductLookup, responses={502: {"model": ErrorResponse}})
+# GET /products/lookup/{barcode} -> infos Open Food Facts pour préremplir le formulaire (200),
+# 404 si le code-barres est inconnu, 502 si Open Food Facts est en panne, 504 s'il est trop lent
+@router.get(
+    "/lookup/{barcode}",
+    response_model=ProductLookup,
+    responses={502: {"model": ErrorResponse}, 504: {"model": ErrorResponse}},
+)
 def lookup_product(barcode: str):
     """Fetches product data from Open Food Facts to prefill the creation form."""
-    not_implemented()
+    try:
+        return product_service.lookup_product(barcode)
+    except openfoodfacts.OpenFoodFactsProductNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Code-barres inconnu sur Open Food Facts") from exc
+    except openfoodfacts.OpenFoodFactsTimeoutError as exc:
+        raise HTTPException(status_code=status.HTTP_504_GATEWAY_TIMEOUT, detail="Open Food Facts ne repond pas") from exc
+    except openfoodfacts.OpenFoodFactsUnavailableError as exc:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Open Food Facts est indisponible") from exc
 
 
 # GET /products/{id} -> un produit (200) ou 404
