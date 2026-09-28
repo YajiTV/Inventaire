@@ -39,13 +39,18 @@ def list_products(
     }
 
 
-# POST /products -> création (201), 409 si le SKU existe déjà, 422 si le body est invalide
+# POST /products -> création (201), 409 si le SKU existe déjà,
+# 404 si la catégorie ou le fournisseur n'existe pas, 422 si le body est invalide
 @router.post("", response_model=ProductRead, status_code=status.HTTP_201_CREATED, responses={409: {"model": ErrorResponse}})
 def create_product(payload: ProductCreate, db: Session = Depends(get_db)):
     try:
         return product_service.create_product(db, payload)
     except product_service.ProductSkuAlreadyExistsError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Un produit porte deja ce SKU") from exc
+    except product_service.UnknownCategoryError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Categorie introuvable") from exc
+    except product_service.UnknownSupplierError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fournisseur introuvable") from exc
 
 
 # GET /products/lookup/{barcode} -> Open Food Facts (tâche mise de côté pour plus tard)
@@ -64,13 +69,18 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Produit introuvable") from exc
 
 
-# PATCH /products/{id} -> modification partielle (200) ou 404
+# PATCH /products/{id} -> modification partielle (200),
+# 404 si le produit, la catégorie ou le fournisseur n'existe pas
 @router.patch("/{product_id}", response_model=ProductRead)
 def update_product(product_id: int, payload: ProductUpdate, db: Session = Depends(get_db)):
     try:
         return product_service.update_product(db, product_id, payload)
     except product_service.ProductNotFoundError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Produit introuvable") from exc
+    except product_service.UnknownCategoryError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Categorie introuvable") from exc
+    except product_service.UnknownSupplierError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fournisseur introuvable") from exc
 
 
 # DELETE /products/{id} -> suppression (204, pas de body) ou 404

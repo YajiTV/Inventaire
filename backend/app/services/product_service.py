@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.models.product import Product
-from app.repositories import product_repository
+from app.repositories import category_repository, product_repository, supplier_repository
 from app.schemas.product import ProductCreate, ProductUpdate
 
 
@@ -13,6 +13,25 @@ class ProductNotFoundError(Exception):
 # Erreur métier : un produit avec ce SKU existe déjà (le router la transformera en 409)
 class ProductSkuAlreadyExistsError(Exception):
     pass
+
+
+# Erreur métier : la catégorie envoyée n'existe pas (le router la transformera en 404)
+class UnknownCategoryError(Exception):
+    pass
+
+
+# Erreur métier : le fournisseur envoyé n'existe pas (le router la transformera en 404)
+class UnknownSupplierError(Exception):
+    pass
+
+
+# Vérifie que la catégorie et le fournisseur existent avant d'écrire en base.
+# None = champ non envoyé (PATCH) ou pas de fournisseur : rien à vérifier.
+def check_relations(db: Session, category_id: int | None, supplier_id: int | None) -> None:
+    if category_id is not None and category_repository.get_by_id(db, category_id) is None:
+        raise UnknownCategoryError(category_id)
+    if supplier_id is not None and supplier_repository.get_by_id(db, supplier_id) is None:
+        raise UnknownSupplierError(supplier_id)
 
 
 # Liste de tous les produits
@@ -28,10 +47,12 @@ def get_product(db: Session, product_id: int) -> Product:
     return product
 
 
-# Création : on refuse un SKU déjà utilisé, puis on transforme le payload en objet Product
+# Création : on refuse un SKU déjà utilisé, une catégorie ou un fournisseur inexistant,
+# puis on transforme le payload en objet Product
 def create_product(db: Session, payload: ProductCreate) -> Product:
     if product_repository.get_by_sku(db, payload.sku) is not None:
         raise ProductSkuAlreadyExistsError(payload.sku)
+    check_relations(db, payload.category_id, payload.supplier_id)
     product = Product(
         sku=payload.sku,
         name=payload.name,
@@ -49,6 +70,7 @@ def create_product(db: Session, payload: ProductCreate) -> Product:
 # (le SKU n'est pas modifiable, il n'est pas dans ProductUpdate)
 def update_product(db: Session, product_id: int, payload: ProductUpdate) -> Product:
     product = get_product(db, product_id)
+    check_relations(db, payload.category_id, payload.supplier_id)
     if payload.name is not None:
         product.name = payload.name
     if payload.description is not None:
