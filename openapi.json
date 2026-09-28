@@ -425,9 +425,15 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "3017620422003"
+            ],
             "title": "Barcode"
           },
           "category_id": {
+            "examples": [
+              1
+            ],
             "title": "Category Id",
             "type": "integer"
           },
@@ -441,6 +447,9 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "Pate a tartiner aux noisettes"
+            ],
             "title": "Description"
           },
           "image_url": {
@@ -453,9 +462,15 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "https://images.openfoodfacts.org/images/products/301/762/042/2003/front_fr.jpg"
+            ],
             "title": "Image Url"
           },
           "name": {
+            "examples": [
+              "Pate a tartiner 400 g"
+            ],
             "maxLength": 150,
             "minLength": 1,
             "title": "Name",
@@ -463,11 +478,17 @@
           },
           "reorder_threshold": {
             "default": 0,
+            "examples": [
+              10
+            ],
             "minimum": 0.0,
             "title": "Reorder Threshold",
             "type": "integer"
           },
           "sku": {
+            "examples": [
+              "PATE-001"
+            ],
             "maxLength": 40,
             "minLength": 1,
             "pattern": "^[A-Z0-9-]+$",
@@ -483,6 +504,9 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              1
+            ],
             "title": "Supplier Id"
           },
           "unit_price": {
@@ -495,6 +519,9 @@
                 "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,8}|(?=[\\d.]{1,11}0*$)\\d{0,8}\\.\\d{0,2}0*$)",
                 "type": "string"
               }
+            ],
+            "examples": [
+              "4.50"
             ],
             "title": "Unit Price"
           }
@@ -512,6 +539,9 @@
         "description": "Product data fetched from Open Food Facts for a barcode.",
         "properties": {
           "barcode": {
+            "examples": [
+              "3017620422003"
+            ],
             "title": "Barcode",
             "type": "string"
           },
@@ -524,6 +554,9 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "Pate a tartiner aux noisettes et au cacao"
+            ],
             "title": "Description"
           },
           "image_url": {
@@ -535,6 +568,9 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "https://images.openfoodfacts.org/images/products/301/762/042/2003/front_fr.jpg"
+            ],
             "title": "Image Url"
           },
           "name": {
@@ -545,6 +581,9 @@
               {
                 "type": "null"
               }
+            ],
+            "examples": [
+              "Nutella"
             ],
             "title": "Name"
           }
@@ -569,9 +608,15 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "3017620422003"
+            ],
             "title": "Barcode"
           },
           "category_id": {
+            "examples": [
+              1
+            ],
             "title": "Category Id",
             "type": "integer"
           },
@@ -585,9 +630,15 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "Pate a tartiner aux noisettes"
+            ],
             "title": "Description"
           },
           "id": {
+            "examples": [
+              1
+            ],
             "title": "Id",
             "type": "integer"
           },
@@ -601,9 +652,15 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "https://images.openfoodfacts.org/images/products/301/762/042/2003/front_fr.jpg"
+            ],
             "title": "Image Url"
           },
           "name": {
+            "examples": [
+              "Pate a tartiner 400 g"
+            ],
             "maxLength": 150,
             "minLength": 1,
             "title": "Name",
@@ -611,11 +668,17 @@
           },
           "reorder_threshold": {
             "default": 0,
+            "examples": [
+              10
+            ],
             "minimum": 0.0,
             "title": "Reorder Threshold",
             "type": "integer"
           },
           "sku": {
+            "examples": [
+              "PATE-001"
+            ],
             "maxLength": 40,
             "minLength": 1,
             "pattern": "^[A-Z0-9-]+$",
@@ -631,14 +694,23 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              1
+            ],
             "title": "Supplier Id"
           },
           "total_quantity": {
             "default": 0,
+            "examples": [
+              42
+            ],
             "title": "Total Quantity",
             "type": "integer"
           },
           "unit_price": {
+            "examples": [
+              "4.50"
+            ],
             "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,8}|(?=[\\d.]{1,11}0*$)\\d{0,8}\\.\\d{0,2}0*$)",
             "title": "Unit Price",
             "type": "string"
@@ -716,6 +788,9 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "Pate a tartiner 750 g"
+            ],
             "title": "Name"
           },
           "reorder_threshold": {
@@ -754,6 +829,9 @@
               {
                 "type": "null"
               }
+            ],
+            "examples": [
+              "6.90"
             ],
             "title": "Unit Price"
           }
@@ -1181,6 +1259,9 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "18 rue de Mons, 76130 Mont-Saint-Aignan"
+            ],
             "title": "Address"
           },
           "email": {
@@ -1193,9 +1274,15 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "commandes@ferrero.fr"
+            ],
             "title": "Email"
           },
           "name": {
+            "examples": [
+              "Ferrero France"
+            ],
             "maxLength": 120,
             "minLength": 1,
             "title": "Name",
@@ -1210,6 +1297,9 @@
               {
                 "type": "null"
               }
+            ],
+            "examples": [
+              "0320000000"
             ],
             "title": "Phone"
           }
@@ -1232,6 +1322,9 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "18 rue de Mons, 76130 Mont-Saint-Aignan"
+            ],
             "title": "Address"
           },
           "email": {
@@ -1244,13 +1337,22 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "commandes@ferrero.fr"
+            ],
             "title": "Email"
           },
           "id": {
+            "examples": [
+              1
+            ],
             "title": "Id",
             "type": "integer"
           },
           "name": {
+            "examples": [
+              "Ferrero France"
+            ],
             "maxLength": 120,
             "minLength": 1,
             "title": "Name",
@@ -1265,6 +1367,9 @@
               {
                 "type": "null"
               }
+            ],
+            "examples": [
+              "0320000000"
             ],
             "title": "Phone"
           }
@@ -1312,6 +1417,9 @@
               {
                 "type": "null"
               }
+            ],
+            "examples": [
+              "Ferrero"
             ],
             "title": "Name"
           },
@@ -2419,9 +2527,11 @@
     },
     "/products": {
       "get": {
+        "description": "Returns the products, sorted by id, one page at a time.\n\nEvery filter is optional and they combine with each other (AND).\n`total` is the number of matching products before pagination, so the front\ncan compute the number of pages. Each product carries its `total_quantity`,\nthe sum of its stock over every location.",
         "operationId": "list_products_products_get",
         "parameters": [
           {
+            "description": "Case-insensitive search in the name, the SKU or the barcode",
             "in": "query",
             "name": "q",
             "required": false,
@@ -2435,10 +2545,12 @@
                   "type": "null"
                 }
               ],
+              "description": "Case-insensitive search in the name, the SKU or the barcode",
               "title": "Q"
             }
           },
           {
+            "description": "Keep only the products of this category",
             "in": "query",
             "name": "category_id",
             "required": false,
@@ -2451,10 +2563,12 @@
                   "type": "null"
                 }
               ],
+              "description": "Keep only the products of this category",
               "title": "Category Id"
             }
           },
           {
+            "description": "Keep only the products of this supplier",
             "in": "query",
             "name": "supplier_id",
             "required": false,
@@ -2467,25 +2581,30 @@
                   "type": "null"
                 }
               ],
+              "description": "Keep only the products of this supplier",
               "title": "Supplier Id"
             }
           },
           {
+            "description": "Keep only the products whose total quantity is at or below their reorder threshold",
             "in": "query",
             "name": "below_threshold",
             "required": false,
             "schema": {
               "default": false,
+              "description": "Keep only the products whose total quantity is at or below their reorder threshold",
               "title": "Below Threshold",
               "type": "boolean"
             }
           },
           {
+            "description": "How many products to return (page size)",
             "in": "query",
             "name": "limit",
             "required": false,
             "schema": {
               "default": 20,
+              "description": "How many products to return (page size)",
               "maximum": 100,
               "minimum": 1,
               "title": "Limit",
@@ -2493,11 +2612,13 @@
             }
           },
           {
+            "description": "How many matching products to skip",
             "in": "query",
             "name": "offset",
             "required": false,
             "schema": {
               "default": 0,
+              "description": "How many matching products to skip",
               "minimum": 0,
               "title": "Offset",
               "type": "integer"
@@ -2513,7 +2634,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "One page of products, with the total number of matches"
           },
           "401": {
             "content": {
@@ -2526,32 +2647,19 @@
             "description": "Unauthorized"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "List Products",
+        "summary": "List the products",
         "tags": [
           "Products"
         ]
       },
       "post": {
+        "description": "Creates a product.\n\nWhen a `barcode` is given but no `description` or `image_url`, the API fills\nthem from Open Food Facts and stores them. If Open Food Facts is down or does\nnot know the barcode, the product is still created, without those fields.",
         "operationId": "create_product_products_post",
         "requestBody": {
           "content": {
@@ -2572,7 +2680,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created product"
           },
           "401": {
             "content": {
@@ -2592,7 +2700,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown category or supplier"
           },
           "409": {
             "content": {
@@ -2602,20 +2710,13 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "A product already uses this SKU"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "Create Product",
+        "summary": "Create a product",
         "tags": [
           "Products"
         ]
@@ -2623,7 +2724,7 @@
     },
     "/products/lookup/{barcode}": {
       "get": {
-        "description": "Fetches product data from Open Food Facts to prefill the creation form.",
+        "description": "Fetches product data from Open Food Facts to prefill the creation form.\n\nNothing is stored: this route only reads. Fields that Open Food Facts\ndoes not provide come back as `null`.",
         "operationId": "lookup_product_products_lookup__barcode__get",
         "parameters": [
           {
@@ -2645,7 +2746,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The product data found on Open Food Facts"
           },
           "401": {
             "content": {
@@ -2665,17 +2766,10 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Open Food Facts does not know this barcode"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           },
           "502": {
             "content": {
@@ -2685,7 +2779,7 @@
                 }
               }
             },
-            "description": "Bad Gateway"
+            "description": "Open Food Facts is unreachable or answered an unusable response"
           },
           "504": {
             "content": {
@@ -2695,10 +2789,10 @@
                 }
               }
             },
-            "description": "Gateway Timeout"
+            "description": "Open Food Facts did not answer within 5 seconds"
           }
         },
-        "summary": "Lookup Product",
+        "summary": "Look up a barcode on Open Food Facts",
         "tags": [
           "Products"
         ]
@@ -2706,6 +2800,7 @@
     },
     "/products/{product_id}": {
       "delete": {
+        "description": "Deletes a product by its id.",
         "operationId": "delete_product_products__product_id__delete",
         "parameters": [
           {
@@ -2720,7 +2815,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Successful Response"
+            "description": "The product was deleted, no body"
           },
           "401": {
             "content": {
@@ -2740,25 +2835,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown product"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "Delete Product",
+        "summary": "Delete a product",
         "tags": [
           "Products"
         ]
       },
       "get": {
+        "description": "Returns one product by its id.",
         "operationId": "get_product_products__product_id__get",
         "parameters": [
           {
@@ -2780,7 +2869,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The product, with its total quantity in stock"
           },
           "401": {
             "content": {
@@ -2800,25 +2889,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown product"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "Get Product",
+        "summary": "Get a product",
         "tags": [
           "Products"
         ]
       },
       "patch": {
+        "description": "Partially updates a product: only the fields sent in the body are changed.\n\nThe SKU cannot be changed.",
         "operationId": "update_product_products__product_id__patch",
         "parameters": [
           {
@@ -2850,7 +2933,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The updated product"
           },
           "401": {
             "content": {
@@ -2870,20 +2953,13 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown product, category or supplier"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "Update Product",
+        "summary": "Update a product",
         "tags": [
           "Products"
         ]
@@ -4183,6 +4259,7 @@
     },
     "/suppliers": {
       "get": {
+        "description": "Returns every supplier.",
         "operationId": "list_suppliers_suppliers_get",
         "responses": {
           "200": {
@@ -4197,7 +4274,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "Every supplier"
           },
           "401": {
             "content": {
@@ -4210,22 +4287,19 @@
             "description": "Unauthorized"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
+          },
+          "422": {
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "List Suppliers",
+        "summary": "List the suppliers",
         "tags": [
           "Suppliers"
         ]
       },
       "post": {
+        "description": "Creates a supplier. Only `name` is required; `email` must be a valid address when given.",
         "operationId": "create_supplier_suppliers_post",
         "requestBody": {
           "content": {
@@ -4246,7 +4320,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created supplier"
           },
           "401": {
             "content": {
@@ -4259,27 +4333,13 @@
             "description": "Unauthorized"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Create Supplier",
+        "summary": "Create a supplier",
         "tags": [
           "Suppliers"
         ]
@@ -4287,6 +4347,7 @@
     },
     "/suppliers/{supplier_id}": {
       "delete": {
+        "description": "Deletes a supplier by its id.\n\nIts products are kept: their `supplier_id` becomes `null`.",
         "operationId": "delete_supplier_suppliers__supplier_id__delete",
         "parameters": [
           {
@@ -4301,7 +4362,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Successful Response"
+            "description": "The supplier was deleted, no body"
           },
           "401": {
             "content": {
@@ -4321,25 +4382,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown supplier"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Delete Supplier",
+        "summary": "Delete a supplier",
         "tags": [
           "Suppliers"
         ]
       },
       "get": {
+        "description": "Returns one supplier by its id.",
         "operationId": "get_supplier_suppliers__supplier_id__get",
         "parameters": [
           {
@@ -4361,7 +4416,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The supplier"
           },
           "401": {
             "content": {
@@ -4381,25 +4436,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown supplier"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Get Supplier",
+        "summary": "Get a supplier",
         "tags": [
           "Suppliers"
         ]
       },
       "patch": {
+        "description": "Partially updates a supplier: only the fields sent in the body are changed.",
         "operationId": "update_supplier_suppliers__supplier_id__patch",
         "parameters": [
           {
@@ -4431,7 +4480,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The updated supplier"
           },
           "401": {
             "content": {
@@ -4451,20 +4500,13 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown supplier"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Update Supplier",
+        "summary": "Update a supplier",
         "tags": [
           "Suppliers"
         ]
