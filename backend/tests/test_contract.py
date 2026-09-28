@@ -37,7 +37,9 @@ def test_protected_routes_answer_401_without_a_token() -> None:
     assert client.get("/stock-movements").status_code == 401
 
 
-def test_valid_payload_reaches_the_route() -> None:
-    """A valid payload passes validation, so it fails on the missing implementation."""
+def test_valid_payload_reaches_the_route(client: TestClient) -> None:
+    """A valid payload passes validation, so the service answers on the unknown product."""
     payload = {"product_id": 1, "location_id": 1, "quantity": 5}
-    assert client.post("/stocks", json=payload).status_code == 501
+    response = client.post("/stocks", json=payload)
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Produit introuvable"
