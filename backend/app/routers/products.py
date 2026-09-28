@@ -17,9 +17,9 @@ router = APIRouter(
 )
 
 
-# GET /products -> liste des produits au format Page (items, total, limit, offset)
-# Les query params sont déjà déclarés (contrat figé) mais les filtres et la pagination
-# seront implémentés dans les tâches suivantes : pour l'instant on renvoie tout.
+# GET /products -> liste filtrée et paginée au format Page (items, total, limit, offset)
+# Exemple : GET /products?q=cafe&category_id=2&below_threshold=true&limit=10&offset=20
+# Chaque query param est optionnel : s'il n'est pas envoyé, le filtre est ignoré.
 @router.get("", response_model=Page[ProductRead])
 def list_products(
     q: str | None = Query(default=None, max_length=150),
@@ -30,13 +30,7 @@ def list_products(
     offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
 ):
-    products = product_service.list_products(db)
-    return {
-        "items": products,
-        "total": len(products),
-        "limit": limit,
-        "offset": offset,
-    }
+    return product_service.list_products(db, q, category_id, supplier_id, below_threshold, limit, offset)
 
 
 # POST /products -> création (201), 409 si le SKU existe déjà,

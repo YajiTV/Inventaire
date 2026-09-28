@@ -34,17 +34,51 @@ def check_relations(db: Session, category_id: int | None, supplier_id: int | Non
         raise UnknownSupplierError(supplier_id)
 
 
-# Liste de tous les produits
-def list_products(db: Session) -> list[Product]:
-    return product_repository.list_all(db)
+# total_quantity n'est pas une colonne de la table products : on la calcule à partir
+# de la table stocks, puis on l'accroche à l'objet pour que ProductRead puisse la lire
+def add_total_quantity(db: Session, product: Product) -> Product:
+    product.total_quantity = product_repository.get_total_quantity(db, product.id)
+    return product
 
 
-# Un produit par son id, erreur s'il n'existe pas
+# Liste filtrée et paginée : renvoie un dictionnaire au format Page (items, total, limit, offset)
+def list_products(
+    db: Session,
+    q: str | None,
+    category_id: int | None,
+    supplier_id: int | None,
+    below_threshold: bool,
+    limit: int,
+    offset: int,
+) -> dict:
+    # 1. Les filtres sur les colonnes sont faits en SQL par le repository
+    products = product_repository.list_filtered(db, q, category_id, supplier_id)
+
+    # 2. On calcule le stock total de chaque produit
+    for product in products:
+        add_total_quantity(db, product)
+
+    # 3. Le filtre "sous le seuil" se fait en Python, car total_quantity vient d'une autre table
+    if below_threshold:
+        below = []
+        for product in products:
+            if product.total_quantity <= product.reorder_threshold:
+                below.append(product)
+        products = below
+
+    # 4. Pagination : total = nombre de résultats AVANT de découper,
+    #    puis on garde seulement la tranche [offset, offset + limit]
+    total = len(products)
+    page_items = products[offset:offset + limit]
+    return {"items": page_items, "total": total, "limit": limit, "offset": offset}
+
+
+# Un produit par son id (avec son stock total), erreur s'il n'existe pas
 def get_product(db: Session, product_id: int) -> Product:
     product = product_repository.get_by_id(db, product_id)
     if product is None:
         raise ProductNotFoundError(product_id)
-    return product
+    return add_total_quantity(db, product)
 
 
 # Création : on refuse un SKU déjà utilisé, une catégorie ou un fournisseur inexistant,
@@ -85,7 +119,8 @@ def update_product(db: Session, product_id: int, payload: ProductUpdate) -> Prod
         product.category_id = payload.category_id
     if payload.supplier_id is not None:
         product.supplier_id = payload.supplier_id
-    return product_repository.save(db, product)
+    product_repository.save(db, product)
+    return add_total_quantity(db, product)
 
 
 # Suppression (get_product lève déjà l'erreur si l'id n'existe pas)
