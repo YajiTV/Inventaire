@@ -15,18 +15,24 @@ TIMEOUT_SECONDS = 5.0
 HEADERS = {"User-Agent": "Inventaire/1.0 (projet etudiant)"}
 
 
+# Erreur "parente" : toutes les erreurs Open Food Facts en héritent,
+# ce qui permet de les attraper toutes d'un coup avec "except OpenFoodFactsError"
+class OpenFoodFactsError(Exception):
+    pass
+
+
 # Erreur : Open Food Facts n'a pas répondu à temps (le router la transformera en 504)
-class OpenFoodFactsTimeoutError(Exception):
+class OpenFoodFactsTimeoutError(OpenFoodFactsError):
     pass
 
 
 # Erreur : Open Food Facts est injoignable ou a renvoyé une réponse inutilisable (-> 502)
-class OpenFoodFactsUnavailableError(Exception):
+class OpenFoodFactsUnavailableError(OpenFoodFactsError):
     pass
 
 
 # Erreur : ce code-barres n'existe pas dans Open Food Facts (-> 404)
-class OpenFoodFactsProductNotFoundError(Exception):
+class OpenFoodFactsProductNotFoundError(OpenFoodFactsError):
     pass
 
 

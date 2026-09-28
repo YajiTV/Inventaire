@@ -42,6 +42,25 @@ def add_total_quantity(db: Session, product: Product) -> Product:
     return product
 
 
+# Enrichissement à la création : si le produit a un code-barres mais pas d'image ou pas de
+# description, on complète avec Open Food Facts, et ces infos sont enregistrées en base avec le produit.
+# Si Open Food Facts ne répond pas ou ne connaît pas le code, on crée le produit quand même :
+# c'est un bonus, pas une condition.
+def fill_from_openfoodfacts(product: Product) -> None:
+    if product.barcode is None:
+        return
+    if product.image_url is not None and product.description is not None:
+        return
+    try:
+        info = openfoodfacts.fetch_product(product.barcode)
+    except openfoodfacts.OpenFoodFactsError:
+        return
+    if product.image_url is None:
+        product.image_url = info["image_url"]
+    if product.description is None:
+        product.description = info["description"]
+
+
 # Liste filtrée et paginée : renvoie un dictionnaire au format Page (items, total, limit, offset)
 def list_products(
     db: Session,
@@ -93,11 +112,13 @@ def create_product(db: Session, payload: ProductCreate) -> Product:
         name=payload.name,
         description=payload.description,
         barcode=payload.barcode,
+        image_url=payload.image_url,
         unit_price=payload.unit_price,
         reorder_threshold=payload.reorder_threshold,
         category_id=payload.category_id,
         supplier_id=payload.supplier_id,
     )
+    fill_from_openfoodfacts(product)
     return product_repository.create(db, product)
 
 
@@ -112,6 +133,8 @@ def update_product(db: Session, product_id: int, payload: ProductUpdate) -> Prod
         product.description = payload.description
     if payload.barcode is not None:
         product.barcode = payload.barcode
+    if payload.image_url is not None:
+        product.image_url = payload.image_url
     if payload.unit_price is not None:
         product.unit_price = payload.unit_price
     if payload.reorder_threshold is not None:
