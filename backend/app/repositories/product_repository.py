@@ -1,7 +1,8 @@
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.models.product import Product
+from app.models.stock import Stock
 
 
 # Repository = la seule couche qui parle directement à la base (via la session SQLAlchemy)
@@ -19,11 +20,39 @@ def get_by_sku(db: Session, sku: str) -> Product | None:
     return result.scalars().first()
 
 
-# Récupère tous les produits
-def list_all(db: Session) -> list[Product]:
+# Récupère les produits qui correspondent aux filtres.
+# Chaque filtre à None est ignoré : on n'ajoute le .where() que s'il est rempli.
+def list_filtered(db: Session, q: str | None, category_id: int | None, supplier_id: int | None) -> list[Product]:
     stmt = select(Product)
+    if q is not None:
+        # ilike = "contient", sans tenir compte des majuscules ; "%" = n'importe quels caractères
+        # or_ = il suffit qu'UN des trois champs corresponde
+        search = f"%{q}%"
+        stmt = stmt.where(
+            or_(
+                Product.name.ilike(search),
+                Product.sku.ilike(search),
+                Product.barcode.ilike(search),
+            )
+        )
+    if category_id is not None:
+        stmt = stmt.where(Product.category_id == category_id)
+    if supplier_id is not None:
+        stmt = stmt.where(Product.supplier_id == supplier_id)
+    # Tri par id : la pagination renvoie toujours les produits dans le même ordre
+    stmt = stmt.order_by(Product.id)
     result = db.execute(stmt)
     return list(result.scalars().all())
+
+
+# Quantité totale d'un produit = somme de ses stocks dans tous les emplacements
+def get_total_quantity(db: Session, product_id: int) -> int:
+    stmt = select(Stock).where(Stock.product_id == product_id)
+    result = db.execute(stmt)
+    total = 0
+    for stock in result.scalars().all():
+        total = total + stock.quantity
+    return total
 
 
 # Insère un nouveau produit en base

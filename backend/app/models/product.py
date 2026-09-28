@@ -28,3 +28,7 @@ class Product(Base):
     supplier_id: Mapped[int | None] = mapped_column(
         ForeignKey("suppliers.id", ondelete="SET NULL"), nullable=True
     )
+
+    # PAS une colonne (pas de Mapped/mapped_column) : simple attribut Python,
+    # rempli par le service avec la somme des quantités de la table stocks
+    total_quantity = 0
