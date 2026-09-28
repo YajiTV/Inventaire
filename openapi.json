@@ -3304,7 +3304,7 @@
                 }
               }
             },
-            "description": "Resource not found"
+            "description": "Unknown order"
           },
           "409": {
             "content": {
@@ -3325,7 +3325,7 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "List Order Lines",
+        "summary": "List the lines of an order",
         "tags": [
           "Purchase orders"
         ]
@@ -3382,7 +3382,7 @@
                 }
               }
             },
-            "description": "Resource not found"
+            "description": "Unknown order or product"
           },
           "409": {
             "content": {
@@ -3392,7 +3392,7 @@
                 }
               }
             },
-            "description": "The order life cycle forbids the operation"
+            "description": "Order no longer a draft, or product already in the order"
           },
           "422": {
             "description": "Invalid body, rejected by Pydantic"
@@ -3403,7 +3403,7 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Create Order Line",
+        "summary": "Add a line to a draft order",
         "tags": [
           "Purchase orders"
         ]
@@ -3454,7 +3454,7 @@
                 }
               }
             },
-            "description": "Resource not found"
+            "description": "Unknown order or line"
           },
           "409": {
             "content": {
@@ -3464,7 +3464,7 @@
                 }
               }
             },
-            "description": "The order life cycle forbids the operation"
+            "description": "Order no longer a draft, or last line of the order"
           },
           "422": {
             "description": "Invalid body, rejected by Pydantic"
@@ -3475,7 +3475,7 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Delete Order Line",
+        "summary": "Delete a line of a draft order",
         "tags": [
           "Purchase orders"
         ]
@@ -3541,7 +3541,7 @@
                 }
               }
             },
-            "description": "Resource not found"
+            "description": "Unknown order or line"
           },
           "409": {
             "content": {
@@ -3551,7 +3551,7 @@
                 }
               }
             },
-            "description": "The order life cycle forbids the operation"
+            "description": "Order no longer a draft"
           },
           "422": {
             "description": "Invalid body, rejected by Pydantic"
@@ -3562,7 +3562,7 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Update Order Line",
+        "summary": "Update the quantity or the price of a line",
         "tags": [
           "Purchase orders"
         ]
