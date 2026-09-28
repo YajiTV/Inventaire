@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 
 from app.core.security import get_current_user
 from app.db.session import get_db
-from app.routers._stub import not_implemented
 from app.schemas.common import ErrorResponse
 from app.schemas.enums import OrderStatus
 from app.schemas.order_line import OrderLineCreate, OrderLineRead, OrderLineUpdate
@@ -14,6 +13,7 @@ from app.schemas.purchase_order import (
 )
 from app.services import (
     location_service,
+    order_line_service,
     product_service,
     purchase_order_service,
     supplier_service,
@@ -37,6 +37,7 @@ ORDER_NOT_FOUND = "Commande introuvable"
 SUPPLIER_NOT_FOUND = "Fournisseur introuvable"
 LOCATION_NOT_FOUND = "Emplacement introuvable"
 PRODUCT_NOT_FOUND = "Produit introuvable"
+LINE_NOT_FOUND = "Ligne de commande introuvable"
 
 
 @router.get(
@@ -178,24 +179,96 @@ def delete_purchase_order(order_id: int, db: Session = Depends(get_db)) -> None:
         ) from exc
 
 
-# Routes below: order line sub-resource, owned by the Order line resource.
+# Order line sub-resource, owned by the Order line resource.
 
 
-@router.get("/{order_id}/lines", response_model=list[OrderLineRead])
-def list_order_lines(order_id: int) -> list[OrderLineRead]:
-    not_implemented()
+@router.get(
+    "/{order_id}/lines",
+    response_model=list[OrderLineRead],
+    summary="List the lines of an order",
+    responses={404: {"model": ErrorResponse, "description": "Unknown order"}},
+)
+def list_order_lines(order_id: int, db: Session = Depends(get_db)):
+    try:
+        return order_line_service.list_lines(db, order_id)
+    except purchase_order_service.PurchaseOrderNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ORDER_NOT_FOUND) from exc
 
 
-@router.post("/{order_id}/lines", response_model=OrderLineRead, status_code=status.HTTP_201_CREATED)
-def create_order_line(order_id: int, payload: OrderLineCreate) -> OrderLineRead:
-    not_implemented()
+@router.post(
+    "/{order_id}/lines",
+    response_model=OrderLineRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Add a line to a draft order",
+    responses={
+        404: {"model": ErrorResponse, "description": "Unknown order or product"},
+        409: {"model": ErrorResponse, "description": "Order no longer a draft, or product already in the order"},
+    },
+)
+def create_order_line(order_id: int, payload: OrderLineCreate, db: Session = Depends(get_db)):
+    try:
+        return order_line_service.create_line(db, order_id, payload)
+    except purchase_order_service.PurchaseOrderNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ORDER_NOT_FOUND) from exc
+    except product_service.ProductNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=PRODUCT_NOT_FOUND) from exc
+    except order_line_service.OrderLinesLockedError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Les lignes d'une commande envoyée ou clôturée ne peuvent plus être modifiées",
+        ) from exc
+    except order_line_service.ProductAlreadyInOrderError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Ce produit est déjà présent dans la commande"
+        ) from exc
 
 
-@router.patch("/{order_id}/lines/{line_id}", response_model=OrderLineRead)
-def update_order_line(order_id: int, line_id: int, payload: OrderLineUpdate) -> OrderLineRead:
-    not_implemented()
+@router.patch(
+    "/{order_id}/lines/{line_id}",
+    response_model=OrderLineRead,
+    summary="Update the quantity or the price of a line",
+    responses={
+        404: {"model": ErrorResponse, "description": "Unknown order or line"},
+        409: {"model": ErrorResponse, "description": "Order no longer a draft"},
+    },
+)
+def update_order_line(order_id: int, line_id: int, payload: OrderLineUpdate, db: Session = Depends(get_db)):
+    try:
+        return order_line_service.update_line(db, order_id, line_id, payload)
+    except purchase_order_service.PurchaseOrderNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ORDER_NOT_FOUND) from exc
+    except order_line_service.OrderLineNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=LINE_NOT_FOUND) from exc
+    except order_line_service.OrderLinesLockedError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Les lignes d'une commande envoyée ou clôturée ne peuvent plus être modifiées",
+        ) from exc
 
 
-@router.delete("/{order_id}/lines/{line_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_order_line(order_id: int, line_id: int) -> None:
-    not_implemented()
+@router.delete(
+    "/{order_id}/lines/{line_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a line of a draft order",
+    responses={
+        404: {"model": ErrorResponse, "description": "Unknown order or line"},
+        409: {"model": ErrorResponse, "description": "Order no longer a draft, or last line of the order"},
+    },
+)
+def delete_order_line(order_id: int, line_id: int, db: Session = Depends(get_db)) -> None:
+    try:
+        order_line_service.delete_line(db, order_id, line_id)
+    except purchase_order_service.PurchaseOrderNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ORDER_NOT_FOUND) from exc
+    except order_line_service.OrderLineNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=LINE_NOT_FOUND) from exc
+    except order_line_service.OrderLinesLockedError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Les lignes d'une commande envoyée ou clôturée ne peuvent plus être modifiées",
+        ) from exc
+    except order_line_service.LastOrderLineError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Une commande doit garder au moins une ligne, supprimez la commande à la place",
+        ) from exc

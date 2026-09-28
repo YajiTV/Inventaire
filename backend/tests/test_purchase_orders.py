@@ -184,8 +184,3 @@ def test_delete_refuses_a_sent_order(client: TestClient) -> None:
     order_id = create_order(client)["id"]
     assert client.patch(f"/purchase-orders/{order_id}", json={"status": "sent"}).status_code == 200
     assert client.delete(f"/purchase-orders/{order_id}").status_code == 409
-
-
-def test_order_lines_sub_resource_is_not_implemented_yet(client: TestClient) -> None:
-    order_id = create_order(client)["id"]
-    assert client.get(f"/purchase-orders/{order_id}/lines").status_code == 501
