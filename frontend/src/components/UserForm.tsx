@@ -41,10 +41,10 @@ export function UserForm({ onSubmit }: UserFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="mb-4 flex flex-wrap gap-2">
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
       <FormField id="user-email" label="Email" type="email" value={email} onChange={setEmail} placeholder="prenom@inventaire.fr" required />
       <FormField id="user-full-name" label="Nom complet" value={fullName} onChange={setFullName} placeholder="Marie Dupont" required />
-      <FormField id="user-password" label="Mot de passe" type="password" value={password} onChange={setPassword} required />
+      <FormField id="user-password" label="Mot de passe" type="password" value={password} onChange={setPassword} placeholder="8 caractères minimum" required />
       <SelectField
         id="user-role"
         label="Rôle"
@@ -52,8 +52,10 @@ export function UserForm({ onSubmit }: UserFormProps) {
         onChange={(value) => setRole(value as UserRole)}
         options={ROLE_OPTIONS}
       />
-      <Button type="submit">Ajouter</Button>
       <ErrorList errors={errors} />
+      <Button type="submit" variant="primary">
+        Ajouter l'utilisateur
+      </Button>
     </form>
   )
 }
