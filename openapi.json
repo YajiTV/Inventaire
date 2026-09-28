@@ -3646,7 +3646,7 @@
     },
     "/replenishment/orders": {
       "post": {
-        "description": "Turns the suggestions of one supplier into a draft purchase order.",
+        "description": "Turns the suggestions of one supplier into a draft purchase order.\n\nQuantities are computed by the server, never taken from the client. A\nproduct that is no longer under its threshold, or that belongs to another\nsupplier, is refused with 409 and no order is created.",
         "operationId": "create_replenishment_order_replenishment_orders_post",
         "requestBody": {
           "content": {
@@ -3667,7 +3667,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created order, in status draft, with one line per product"
           },
           "401": {
             "content": {
@@ -3677,7 +3677,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3687,7 +3687,17 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "A product is not under its threshold or not sold by this supplier"
           },
           "422": {
             "content": {
@@ -3700,7 +3710,12 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Create Replenishment Order",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Generate a purchase order from the suggestions",
         "tags": [
           "Replenishment"
         ]
@@ -3708,7 +3723,7 @@
     },
     "/replenishment/suggestions": {
       "get": {
-        "description": "Lists the products whose total quantity is below their reorder threshold.",
+        "description": "Lists the products whose total quantity, over every location, is below\ntheir reorder threshold.\n\nThe suggested quantity brings the stock back to twice the threshold.\n`supplier_id` is optional: without it, products with no supplier are\nlisted too, with a null `supplier_id`, and cannot be ordered.",
         "operationId": "list_suggestions_replenishment_suggestions_get",
         "parameters": [
           {
@@ -3741,7 +3756,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "Each product under its reorder threshold, with the quantity to order"
           },
           "401": {
             "content": {
@@ -3751,7 +3766,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3761,7 +3776,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Resource not found"
           },
           "422": {
             "content": {
@@ -3774,7 +3789,12 @@
             "description": "Validation Error"
           }
         },
-        "summary": "List Suggestions",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List the products to reorder",
         "tags": [
           "Replenishment"
         ]
