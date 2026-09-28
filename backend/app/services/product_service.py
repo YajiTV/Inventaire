@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from app.clients import openfoodfacts
 from app.models.product import Product
 from app.repositories import category_repository, product_repository, supplier_repository
 from app.schemas.product import ProductCreate, ProductUpdate
@@ -127,3 +128,10 @@ def update_product(db: Session, product_id: int, payload: ProductUpdate) -> Prod
 def delete_product(db: Session, product_id: int) -> None:
     product = get_product(db, product_id)
     product_repository.delete(db, product)
+
+
+# Préremplissage : infos d'un produit sur Open Food Facts à partir de son code-barres.
+# Le service passe par le client (comme il passe par le repository pour la base) ;
+# les erreurs OpenFoodFacts...Error remontent telles quelles jusqu'au router.
+def lookup_product(barcode: str) -> dict:
+    return openfoodfacts.fetch_product(barcode)
