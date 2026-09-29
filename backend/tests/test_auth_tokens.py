@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from app.core.security import create_access_token, create_refresh_token, settings
+from app.core.security import create_access_token, settings
 from app.models.user import User
 from app.schemas.enums import UserRole
 from app.services.password import hash_password
@@ -73,9 +73,13 @@ def test_tampered_token_is_rejected(client: TestClient, db_session: Session) -> 
 
 
 def test_refresh_token_cannot_be_used_as_access_token(client: TestClient, db_session: Session) -> None:
+    # The refresh cookie is an opaque random string, not a JWT: it fails the
+    # very first step of decode_token, for a different reason than a
+    # wrong-type JWT would, but the outcome must be the same, 401.
     user = create_user(db_session)
-    response = client.get("/auth/me", headers=bearer(create_refresh_token(user.id)))
-    assert response.status_code == 401
+    login = client.post("/auth/login", json={"email": user.email, "password": "s3cret-pass"})
+    raw_refresh_token = login.cookies[settings.refresh_cookie_name]
+    assert client.get("/auth/me", headers=bearer(raw_refresh_token)).status_code == 401
 
 
 def test_token_of_an_unknown_user_is_rejected(client: TestClient) -> None:

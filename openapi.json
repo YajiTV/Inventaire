@@ -1639,7 +1639,7 @@
   "paths": {
     "/auth/login": {
       "post": {
-        "description": "Authenticates with an email and a password.\n\nThe response body carries a short-lived access token, meant to be kept in\nmemory on the client (never in localStorage or sessionStorage) and sent\nas `Authorization: Bearer <token>` on every subsequent request. A\nlonger-lived refresh token is set alongside it as an httpOnly, Secure,\nSameSite=Strict cookie, scoped to the `/auth` path: it never appears in\nthe response body and is never readable from client-side JavaScript.",
+        "description": "Authenticates with an email and a password.\n\nThe response body carries a short-lived access token, meant to be kept in\nmemory on the client (never in localStorage or sessionStorage) and sent\nas `Authorization: Bearer <token>` on every subsequent request. A\nlonger-lived refresh token is set alongside it as an httpOnly, Secure,\nSameSite=Strict cookie, scoped to the `/auth` path: it never appears in\nthe response body and is never readable from client-side JavaScript. It\nis opaque (not a JWT) and tracked server-side, which is what lets\n`/auth/refresh` rotate it and `/auth/logout` revoke it.",
         "operationId": "login_auth_login_post",
         "requestBody": {
           "content": {
@@ -1691,7 +1691,7 @@
     },
     "/auth/logout": {
       "post": {
-        "description": "Clears the refresh token cookie.\n\nThe client is expected to drop its in-memory access token at the same\ntime. The access token itself is not blacklisted: it stays valid, on the\nserver side, until its own short expiry runs out.",
+        "description": "Revokes the refresh token in the database and clears the cookie.\n\nUnlike a plain cookie deletion, this also stops the same refresh token\nfrom being replayed later if it had already leaked (a stolen cookie\ncopied before logout, for instance).",
         "operationId": "logout_auth_logout_post",
         "responses": {
           "204": {
@@ -1753,7 +1753,7 @@
     },
     "/auth/refresh": {
       "post": {
-        "description": "Issues a new access token from the refresh token cookie set by `/auth/login`.\n\nMeant to be called once the access token has expired (or is about to),\ninstead of asking the user to log in again. Requires no request body: the\nrefresh token travels only as the httpOnly cookie, sent automatically by\nthe browser. The refresh token itself is not renewed by this call: the\nsame one is reused until it expires (no rotation in this project).",
+        "description": "Issues a new access token from the refresh token cookie set by `/auth/login`.\n\nMeant to be called once the access token has expired (or is about to),\ninstead of asking the user to log in again. Requires no request body: the\nrefresh token travels only as the httpOnly cookie, sent automatically by\nthe browser.\n\nThe refresh token is rotated on every call: the response sets a brand new\ncookie, and the token just used is revoked in the database and can never\nbe presented again. Presenting an already-used refresh token does not\njust fail, it revokes every other active session of that user, since it\nis what a copied cookie looks like from the server's side.",
         "operationId": "refresh_auth_refresh_post",
         "responses": {
           "200": {
@@ -1774,7 +1774,7 @@
                 }
               }
             },
-            "description": "Missing, expired or invalid refresh cookie"
+            "description": "Missing, expired, invalid or already-used refresh cookie"
           }
         },
         "summary": "Renew the access token",
