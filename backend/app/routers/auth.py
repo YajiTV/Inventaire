@@ -46,14 +46,16 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
     as `Authorization: Bearer <token>` on every subsequent request. A
     longer-lived refresh token is set alongside it as an httpOnly, Secure,
     SameSite=Strict cookie, scoped to the `/auth` path: it never appears in
-    the response body and is never readable from client-side JavaScript.
+    the response body and is never readable from client-side JavaScript. It
+    is opaque (not a JWT) and tracked server-side, which is what lets
+    `/auth/refresh` rotate it and `/auth/logout` revoke it.
     """
     try:
         user = auth_service.authenticate(db, payload.email, payload.password)
     except auth_service.InvalidCredentialsError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Identifiants invalides") from exc
 
-    access_token, refresh_token = auth_service.issue_tokens(user)
+    access_token, refresh_token = auth_service.issue_tokens(db, user)
     _set_refresh_cookie(response, refresh_token)
     return TokenResponse(access_token=access_token, expires_in=settings.access_token_expire_minutes * 60)
 
@@ -62,27 +64,33 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
     "/refresh",
     response_model=TokenResponse,
     summary="Renew the access token",
-    responses={401: {"model": ErrorResponse, "description": "Missing, expired or invalid refresh cookie"}},
+    responses={401: {"model": ErrorResponse, "description": "Missing, expired, invalid or already-used refresh cookie"}},
 )
-def refresh(request: Request, db: Session = Depends(get_db)) -> TokenResponse:
+def refresh(request: Request, response: Response, db: Session = Depends(get_db)) -> TokenResponse:
     """
     Issues a new access token from the refresh token cookie set by `/auth/login`.
 
     Meant to be called once the access token has expired (or is about to),
     instead of asking the user to log in again. Requires no request body: the
     refresh token travels only as the httpOnly cookie, sent automatically by
-    the browser. The refresh token itself is not renewed by this call: the
-    same one is reused until it expires (no rotation in this project).
+    the browser.
+
+    The refresh token is rotated on every call: the response sets a brand new
+    cookie, and the token just used is revoked in the database and can never
+    be presented again. Presenting an already-used refresh token does not
+    just fail, it revokes every other active session of that user, since it
+    is what a copied cookie looks like from the server's side.
     """
     refresh_token = request.cookies.get(settings.refresh_cookie_name)
     if refresh_token is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expiree")
 
     try:
-        access_token = auth_service.refresh_access_token(db, refresh_token)
+        access_token, new_refresh_token = auth_service.rotate_refresh_token(db, refresh_token)
     except auth_service.InvalidSessionError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expiree") from exc
 
+    _set_refresh_cookie(response, new_refresh_token)
     return TokenResponse(access_token=access_token, expires_in=settings.access_token_expire_minutes * 60)
 
 
@@ -91,14 +99,17 @@ def refresh(request: Request, db: Session = Depends(get_db)) -> TokenResponse:
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Log out",
 )
-def logout(response: Response) -> None:
+def logout(request: Request, response: Response, db: Session = Depends(get_db)) -> None:
     """
-    Clears the refresh token cookie.
+    Revokes the refresh token in the database and clears the cookie.
 
-    The client is expected to drop its in-memory access token at the same
-    time. The access token itself is not blacklisted: it stays valid, on the
-    server side, until its own short expiry runs out.
+    Unlike a plain cookie deletion, this also stops the same refresh token
+    from being replayed later if it had already leaked (a stolen cookie
+    copied before logout, for instance).
     """
+    refresh_token = request.cookies.get(settings.refresh_cookie_name)
+    if refresh_token is not None:
+        auth_service.revoke_refresh_token(db, refresh_token)
     response.delete_cookie(settings.refresh_cookie_name, path="/auth")
 
 
