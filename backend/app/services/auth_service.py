@@ -49,11 +49,16 @@ def authenticate(db: Session, email: str, password: str) -> User:
 
 
 def _utcnow() -> datetime:
-    # Naive on purpose: SQLite (used by the test suite) round-trips
-    # DateTime(timezone=True) as naive datetimes, so every comparison here
-    # stays naive-to-naive on both SQLite and Postgres. datetime.utcnow()
-    # would give the same value but is deprecated since Python 3.12.
-    return datetime.now(timezone.utc).replace(tzinfo=None)
+    return datetime.now(timezone.utc)
+
+
+def _as_aware_utc(value: datetime) -> datetime:
+    # SQLite (used by the test suite) round-trips DateTime(timezone=True) as
+    # a naive datetime; Postgres returns a timezone-aware one for the same
+    # column type. Every value here is written as UTC, so a naive value read
+    # back is always UTC too: this makes both sides comparable regardless of
+    # which database produced them.
+    return value if value.tzinfo is not None else value.replace(tzinfo=timezone.utc)
 
 
 def _hash_refresh_token(raw_token: str) -> str:
@@ -93,7 +98,7 @@ def rotate_refresh_token(db: Session, raw_token: str) -> tuple[str, str]:
         refresh_token_repository.revoke_all_active_for_user(db, record.user_id, now)
         raise InvalidSessionError("reused token")
 
-    if record.expires_at < now:
+    if _as_aware_utc(record.expires_at) < now:
         raise InvalidSessionError("expired token")
 
     user = user_repository.get_by_id(db, record.user_id)
