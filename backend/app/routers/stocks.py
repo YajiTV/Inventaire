@@ -14,19 +14,42 @@ router = APIRouter(
     prefix="/stocks",
     tags=["Stocks"],
     responses={
-        401: {"model": ErrorResponse},
-        404: {"model": ErrorResponse},
+        404: {"model": ErrorResponse, "description": "Resource not found"},
+        422: {"description": "Invalid body, rejected by Pydantic"},
     },
 )
 
 
-@router.get("", response_model=list[StockRead])
+@router.get(
+    "",
+    response_model=list[StockRead],
+    summary="List stock lines",
+    response_description="Every stock line, one per product and location",
+    responses={404: {"description": "Not returned by this route"}},
+)
 def list_stocks(db: Session = Depends(get_db)) -> list[StockRead]:
+    """Returns the quantity held for each product at each location."""
     return stock_service.list_stocks(db)
 
 
-@router.post("", response_model=StockRead, status_code=status.HTTP_201_CREATED, responses={409: {"model": ErrorResponse}})
+@router.post(
+    "",
+    response_model=StockRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a stock line",
+    response_description="The created stock line",
+    responses={
+        404: {"model": ErrorResponse, "description": "Unknown product or location"},
+        409: {"model": ErrorResponse, "description": "A stock line already exists for this product at this location"},
+    },
+)
 def create_stock(payload: StockCreate, db: Session = Depends(get_db)) -> StockRead:
+    """
+    Registers the quantity of a product at a location.
+
+    A product has at most one stock line per location: a second one for the
+    same pair is refused with 409. The quantity can be zero, never negative.
+    """
     try:
         return stock_service.create_stock(db, payload)
     except product_service.ProductNotFoundError as exc:
@@ -40,24 +63,50 @@ def create_stock(payload: StockCreate, db: Session = Depends(get_db)) -> StockRe
         ) from exc
 
 
-@router.get("/{stock_id}", response_model=StockRead)
+@router.get(
+    "/{stock_id}",
+    response_model=StockRead,
+    summary="Get a stock line",
+    response_description="The stock line",
+    responses={404: {"model": ErrorResponse, "description": "Unknown stock line"}},
+)
 def get_stock(stock_id: int, db: Session = Depends(get_db)) -> StockRead:
+    """Returns one stock line."""
     try:
         return stock_service.get_stock(db, stock_id)
     except stock_service.StockNotFoundError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=STOCK_NOT_FOUND) from exc
 
 
-@router.patch("/{stock_id}", response_model=StockRead)
+@router.patch(
+    "/{stock_id}",
+    response_model=StockRead,
+    summary="Correct the quantity of a stock line",
+    response_description="The updated stock line",
+    responses={404: {"model": ErrorResponse, "description": "Unknown stock line"}},
+)
 def update_stock(stock_id: int, payload: StockUpdate, db: Session = Depends(get_db)) -> StockRead:
+    """
+    Sets the quantity directly, as an inventory correction.
+
+    The product and the location of a stock line cannot change. To move goods
+    and keep a trace of who did it, use `POST /stock-movements` instead.
+    """
     try:
         return stock_service.update_stock(db, stock_id, payload)
     except stock_service.StockNotFoundError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=STOCK_NOT_FOUND) from exc
 
 
-@router.delete("/{stock_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{stock_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a stock line",
+    response_description="The stock line is deleted",
+    responses={404: {"model": ErrorResponse, "description": "Unknown stock line"}},
+)
 def delete_stock(stock_id: int, db: Session = Depends(get_db)) -> None:
+    """Deletes one stock line. The product and the location are kept."""
     try:
         stock_service.delete_stock(db, stock_id)
     except stock_service.StockNotFoundError as exc:

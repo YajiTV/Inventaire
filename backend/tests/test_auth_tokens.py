@@ -66,8 +66,9 @@ def test_token_signed_with_another_secret_is_rejected(client: TestClient, db_ses
 def test_tampered_token_is_rejected(client: TestClient, db_session: Session) -> None:
     user = create_user(db_session)
     header, payload, signature = create_access_token(user.id).split(".")
-    # Flip the last character of the signature: the payload is untouched, the signature no longer matches.
-    tampered_signature = signature[:-1] + ("A" if signature[-1] != "A" else "B")
+    # Flip the first character of the signature: the payload is untouched, the signature no longer matches.
+    # Not the last one: its low bits are base64 padding, so changing it can decode to the same bytes.
+    tampered_signature = ("A" if signature[0] != "A" else "B") + signature[1:]
     tampered = ".".join([header, payload, tampered_signature])
     assert client.get("/auth/me", headers=bearer(tampered)).status_code == 401
 
