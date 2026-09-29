@@ -3990,6 +3990,7 @@
     },
     "/stocks": {
       "get": {
+        "description": "Returns the quantity held for each product at each location.",
         "operationId": "list_stocks_stocks_get",
         "responses": {
           "200": {
@@ -4004,35 +4005,22 @@
                 }
               }
             },
-            "description": "Successful Response"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Unauthorized"
+            "description": "Every stock line, one per product and location"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
+          },
+          "422": {
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "List Stocks",
+        "summary": "List stock lines",
         "tags": [
           "Stocks"
         ]
       },
       "post": {
+        "description": "Registers the quantity of a product at a location.\n\nA product has at most one stock line per location: a second one for the\nsame pair is refused with 409. The quantity can be zero, never negative.",
         "operationId": "create_stock_stocks_post",
         "requestBody": {
           "content": {
@@ -4053,17 +4041,7 @@
                 }
               }
             },
-            "description": "Successful Response"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Unauthorized"
+            "description": "The created stock line"
           },
           "404": {
             "content": {
@@ -4073,7 +4051,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown product or location"
           },
           "409": {
             "content": {
@@ -4083,20 +4061,13 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "A stock line already exists for this product at this location"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Create Stock",
+        "summary": "Create a stock line",
         "tags": [
           "Stocks"
         ]
@@ -4104,6 +4075,7 @@
     },
     "/stocks/{stock_id}": {
       "delete": {
+        "description": "Deletes one stock line. The product and the location are kept.",
         "operationId": "delete_stock_stocks__stock_id__delete",
         "parameters": [
           {
@@ -4118,17 +4090,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Successful Response"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Unauthorized"
+            "description": "The stock line is deleted"
           },
           "404": {
             "content": {
@@ -4138,25 +4100,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown stock line"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Delete Stock",
+        "summary": "Delete a stock line",
         "tags": [
           "Stocks"
         ]
       },
       "get": {
+        "description": "Returns one stock line.",
         "operationId": "get_stock_stocks__stock_id__get",
         "parameters": [
           {
@@ -4178,17 +4134,7 @@
                 }
               }
             },
-            "description": "Successful Response"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Unauthorized"
+            "description": "The stock line"
           },
           "404": {
             "content": {
@@ -4198,25 +4144,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown stock line"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Get Stock",
+        "summary": "Get a stock line",
         "tags": [
           "Stocks"
         ]
       },
       "patch": {
+        "description": "Sets the quantity directly, as an inventory correction.\n\nThe product and the location of a stock line cannot change. To move goods\nand keep a trace of who did it, use `POST /stock-movements` instead.",
         "operationId": "update_stock_stocks__stock_id__patch",
         "parameters": [
           {
@@ -4248,17 +4188,7 @@
                 }
               }
             },
-            "description": "Successful Response"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Unauthorized"
+            "description": "The updated stock line"
           },
           "404": {
             "content": {
@@ -4268,20 +4198,13 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown stock line"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Update Stock",
+        "summary": "Correct the quantity of a stock line",
         "tags": [
           "Stocks"
         ]
