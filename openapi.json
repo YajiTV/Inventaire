@@ -1639,7 +1639,7 @@
   "paths": {
     "/auth/login": {
       "post": {
-        "description": "Returns an access token and sets the refresh token cookie.",
+        "description": "Authenticates with an email and a password.\n\nThe response body carries a short-lived access token, meant to be kept in\nmemory on the client (never in localStorage or sessionStorage) and sent\nas `Authorization: Bearer <token>` on every subsequent request. A\nlonger-lived refresh token is set alongside it as an httpOnly, Secure,\nSameSite=Strict cookie, scoped to the `/auth` path: it never appears in\nthe response body and is never readable from client-side JavaScript.",
         "operationId": "login_auth_login_post",
         "requestBody": {
           "content": {
@@ -1670,7 +1670,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Invalid email or password"
           },
           "422": {
             "content": {
@@ -1683,7 +1683,7 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Login",
+        "summary": "Log in",
         "tags": [
           "Auth"
         ]
@@ -1691,6 +1691,7 @@
     },
     "/auth/logout": {
       "post": {
+        "description": "Clears the refresh token cookie.\n\nThe client is expected to drop its in-memory access token at the same\ntime. The access token itself is not blacklisted: it stays valid, on the\nserver side, until its own short expiry runs out.",
         "operationId": "logout_auth_logout_post",
         "responses": {
           "204": {
@@ -1707,7 +1708,7 @@
             "description": "Unauthorized"
           }
         },
-        "summary": "Logout",
+        "summary": "Log out",
         "tags": [
           "Auth"
         ]
@@ -1715,6 +1716,7 @@
     },
     "/auth/me": {
       "get": {
+        "description": "Returns the account behind the access token sent in the `Authorization` header.",
         "operationId": "read_current_user_auth_me_get",
         "responses": {
           "200": {
@@ -1743,7 +1745,7 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Read Current User",
+        "summary": "Get the current user",
         "tags": [
           "Auth"
         ]
@@ -1751,7 +1753,7 @@
     },
     "/auth/refresh": {
       "post": {
-        "description": "Issues a new access token from the refresh token cookie.",
+        "description": "Issues a new access token from the refresh token cookie set by `/auth/login`.\n\nMeant to be called once the access token has expired (or is about to),\ninstead of asking the user to log in again. Requires no request body: the\nrefresh token travels only as the httpOnly cookie, sent automatically by\nthe browser. The refresh token itself is not renewed by this call: the\nsame one is reused until it expires (no rotation in this project).",
         "operationId": "refresh_auth_refresh_post",
         "responses": {
           "200": {
@@ -1772,10 +1774,10 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing, expired or invalid refresh cookie"
           }
         },
-        "summary": "Refresh",
+        "summary": "Renew the access token",
         "tags": [
           "Auth"
         ]
@@ -4544,6 +4546,7 @@
     },
     "/users": {
       "get": {
+        "description": "Admin only.",
         "operationId": "list_users_users_get",
         "responses": {
           "200": {
@@ -4596,12 +4599,13 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "List Users",
+        "summary": "List the users",
         "tags": [
           "Users"
         ]
       },
       "post": {
+        "description": "Public registration endpoint: no token required.\n\nThe role in the payload is always ignored and the account is created as\n`operator`, regardless of what is sent. There is currently no way to\ncreate an `admin` account through this endpoint: an existing admin has to\npromote the account afterwards with `PATCH /users/{user_id}`.",
         "operationId": "create_user_users_post",
         "requestBody": {
           "content": {
@@ -4662,7 +4666,7 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Email already registered"
           },
           "422": {
             "content": {
@@ -4675,7 +4679,7 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Create User",
+        "summary": "Register a new account",
         "tags": [
           "Users"
         ]
@@ -4683,6 +4687,7 @@
     },
     "/users/{user_id}": {
       "delete": {
+        "description": "Admin only.",
         "operationId": "delete_user_users__user_id__delete",
         "parameters": [
           {
@@ -4745,12 +4750,13 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Delete User",
+        "summary": "Delete a user",
         "tags": [
           "Users"
         ]
       },
       "get": {
+        "description": "A user can read their own account; only an admin can read another one.",
         "operationId": "get_user_users__user_id__get",
         "parameters": [
           {
@@ -4820,12 +4826,13 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Get User",
+        "summary": "Get a user",
         "tags": [
           "Users"
         ]
       },
       "patch": {
+        "description": "A user can edit their own `full_name`. Only an admin can also edit\n`role` and `is_active`, on themselves or on anyone else: a user editing\ntheir own account cannot change their own role or reactivate/deactivate\nthemselves, to prevent self-escalation to admin.",
         "operationId": "update_user_users__user_id__patch",
         "parameters": [
           {
@@ -4905,7 +4912,7 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Update User",
+        "summary": "Update a user",
         "tags": [
           "Users"
         ]
