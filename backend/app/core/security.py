@@ -30,10 +30,6 @@ def create_access_token(user_id: int) -> str:
     return _create_token(user_id, "access", timedelta(minutes=settings.access_token_expire_minutes))
 
 
-def create_refresh_token(user_id: int) -> str:
-    return _create_token(user_id, "refresh", timedelta(days=settings.refresh_token_expire_days))
-
-
 def decode_token(token: str, expected_type: str) -> int:
     try:
         payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])

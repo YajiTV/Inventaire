@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.stock import Stock
 from app.repositories import stock_repository
 from app.schemas.stock import StockCreate, StockUpdate
-from app.services import location_service
+from app.services import location_service, product_service
 
 class StockNotFoundError(Exception):
     pass
@@ -21,6 +21,7 @@ def get_stock(db: Session, stock_id: int) -> Stock:
     return stock
 
 def create_stock(db: Session, payload: StockCreate) -> Stock:
+    product_service.get_product(db, payload.product_id)
     location_service.get_location(db, payload.location_id)
     if stock_repository.get_by_product_and_location(db, payload.product_id, payload.location_id) is not None:
         raise StockAlreadyExistsError((payload.product_id, payload.location_id))

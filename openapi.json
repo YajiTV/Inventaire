@@ -1716,7 +1716,7 @@
   "paths": {
     "/auth/login": {
       "post": {
-        "description": "Returns an access token and sets the refresh token cookie.",
+        "description": "Authenticates with an email and a password.\n\nThe response body carries a short-lived access token, meant to be kept in\nmemory on the client (never in localStorage or sessionStorage) and sent\nas `Authorization: Bearer <token>` on every subsequent request. A\nlonger-lived refresh token is set alongside it as an httpOnly, Secure,\nSameSite=Strict cookie, scoped to the `/auth` path: it never appears in\nthe response body and is never readable from client-side JavaScript. It\nis opaque (not a JWT) and tracked server-side, which is what lets\n`/auth/refresh` rotate it and `/auth/logout` revoke it.",
         "operationId": "login_auth_login_post",
         "requestBody": {
           "content": {
@@ -1747,7 +1747,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Invalid email or password"
           },
           "422": {
             "content": {
@@ -1760,7 +1760,7 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Login",
+        "summary": "Log in",
         "tags": [
           "Auth"
         ]
@@ -1768,6 +1768,7 @@
     },
     "/auth/logout": {
       "post": {
+        "description": "Revokes the refresh token in the database and clears the cookie.\n\nUnlike a plain cookie deletion, this also stops the same refresh token\nfrom being replayed later if it had already leaked (a stolen cookie\ncopied before logout, for instance).",
         "operationId": "logout_auth_logout_post",
         "responses": {
           "204": {
@@ -1784,7 +1785,7 @@
             "description": "Unauthorized"
           }
         },
-        "summary": "Logout",
+        "summary": "Log out",
         "tags": [
           "Auth"
         ]
@@ -1792,6 +1793,7 @@
     },
     "/auth/me": {
       "get": {
+        "description": "Returns the account behind the access token sent in the `Authorization` header.",
         "operationId": "read_current_user_auth_me_get",
         "responses": {
           "200": {
@@ -1820,7 +1822,7 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Read Current User",
+        "summary": "Get the current user",
         "tags": [
           "Auth"
         ]
@@ -1828,7 +1830,7 @@
     },
     "/auth/refresh": {
       "post": {
-        "description": "Issues a new access token from the refresh token cookie.",
+        "description": "Issues a new access token from the refresh token cookie set by `/auth/login`.\n\nMeant to be called once the access token has expired (or is about to),\ninstead of asking the user to log in again. Requires no request body: the\nrefresh token travels only as the httpOnly cookie, sent automatically by\nthe browser.\n\nThe refresh token is rotated on every call: the response sets a brand new\ncookie, and the token just used is revoked in the database and can never\nbe presented again. Presenting an already-used refresh token does not\njust fail, it revokes every other active session of that user, since it\nis what a copied cookie looks like from the server's side.",
         "operationId": "refresh_auth_refresh_post",
         "responses": {
           "200": {
@@ -1849,10 +1851,10 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing, expired, invalid or already-used refresh cookie"
           }
         },
-        "summary": "Refresh",
+        "summary": "Renew the access token",
         "tags": [
           "Auth"
         ]
@@ -3805,7 +3807,7 @@
     },
     "/replenishment/orders": {
       "post": {
-        "description": "Turns the suggestions of one supplier into a draft purchase order.",
+        "description": "Turns the suggestions of one supplier into a draft purchase order.\n\nQuantities are computed by the server, never taken from the client. A\nproduct that is no longer under its threshold, or that belongs to another\nsupplier, is refused with 409 and no order is created.",
         "operationId": "create_replenishment_order_replenishment_orders_post",
         "requestBody": {
           "content": {
@@ -3826,7 +3828,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created order, in status draft, with one line per product"
           },
           "401": {
             "content": {
@@ -3836,7 +3838,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3846,7 +3848,17 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "A product is not under its threshold or not sold by this supplier"
           },
           "422": {
             "content": {
@@ -3859,7 +3871,12 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Create Replenishment Order",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Generate a purchase order from the suggestions",
         "tags": [
           "Replenishment"
         ]
@@ -3867,7 +3884,7 @@
     },
     "/replenishment/suggestions": {
       "get": {
-        "description": "Lists the products whose total quantity is below their reorder threshold.",
+        "description": "Lists the products whose total quantity, over every location, is below\ntheir reorder threshold.\n\nThe suggested quantity brings the stock back to twice the threshold.\n`supplier_id` is optional: without it, products with no supplier are\nlisted too, with a null `supplier_id`, and cannot be ordered.",
         "operationId": "list_suggestions_replenishment_suggestions_get",
         "parameters": [
           {
@@ -3900,7 +3917,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "Each product under its reorder threshold, with the quantity to order"
           },
           "401": {
             "content": {
@@ -3910,7 +3927,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3920,7 +3937,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Resource not found"
           },
           "422": {
             "content": {
@@ -3933,7 +3950,12 @@
             "description": "Validation Error"
           }
         },
-        "summary": "List Suggestions",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List the products to reorder",
         "tags": [
           "Replenishment"
         ]
@@ -4129,6 +4151,7 @@
     },
     "/stocks": {
       "get": {
+        "description": "Returns the quantity held for each product at each location.",
         "operationId": "list_stocks_stocks_get",
         "responses": {
           "200": {
@@ -4143,35 +4166,22 @@
                 }
               }
             },
-            "description": "Successful Response"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Unauthorized"
+            "description": "Every stock line, one per product and location"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
+          },
+          "422": {
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "List Stocks",
+        "summary": "List stock lines",
         "tags": [
           "Stocks"
         ]
       },
       "post": {
+        "description": "Registers the quantity of a product at a location.\n\nA product has at most one stock line per location: a second one for the\nsame pair is refused with 409. The quantity can be zero, never negative.",
         "operationId": "create_stock_stocks_post",
         "requestBody": {
           "content": {
@@ -4192,17 +4202,7 @@
                 }
               }
             },
-            "description": "Successful Response"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Unauthorized"
+            "description": "The created stock line"
           },
           "404": {
             "content": {
@@ -4212,7 +4212,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown product or location"
           },
           "409": {
             "content": {
@@ -4222,20 +4222,13 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "A stock line already exists for this product at this location"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Create Stock",
+        "summary": "Create a stock line",
         "tags": [
           "Stocks"
         ]
@@ -4243,6 +4236,7 @@
     },
     "/stocks/{stock_id}": {
       "delete": {
+        "description": "Deletes one stock line. The product and the location are kept.",
         "operationId": "delete_stock_stocks__stock_id__delete",
         "parameters": [
           {
@@ -4257,17 +4251,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Successful Response"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Unauthorized"
+            "description": "The stock line is deleted"
           },
           "404": {
             "content": {
@@ -4277,25 +4261,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown stock line"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Delete Stock",
+        "summary": "Delete a stock line",
         "tags": [
           "Stocks"
         ]
       },
       "get": {
+        "description": "Returns one stock line.",
         "operationId": "get_stock_stocks__stock_id__get",
         "parameters": [
           {
@@ -4317,17 +4295,7 @@
                 }
               }
             },
-            "description": "Successful Response"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Unauthorized"
+            "description": "The stock line"
           },
           "404": {
             "content": {
@@ -4337,25 +4305,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown stock line"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Get Stock",
+        "summary": "Get a stock line",
         "tags": [
           "Stocks"
         ]
       },
       "patch": {
+        "description": "Sets the quantity directly, as an inventory correction.\n\nThe product and the location of a stock line cannot change. To move goods\nand keep a trace of who did it, use `POST /stock-movements` instead.",
         "operationId": "update_stock_stocks__stock_id__patch",
         "parameters": [
           {
@@ -4387,17 +4349,7 @@
                 }
               }
             },
-            "description": "Successful Response"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Unauthorized"
+            "description": "The updated stock line"
           },
           "404": {
             "content": {
@@ -4407,20 +4359,13 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown stock line"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Update Stock",
+        "summary": "Correct the quantity of a stock line",
         "tags": [
           "Stocks"
         ]
@@ -4683,6 +4628,7 @@
     },
     "/users": {
       "get": {
+        "description": "Admin only.",
         "operationId": "list_users_users_get",
         "responses": {
           "200": {
@@ -4735,12 +4681,13 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "List Users",
+        "summary": "List the users",
         "tags": [
           "Users"
         ]
       },
       "post": {
+        "description": "Public registration endpoint: no token required.\n\nThe role in the payload is always ignored and the account is created as\n`operator`, regardless of what is sent. There is currently no way to\ncreate an `admin` account through this endpoint: an existing admin has to\npromote the account afterwards with `PATCH /users/{user_id}`.",
         "operationId": "create_user_users_post",
         "requestBody": {
           "content": {
@@ -4801,7 +4748,7 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Email already registered"
           },
           "422": {
             "content": {
@@ -4814,7 +4761,7 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Create User",
+        "summary": "Register a new account",
         "tags": [
           "Users"
         ]
@@ -4822,6 +4769,7 @@
     },
     "/users/{user_id}": {
       "delete": {
+        "description": "Admin only.",
         "operationId": "delete_user_users__user_id__delete",
         "parameters": [
           {
@@ -4884,12 +4832,13 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Delete User",
+        "summary": "Delete a user",
         "tags": [
           "Users"
         ]
       },
       "get": {
+        "description": "A user can read their own account; only an admin can read another one.",
         "operationId": "get_user_users__user_id__get",
         "parameters": [
           {
@@ -4959,12 +4908,13 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Get User",
+        "summary": "Get a user",
         "tags": [
           "Users"
         ]
       },
       "patch": {
+        "description": "A user can edit their own `full_name`. Only an admin can also edit\n`role` and `is_active`, on themselves or on anyone else: a user editing\ntheir own account cannot change their own role or reactivate/deactivate\nthemselves, to prevent self-escalation to admin.",
         "operationId": "update_user_users__user_id__patch",
         "parameters": [
           {
@@ -5044,7 +4994,7 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Update User",
+        "summary": "Update a user",
         "tags": [
           "Users"
         ]

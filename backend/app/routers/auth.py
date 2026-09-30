@@ -31,39 +31,93 @@ def _set_refresh_cookie(response: Response, refresh_token: str) -> None:
     )
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post(
+    "/login",
+    response_model=TokenResponse,
+    summary="Log in",
+    responses={401: {"model": ErrorResponse, "description": "Invalid email or password"}},
+)
 def login(payload: LoginRequest, response: Response, db: Session = Depends(get_db)) -> TokenResponse:
-    """Returns an access token and sets the refresh token cookie."""
+    """
+    Authenticates with an email and a password.
+
+    The response body carries a short-lived access token, meant to be kept in
+    memory on the client (never in localStorage or sessionStorage) and sent
+    as `Authorization: Bearer <token>` on every subsequent request. A
+    longer-lived refresh token is set alongside it as an httpOnly, Secure,
+    SameSite=Strict cookie, scoped to the `/auth` path: it never appears in
+    the response body and is never readable from client-side JavaScript. It
+    is opaque (not a JWT) and tracked server-side, which is what lets
+    `/auth/refresh` rotate it and `/auth/logout` revoke it.
+    """
     try:
         user = auth_service.authenticate(db, payload.email, payload.password)
     except auth_service.InvalidCredentialsError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Identifiants invalides") from exc
 
-    access_token, refresh_token = auth_service.issue_tokens(user)
+    access_token, refresh_token = auth_service.issue_tokens(db, user)
     _set_refresh_cookie(response, refresh_token)
     return TokenResponse(access_token=access_token, expires_in=settings.access_token_expire_minutes * 60)
 
 
-@router.post("/refresh", response_model=TokenResponse)
-def refresh(request: Request, db: Session = Depends(get_db)) -> TokenResponse:
-    """Issues a new access token from the refresh token cookie."""
+@router.post(
+    "/refresh",
+    response_model=TokenResponse,
+    summary="Renew the access token",
+    responses={401: {"model": ErrorResponse, "description": "Missing, expired, invalid or already-used refresh cookie"}},
+)
+def refresh(request: Request, response: Response, db: Session = Depends(get_db)) -> TokenResponse:
+    """
+    Issues a new access token from the refresh token cookie set by `/auth/login`.
+
+    Meant to be called once the access token has expired (or is about to),
+    instead of asking the user to log in again. Requires no request body: the
+    refresh token travels only as the httpOnly cookie, sent automatically by
+    the browser.
+
+    The refresh token is rotated on every call: the response sets a brand new
+    cookie, and the token just used is revoked in the database and can never
+    be presented again. Presenting an already-used refresh token does not
+    just fail, it revokes every other active session of that user, since it
+    is what a copied cookie looks like from the server's side.
+    """
     refresh_token = request.cookies.get(settings.refresh_cookie_name)
     if refresh_token is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expiree")
 
     try:
-        access_token = auth_service.refresh_access_token(db, refresh_token)
+        access_token, new_refresh_token = auth_service.rotate_refresh_token(db, refresh_token)
     except auth_service.InvalidSessionError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expiree") from exc
 
+    _set_refresh_cookie(response, new_refresh_token)
     return TokenResponse(access_token=access_token, expires_in=settings.access_token_expire_minutes * 60)
 
 
-@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
-def logout(response: Response) -> None:
+@router.post(
+    "/logout",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Log out",
+)
+def logout(request: Request, response: Response, db: Session = Depends(get_db)) -> None:
+    """
+    Revokes the refresh token in the database and clears the cookie.
+
+    Unlike a plain cookie deletion, this also stops the same refresh token
+    from being replayed later if it had already leaked (a stolen cookie
+    copied before logout, for instance).
+    """
+    refresh_token = request.cookies.get(settings.refresh_cookie_name)
+    if refresh_token is not None:
+        auth_service.revoke_refresh_token(db, refresh_token)
     response.delete_cookie(settings.refresh_cookie_name, path="/auth")
 
 
-@router.get("/me", response_model=UserRead)
+@router.get(
+    "/me",
+    response_model=UserRead,
+    summary="Get the current user",
+)
 def read_current_user(current_user: User = Depends(get_current_user)) -> User:
+    """Returns the account behind the access token sent in the `Authorization` header."""
     return current_user
