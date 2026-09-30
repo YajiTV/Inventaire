@@ -35,9 +35,13 @@ def list_all(
 def stage(db: Session, instance: object) -> None:
     """
     Queues an object without committing, so the movement and the stock rows it
-    touches are written by the single commit below, or not at all.
+    touches are written by the caller's single commit, or not at all.
+
+    The flush sends the INSERT inside the open transaction: a stock line created
+    here is then visible to the next lookup of the same request.
     """
     db.add(instance)
+    db.flush()
 
 
 def create(db: Session, movement: StockMovement) -> StockMovement:

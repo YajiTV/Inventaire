@@ -1,7 +1,8 @@
 from datetime import datetime
 from decimal import Decimal
+from typing import Self
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.schemas.common import ReadModel
 from app.schemas.enums import OrderStatus
@@ -16,6 +17,14 @@ class PurchaseOrderBase(BaseModel):
 
 class PurchaseOrderCreate(PurchaseOrderBase):
     lines: list[OrderLineCreate] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def check_distinct_products(self) -> Self:
+        # Same rule as POST /purchase-orders/{id}/lines: one line per product.
+        product_ids = [line.product_id for line in self.lines]
+        if len(product_ids) != len(set(product_ids)):
+            raise ValueError("each product can appear only once in the lines of an order")
+        return self
 
 
 class PurchaseOrderUpdate(BaseModel):

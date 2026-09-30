@@ -3410,7 +3410,7 @@
         ]
       },
       "post": {
-        "description": "Creates an order and its lines in one call.\n\nThe order always starts in status `draft`, whatever the payload asks for,\nand at least one line is required. The reference must be unique across\nevery order. `total_price` is computed from the lines and never stored.",
+        "description": "Creates an order and its lines in one call.\n\nThe order always starts in status `draft`, whatever the payload asks for,\nand at least one line is required, each product at most once. The\nreference must be unique across every order. `total_price` is computed\nfrom the lines and never stored.",
         "operationId": "create_purchase_order_purchase_orders_post",
         "requestBody": {
           "content": {
@@ -3604,7 +3604,7 @@
         ]
       },
       "patch": {
-        "description": "Moves the order along its life cycle, or changes its delivery location.\n\nAllowed transitions: `draft` -> `sent` -> `received`, and `draft` or `sent`\n-> `cancelled`. Any other transition returns 409, and a `received` or\n`cancelled` order is closed: neither its status nor its location can change\nany more.\n\nMoving to `received` is the side of the feature that touches the stock: it\ngenerates one incoming movement per line and stamps `received_at`.",
+        "description": "Moves the order along its life cycle, or changes its delivery location.\n\nAllowed transitions: `draft` -> `sent` -> `received`, and `draft` or `sent`\n-> `cancelled`. Any other transition returns 409, and a `received` or\n`cancelled` order is closed: neither its status nor its location can change\nany more.\n\nMoving to `received` is the side of the feature that touches the stock: it\ngenerates one `in` stock movement per line into the order's location,\nstamped with the authenticated user, and sets `received_at`. The status,\nthe movements and the quantities are written in a single transaction.",
         "operationId": "update_purchase_order_purchase_orders__order_id__patch",
         "parameters": [
           {
@@ -4347,7 +4347,7 @@
         ]
       },
       "post": {
-        "description": "Records a movement and updates the stock of the locations involved.\n\nThree kinds of movement, each one with its own required locations:\n\n- `incoming`: needs `to_location_id`, adds the quantity, creates the stock\n  line if that product had none at that location yet.\n- `outgoing`: needs `from_location_id`, removes the quantity.\n- `transfer`: needs both, removes on one side and adds on the other.\n\nStock never goes negative: an `outgoing` or a `transfer` larger than what\nthe source holds is refused with 409 and nothing is written. The movement\nis stamped with the authenticated user, so the history says who did what.",
+        "description": "Records a movement and updates the stock of the locations involved.\n\nThree kinds of movement, each one with its own required locations:\n\n- `in`: needs `target_location_id`, adds the quantity, creates the stock\n  line if that product had none at that location yet.\n- `out`: needs `source_location_id`, removes the quantity.\n- `transfer`: needs both (two different locations), removes on the source\n  and adds on the target.\n\nStock never goes negative: an `out` or a `transfer` larger than what\nthe source holds is refused with 409 and nothing is written. The movement\nis stamped with the authenticated user, so the history says who did what.",
         "operationId": "create_stock_movement_stock_movements_post",
         "requestBody": {
           "content": {
