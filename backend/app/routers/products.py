@@ -166,7 +166,10 @@ def update_product(product_id: int, payload: ProductUpdate, db: Session = Depend
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete a product",
     response_description="The product was deleted, no body",
-    responses={404: {"model": ErrorResponse, "description": "Unknown product"}},
+    responses={
+        404: {"model": ErrorResponse, "description": "Unknown product"},
+        409: {"model": ErrorResponse, "description": "The product still has stock movements or order lines"},
+    },
 )
 def delete_product(product_id: int, db: Session = Depends(get_db)) -> None:
     """Deletes a product by its id."""

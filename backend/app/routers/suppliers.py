@@ -85,6 +85,7 @@ def update_supplier(supplier_id: int, payload: SupplierUpdate, db: Session = Dep
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete a supplier",
     response_description="The supplier was deleted, no body",
+    responses={409: {"model": ErrorResponse, "description": "The supplier still has purchase orders"}},
 )
 def delete_supplier(supplier_id: int, db: Session = Depends(get_db)) -> None:
     """

@@ -1,6 +1,8 @@
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -42,6 +44,17 @@ for module in (
     replenishment,
 ):
     app.include_router(module.router)
+
+
+# The database refused the write, most often a delete on a row still referenced
+# elsewhere (a category that has products, a supplier that has orders...).
+# It is a conflict with the current data, not a server error: 409 instead of 500.
+@app.exception_handler(IntegrityError)
+def integrity_error_handler(_request: Request, _exc: IntegrityError) -> JSONResponse:
+    return JSONResponse(
+        status_code=status.HTTP_409_CONFLICT,
+        content={"detail": "Opération impossible : cette ressource est liée à d'autres données"},
+    )
 
 
 @app.get("/health", tags=["Health"])

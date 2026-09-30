@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -14,6 +14,15 @@ from app.services.password import hash_password
 # SQLite en memoire, une connexion partagee (StaticPool) pour que toutes les
 # sessions de test voient les memes tables le temps du test.
 engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False}, poolclass=StaticPool)
+
+
+# SQLite ignore les cles etrangeres par defaut : on les active pour que les tests
+# voient les memes refus que PostgreSQL (suppression d'une ressource encore utilisee).
+@event.listens_for(engine, "connect")
+def _enable_foreign_keys(dbapi_connection, _record):
+    dbapi_connection.execute("PRAGMA foreign_keys=ON")
+
+
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -33,7 +42,11 @@ def db_session():
 @pytest.fixture()
 def client(db_session: Session):
     def override_get_db():
-        yield db_session
+        try:
+            yield db_session
+        except Exception:
+            db_session.rollback()
+            raise
 
     app.dependency_overrides[get_db] = override_get_db
     try:
