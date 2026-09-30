@@ -3753,7 +3753,7 @@
         ],
         "summary": "List the lines of an order",
         "tags": [
-          "Purchase orders"
+          "Order lines"
         ]
       },
       "post": {
@@ -3831,7 +3831,7 @@
         ],
         "summary": "Add a line to a draft order",
         "tags": [
-          "Purchase orders"
+          "Order lines"
         ]
       }
     },
@@ -3903,7 +3903,7 @@
         ],
         "summary": "Delete a line of a draft order",
         "tags": [
-          "Purchase orders"
+          "Order lines"
         ]
       },
       "get": {
@@ -3980,7 +3980,7 @@
         ],
         "summary": "Get a line of an order",
         "tags": [
-          "Purchase orders"
+          "Order lines"
         ]
       },
       "patch": {
@@ -4067,7 +4067,7 @@
         ],
         "summary": "Update the quantity or the price of a line",
         "tags": [
-          "Purchase orders"
+          "Order lines"
         ]
       }
     },
