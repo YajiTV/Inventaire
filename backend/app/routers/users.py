@@ -113,6 +113,7 @@ def update_user(
     "/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete a user",
+    responses={409: {"model": ErrorResponse, "description": "The user still has stock movements"}},
 )
 def delete_user(
     user_id: int,

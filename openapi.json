@@ -2012,6 +2012,16 @@
             },
             "description": "Not Found"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
           "422": {
             "content": {
               "application/json": {
@@ -2997,6 +3007,16 @@
               }
             },
             "description": "Unknown product"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The product still has stock movements or order lines"
           },
           "422": {
             "description": "Invalid body or query parameter, rejected by Pydantic"
@@ -4498,6 +4518,16 @@
             },
             "description": "Unknown supplier"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The supplier still has purchase orders"
+          },
           "422": {
             "description": "Invalid body, rejected by Pydantic"
           }
@@ -4815,6 +4845,16 @@
               }
             },
             "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The user still has stock movements"
           },
           "422": {
             "content": {

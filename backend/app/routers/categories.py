@@ -47,7 +47,7 @@ def update_category(category_id: int, payload: CategoryUpdate, db: Session = Dep
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Une categorie porte deja ce nom") from exc
 
 
-@router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT, responses={409: {"model": ErrorResponse}})
 def delete_category(category_id: int, db: Session = Depends(get_db)) -> None:
     try:
         category_service.delete_category(db, category_id)

@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.clients import adresse
 from app.models.stock import Stock
+from tests.test_stock_movements import create_product
 
 
 def create(client: TestClient, code: str = "A1", name: str = "Allee A1", description: str | None = "Rayon boissons") -> dict:
@@ -89,7 +90,7 @@ def test_delete_location_not_found(client: TestClient) -> None:
 
 def test_delete_location_rejects_when_stock_exists(client: TestClient, db_session: Session) -> None:
     created = create(client)
-    db_session.add(Stock(product_id=1, location_id=created["id"], quantity=5))
+    db_session.add(Stock(product_id=create_product(client), location_id=created["id"], quantity=5))
     db_session.commit()
 
     response = client.delete(f"/locations/{created['id']}")
@@ -105,8 +106,8 @@ def test_list_location_stocks_empty(client: TestClient) -> None:
 
 def test_list_location_stocks(client: TestClient, db_session: Session) -> None:
     created = create(client)
-    db_session.add(Stock(product_id=1, location_id=created["id"], quantity=5))
-    db_session.add(Stock(product_id=2, location_id=created["id"], quantity=12))
+    db_session.add(Stock(product_id=create_product(client, "CAFE-001"), location_id=created["id"], quantity=5))
+    db_session.add(Stock(product_id=create_product(client, "CAFE-002"), location_id=created["id"], quantity=12))
     db_session.commit()
 
     response = client.get(f"/locations/{created['id']}/stocks")
