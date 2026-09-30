@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from app.clients import adresse
 from app.models.location import Location
 from app.models.stock import Stock
 from app.repositories import location_repository, stock_repository
@@ -59,3 +60,9 @@ def delete_location(db: Session, location_id: int) -> None:
 def list_location_stocks(db: Session, location_id: int) -> list[Stock]:
     get_location(db, location_id)
     return stock_repository.list_by_location(db, location_id)
+
+
+# Recherche libre : passe par le client comme fetch_product pour Open Food Facts.
+# Les erreurs Adresse...Error remontent telles quelles jusqu'au router.
+def lookup_address(query: str) -> dict:
+    return adresse.search_address(query)
