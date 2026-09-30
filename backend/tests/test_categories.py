@@ -1,4 +1,7 @@
+import pytest
 from fastapi.testclient import TestClient
+
+pytestmark = pytest.mark.usefixtures("authenticated")
 
 
 def create(client: TestClient, name: str = "Boissons", description: str | None = "Sirops et jus") -> dict:
@@ -80,3 +83,13 @@ def test_delete_category(client: TestClient) -> None:
 def test_delete_category_not_found(client: TestClient) -> None:
     response = client.delete("/categories/999")
     assert response.status_code == 404
+
+
+def test_delete_category_used_by_a_product_returns_409(client: TestClient) -> None:
+    category = client.post("/categories", json={"name": "Boissons"}).json()
+    product = {"sku": "CAFE-001", "name": "Cafe", "unit_price": "12.50", "category_id": category["id"]}
+    assert client.post("/products", json=product).status_code == 201
+
+    response = client.delete(f"/categories/{category['id']}")
+    assert response.status_code == 409
+    assert client.get(f"/categories/{category['id']}").status_code == 200

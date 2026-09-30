@@ -20,28 +20,53 @@ router = APIRouter(
 )
 
 
-@router.get("", response_model=list[UserRead])
+@router.get(
+    "",
+    response_model=list[UserRead],
+    summary="List the users",
+)
 def list_users(
     db: Session = Depends(get_db),
     _current_user: User = Depends(require_admin),
 ) -> list[UserRead]:
+    """Admin only."""
     return user_service.list_users(db)
 
 
-@router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED, responses={409: {"model": ErrorResponse}})
-def create_user(payload: UserCreate, db: Session = Depends(get_db)) -> UserRead:
+@router.post(
+    "",
+    response_model=UserRead,
+    status_code=status.HTTP_201_CREATED,
+    responses={409: {"model": ErrorResponse, "description": "Email already registered"}},
+    summary="Create an account",
+)
+def create_user(
+    payload: UserCreate,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(require_admin),
+) -> UserRead:
+    """
+    Admin only. Creates an account with the role given in the payload.
+
+    Visitors create their own account with `POST /auth/register`.
+    """
     try:
-        return auth_service.register_user(db, payload)
+        return auth_service.register_user(db, payload, role=payload.role)
     except auth_service.EmailAlreadyRegisteredError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Un compte existe deja avec cet email") from exc
 
 
-@router.get("/{user_id}", response_model=UserRead)
+@router.get(
+    "/{user_id}",
+    response_model=UserRead,
+    summary="Get a user",
+)
 def get_user(
     user_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> UserRead:
+    """A user can read their own account; only an admin can read another one."""
     if current_user.id != user_id and current_user.role != UserRole.ADMIN:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Non autorise")
     try:
@@ -50,13 +75,23 @@ def get_user(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur introuvable") from exc
 
 
-@router.patch("/{user_id}", response_model=UserRead)
+@router.patch(
+    "/{user_id}",
+    response_model=UserRead,
+    summary="Update a user",
+)
 def update_user(
     user_id: int,
     payload: UserUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> UserRead:
+    """
+    A user can edit their own `full_name`. Only an admin can also edit
+    `role` and `is_active`, on themselves or on anyone else: a user editing
+    their own account cannot change their own role or reactivate/deactivate
+    themselves, to prevent self-escalation to admin.
+    """
     is_self = current_user.id == user_id
     is_admin = current_user.role == UserRole.ADMIN
 
@@ -75,12 +110,18 @@ def update_user(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur introuvable") from exc
 
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a user",
+    responses={409: {"model": ErrorResponse, "description": "The user still has stock movements"}},
+)
 def delete_user(
     user_id: int,
     db: Session = Depends(get_db),
     _current_user: User = Depends(require_admin),
 ) -> None:
+    """Admin only."""
     try:
         user_service.delete_user(db, user_id)
     except user_service.UserNotFoundError as exc:

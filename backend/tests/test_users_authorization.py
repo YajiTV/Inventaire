@@ -100,3 +100,18 @@ def test_delete_user_allowed_for_admin(client: TestClient, db_session: Session) 
 
     response = client.delete(f"/users/{target.id}", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 204
+
+
+def test_create_user_is_reserved_to_admins(client: TestClient, db_session: Session) -> None:
+    payload = {"email": "nouveau@inventaire.fr", "full_name": "Nouveau", "password": "s3cret-pass", "role": "admin"}
+    assert client.post("/users", json=payload).status_code == 401
+
+    _create_user(db_session, "operateur@inventaire.fr", UserRole.OPERATOR)
+    operator = {"Authorization": f"Bearer {_login(client, 'operateur@inventaire.fr')}"}
+    assert client.post("/users", json=payload, headers=operator).status_code == 403
+
+    _create_user(db_session, "admin@inventaire.fr", UserRole.ADMIN)
+    admin = {"Authorization": f"Bearer {_login(client, 'admin@inventaire.fr')}"}
+    response = client.post("/users", json=payload, headers=admin)
+    assert response.status_code == 201
+    assert response.json()["role"] == "admin"

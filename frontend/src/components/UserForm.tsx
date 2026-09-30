@@ -1,9 +1,8 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
-import { ROLE_OPTIONS, validateUserCreate } from '../lib/users'
-import type { UserCreate, UserRole } from '../types/api'
+import { validateUserCreate } from '../lib/users'
+import type { UserCreate } from '../types/api'
 import { FormField } from './FormField'
-import { SelectField } from './SelectField'
 import { ErrorList } from './ErrorList'
 import { Button } from './Button'
 
@@ -15,17 +14,18 @@ export function UserForm({ onSubmit }: UserFormProps) {
   const [email, setEmail] = useState('')
   const [fullName, setFullName] = useState('')
   const [password, setPassword] = useState('')
-  const [role, setRole] = useState<UserRole>('operator')
   const [errors, setErrors] = useState<string[]>([])
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
 
+    // No role field here: the API always creates operator accounts through
+    // this endpoint, whatever role is sent. An admin can be promoted
+    // afterwards from the users table below.
     const user: UserCreate = {
       email: email.trim(),
       full_name: fullName.trim(),
       password,
-      role,
     }
 
     const found = validateUserCreate(user)
@@ -36,24 +36,21 @@ export function UserForm({ onSubmit }: UserFormProps) {
       setEmail('')
       setFullName('')
       setPassword('')
-      setRole('operator')
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="mb-4 flex flex-wrap gap-2">
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
       <FormField id="user-email" label="Email" type="email" value={email} onChange={setEmail} placeholder="prenom@inventaire.fr" required />
       <FormField id="user-full-name" label="Nom complet" value={fullName} onChange={setFullName} placeholder="Marie Dupont" required />
-      <FormField id="user-password" label="Mot de passe" type="password" value={password} onChange={setPassword} required />
-      <SelectField
-        id="user-role"
-        label="Rôle"
-        value={role}
-        onChange={(value) => setRole(value as UserRole)}
-        options={ROLE_OPTIONS}
-      />
-      <Button type="submit">Ajouter</Button>
+      <FormField id="user-password" label="Mot de passe" type="password" value={password} onChange={setPassword} placeholder="8 caractères minimum" required />
+      <p className="text-xs text-ink-soft">
+        Le compte est créé en tant qu'opérateur. Pour un rôle admin, modifiez-le ensuite dans le tableau ci-dessous.
+      </p>
       <ErrorList errors={errors} />
+      <Button type="submit" variant="primary">
+        Ajouter l'utilisateur
+      </Button>
     </form>
   )
 }

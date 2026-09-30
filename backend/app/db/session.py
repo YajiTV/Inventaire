@@ -16,5 +16,9 @@ def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
+    except Exception:
+        # A failed commit leaves the session unusable until it is rolled back
+        db.rollback()
+        raise
     finally:
         db.close()

@@ -1,6 +1,142 @@
 {
   "components": {
     "schemas": {
+      "AddressLookup": {
+        "description": "Address data fetched from the French government address API (BAN) for a free-text query.",
+        "properties": {
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "examples": [
+              "Amiens"
+            ],
+            "title": "City"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "examples": [
+              "8 Boulevard du Port 80000 Amiens"
+            ],
+            "title": "Label"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "examples": [
+              49.897452
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "examples": [
+              2.298047
+            ],
+            "title": "Longitude"
+          },
+          "postcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "examples": [
+              "80000"
+            ],
+            "title": "Postcode"
+          }
+        },
+        "title": "AddressLookup",
+        "type": "object"
+      },
+      "Body_login_form_auth_token_post": {
+        "properties": {
+          "client_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id"
+          },
+          "client_secret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "format": "password",
+            "title": "Client Secret"
+          },
+          "grant_type": {
+            "anyOf": [
+              {
+                "pattern": "^password$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grant Type"
+          },
+          "password": {
+            "format": "password",
+            "title": "Password",
+            "type": "string"
+          },
+          "scope": {
+            "default": "",
+            "title": "Scope",
+            "type": "string"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "Body_login_form_auth_token_post",
+        "type": "object"
+      },
       "CategoryCreate": {
         "properties": {
           "description": {
@@ -425,9 +561,15 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "3017620422003"
+            ],
             "title": "Barcode"
           },
           "category_id": {
+            "examples": [
+              1
+            ],
             "title": "Category Id",
             "type": "integer"
           },
@@ -441,9 +583,30 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "Pate a tartiner aux noisettes"
+            ],
             "title": "Description"
           },
+          "image_url": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "examples": [
+              "https://images.openfoodfacts.org/images/products/301/762/042/2003/front_fr.jpg"
+            ],
+            "title": "Image Url"
+          },
           "name": {
+            "examples": [
+              "Pate a tartiner 400 g"
+            ],
             "maxLength": 150,
             "minLength": 1,
             "title": "Name",
@@ -451,11 +614,17 @@
           },
           "reorder_threshold": {
             "default": 0,
+            "examples": [
+              10
+            ],
             "minimum": 0.0,
             "title": "Reorder Threshold",
             "type": "integer"
           },
           "sku": {
+            "examples": [
+              "PATE-001"
+            ],
             "maxLength": 40,
             "minLength": 1,
             "pattern": "^[A-Z0-9-]+$",
@@ -471,6 +640,9 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              1
+            ],
             "title": "Supplier Id"
           },
           "unit_price": {
@@ -483,6 +655,9 @@
                 "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,8}|(?=[\\d.]{1,11}0*$)\\d{0,8}\\.\\d{0,2}0*$)",
                 "type": "string"
               }
+            ],
+            "examples": [
+              "4.50"
             ],
             "title": "Unit Price"
           }
@@ -500,6 +675,9 @@
         "description": "Product data fetched from Open Food Facts for a barcode.",
         "properties": {
           "barcode": {
+            "examples": [
+              "3017620422003"
+            ],
             "title": "Barcode",
             "type": "string"
           },
@@ -512,6 +690,9 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "Pate a tartiner aux noisettes et au cacao"
+            ],
             "title": "Description"
           },
           "image_url": {
@@ -523,6 +704,9 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "https://images.openfoodfacts.org/images/products/301/762/042/2003/front_fr.jpg"
+            ],
             "title": "Image Url"
           },
           "name": {
@@ -533,6 +717,9 @@
               {
                 "type": "null"
               }
+            ],
+            "examples": [
+              "Nutella"
             ],
             "title": "Name"
           }
@@ -557,9 +744,15 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "3017620422003"
+            ],
             "title": "Barcode"
           },
           "category_id": {
+            "examples": [
+              1
+            ],
             "title": "Category Id",
             "type": "integer"
           },
@@ -573,13 +766,37 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "Pate a tartiner aux noisettes"
+            ],
             "title": "Description"
           },
           "id": {
+            "examples": [
+              1
+            ],
             "title": "Id",
             "type": "integer"
           },
+          "image_url": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "examples": [
+              "https://images.openfoodfacts.org/images/products/301/762/042/2003/front_fr.jpg"
+            ],
+            "title": "Image Url"
+          },
           "name": {
+            "examples": [
+              "Pate a tartiner 400 g"
+            ],
             "maxLength": 150,
             "minLength": 1,
             "title": "Name",
@@ -587,11 +804,17 @@
           },
           "reorder_threshold": {
             "default": 0,
+            "examples": [
+              10
+            ],
             "minimum": 0.0,
             "title": "Reorder Threshold",
             "type": "integer"
           },
           "sku": {
+            "examples": [
+              "PATE-001"
+            ],
             "maxLength": 40,
             "minLength": 1,
             "pattern": "^[A-Z0-9-]+$",
@@ -607,14 +830,23 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              1
+            ],
             "title": "Supplier Id"
           },
           "total_quantity": {
             "default": 0,
+            "examples": [
+              42
+            ],
             "title": "Total Quantity",
             "type": "integer"
           },
           "unit_price": {
+            "examples": [
+              "4.50"
+            ],
             "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,8}|(?=[\\d.]{1,11}0*$)\\d{0,8}\\.\\d{0,2}0*$)",
             "title": "Unit Price",
             "type": "string"
@@ -669,6 +901,18 @@
             ],
             "title": "Description"
           },
+          "image_url": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
           "name": {
             "anyOf": [
               {
@@ -679,6 +923,9 @@
               {
                 "type": "null"
               }
+            ],
+            "examples": [
+              "Pate a tartiner 750 g"
             ],
             "title": "Name"
           },
@@ -718,6 +965,9 @@
               {
                 "type": "null"
               }
+            ],
+            "examples": [
+              "6.90"
             ],
             "title": "Unit Price"
           }
@@ -1145,6 +1395,9 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "18 rue de Mons, 76130 Mont-Saint-Aignan"
+            ],
             "title": "Address"
           },
           "email": {
@@ -1157,9 +1410,15 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "commandes@ferrero.fr"
+            ],
             "title": "Email"
           },
           "name": {
+            "examples": [
+              "Ferrero France"
+            ],
             "maxLength": 120,
             "minLength": 1,
             "title": "Name",
@@ -1174,6 +1433,9 @@
               {
                 "type": "null"
               }
+            ],
+            "examples": [
+              "0320000000"
             ],
             "title": "Phone"
           }
@@ -1196,6 +1458,9 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "18 rue de Mons, 76130 Mont-Saint-Aignan"
+            ],
             "title": "Address"
           },
           "email": {
@@ -1208,13 +1473,22 @@
                 "type": "null"
               }
             ],
+            "examples": [
+              "commandes@ferrero.fr"
+            ],
             "title": "Email"
           },
           "id": {
+            "examples": [
+              1
+            ],
             "title": "Id",
             "type": "integer"
           },
           "name": {
+            "examples": [
+              "Ferrero France"
+            ],
             "maxLength": 120,
             "minLength": 1,
             "title": "Name",
@@ -1229,6 +1503,9 @@
               {
                 "type": "null"
               }
+            ],
+            "examples": [
+              "0320000000"
             ],
             "title": "Phone"
           }
@@ -1276,6 +1553,9 @@
               {
                 "type": "null"
               }
+            ],
+            "examples": [
+              "Ferrero"
             ],
             "title": "Name"
           },
@@ -1481,9 +1761,14 @@
       }
     },
     "securitySchemes": {
-      "HTTPBearer": {
-        "scheme": "bearer",
-        "type": "http"
+      "OAuth2PasswordBearer": {
+        "flows": {
+          "password": {
+            "scopes": {},
+            "tokenUrl": "/auth/token"
+          }
+        },
+        "type": "oauth2"
       }
     }
   },
@@ -1495,7 +1780,7 @@
   "paths": {
     "/auth/login": {
       "post": {
-        "description": "Returns an access token and sets the refresh token cookie.",
+        "description": "Authenticates with an email and a password.\n\nThe response body carries a short-lived access token, meant to be kept in\nmemory on the client (never in localStorage or sessionStorage) and sent\nas `Authorization: Bearer <token>` on every subsequent request. A\nlonger-lived refresh token is set alongside it as an httpOnly, Secure,\nSameSite=Strict cookie, scoped to the `/auth` path: it never appears in\nthe response body and is never readable from client-side JavaScript. It\nis opaque (not a JWT) and tracked server-side, which is what lets\n`/auth/refresh` rotate it and `/auth/logout` revoke it.",
         "operationId": "login_auth_login_post",
         "requestBody": {
           "content": {
@@ -1526,7 +1811,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Invalid email or password"
           },
           "422": {
             "content": {
@@ -1539,7 +1824,7 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Login",
+        "summary": "Log in",
         "tags": [
           "Auth"
         ]
@@ -1547,6 +1832,7 @@
     },
     "/auth/logout": {
       "post": {
+        "description": "Revokes the refresh token in the database and clears the cookie.\n\nUnlike a plain cookie deletion, this also stops the same refresh token\nfrom being replayed later if it had already leaked (a stolen cookie\ncopied before logout, for instance).",
         "operationId": "logout_auth_logout_post",
         "responses": {
           "204": {
@@ -1563,7 +1849,7 @@
             "description": "Unauthorized"
           }
         },
-        "summary": "Logout",
+        "summary": "Log out",
         "tags": [
           "Auth"
         ]
@@ -1571,6 +1857,7 @@
     },
     "/auth/me": {
       "get": {
+        "description": "Returns the account behind the access token sent in the `Authorization` header.",
         "operationId": "read_current_user_auth_me_get",
         "responses": {
           "200": {
@@ -1596,10 +1883,10 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
-        "summary": "Read Current User",
+        "summary": "Get the current user",
         "tags": [
           "Auth"
         ]
@@ -1607,7 +1894,7 @@
     },
     "/auth/refresh": {
       "post": {
-        "description": "Issues a new access token from the refresh token cookie.",
+        "description": "Issues a new access token from the refresh token cookie set by `/auth/login`.\n\nMeant to be called once the access token has expired (or is about to),\ninstead of asking the user to log in again. Requires no request body: the\nrefresh token travels only as the httpOnly cookie, sent automatically by\nthe browser.\n\nThe refresh token is rotated on every call: the response sets a brand new\ncookie, and the token just used is revoked in the database and can never\nbe presented again. Presenting an already-used refresh token does not\njust fail, it revokes every other active session of that user, since it\nis what a copied cookie looks like from the server's side.",
         "operationId": "refresh_auth_refresh_post",
         "responses": {
           "200": {
@@ -1628,28 +1915,35 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing, expired, invalid or already-used refresh cookie"
           }
         },
-        "summary": "Refresh",
+        "summary": "Renew the access token",
         "tags": [
           "Auth"
         ]
       }
     },
-    "/categories": {
-      "get": {
-        "operationId": "list_categories_categories_get",
+    "/auth/register": {
+      "post": {
+        "description": "Public: no token required.\n\nThe role in the payload is ignored, the account is always created as\n`operator`. An admin can promote it afterwards with `PATCH /users/{user_id}`.",
+        "operationId": "register_auth_register_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreate"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
-          "200": {
+          "201": {
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/CategoryRead"
-                  },
-                  "title": "Response List Categories Categories Get",
-                  "type": "array"
+                  "$ref": "#/components/schemas/UserRead"
                 }
               }
             },
@@ -1665,7 +1959,7 @@
             },
             "description": "Unauthorized"
           },
-          "404": {
+          "409": {
             "content": {
               "application/json": {
                 "schema": {
@@ -1673,15 +1967,120 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Email already registered"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
           }
         },
-        "summary": "List Categories",
+        "summary": "Register a new account",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/token": {
+      "post": {
+        "description": "Same as `/auth/login`, but reads an OAuth2 form (`username` = email, `password`).\n\nThis is the route behind Swagger's Authorize button.",
+        "operationId": "login_form_auth_token_post",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_login_form_auth_token_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid email or password"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Log in with a form (Swagger)",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/categories": {
+      "get": {
+        "description": "Returns every category, used to classify the products.",
+        "operationId": "list_categories_categories_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryRead"
+                  },
+                  "title": "Response List Categories Categories Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Every category"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid token (write routes only, reads are public)"
+          },
+          "404": {
+            "description": "Not returned by this route"
+          },
+          "422": {
+            "description": "Invalid body, rejected by Pydantic"
+          }
+        },
+        "summary": "List the categories",
         "tags": [
           "Categories"
         ]
       },
       "post": {
+        "description": "Creates a category. Two categories cannot share the same name.",
         "operationId": "create_category_categories_post",
         "requestBody": {
           "content": {
@@ -1702,7 +2101,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created category"
           },
           "401": {
             "content": {
@@ -1712,7 +2111,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -1722,7 +2121,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown category"
           },
           "409": {
             "content": {
@@ -1732,20 +2131,18 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "A category already uses this name"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Create Category",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create a category",
         "tags": [
           "Categories"
         ]
@@ -1753,6 +2150,7 @@
     },
     "/categories/{category_id}": {
       "delete": {
+        "description": "Deletes a category. Refused while products still belong to it.",
         "operationId": "delete_category_categories__category_id__delete",
         "parameters": [
           {
@@ -1767,7 +2165,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Successful Response"
+            "description": "The category was deleted, no body"
           },
           "401": {
             "content": {
@@ -1777,7 +2175,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -1787,25 +2185,34 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown category"
           },
-          "422": {
+          "409": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             },
-            "description": "Validation Error"
+            "description": "The category still has products"
+          },
+          "422": {
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Delete Category",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Delete a category",
         "tags": [
           "Categories"
         ]
       },
       "get": {
+        "description": "Returns one category by its id.",
         "operationId": "get_category_categories__category_id__get",
         "parameters": [
           {
@@ -1827,7 +2234,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The category"
           },
           "401": {
             "content": {
@@ -1837,7 +2244,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -1847,25 +2254,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown category"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Get Category",
+        "summary": "Get a category",
         "tags": [
           "Categories"
         ]
       },
       "patch": {
+        "description": "Partially updates a category: only the fields sent in the body are changed.",
         "operationId": "update_category_categories__category_id__patch",
         "parameters": [
           {
@@ -1897,7 +2298,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The updated category"
           },
           "401": {
             "content": {
@@ -1907,7 +2308,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -1917,7 +2318,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown category"
           },
           "409": {
             "content": {
@@ -1927,20 +2328,18 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "A category already uses this name"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Update Category",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update a category",
         "tags": [
           "Categories"
         ]
@@ -1998,6 +2397,7 @@
     },
     "/locations": {
       "get": {
+        "description": "Returns every storage location (warehouse, aisle, shelf...).",
         "operationId": "list_locations_locations_get",
         "responses": {
           "200": {
@@ -2012,7 +2412,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "Every storage location"
           },
           "401": {
             "content": {
@@ -2022,25 +2422,22 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
+          },
+          "422": {
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "List Locations",
+        "summary": "List the locations",
         "tags": [
           "Locations"
         ]
       },
       "post": {
+        "description": "Creates a location. The code is unique, in capitals, digits and dashes (`A1`, `ZONE-B`).",
         "operationId": "create_location_locations_post",
         "requestBody": {
           "content": {
@@ -2061,7 +2458,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created location"
           },
           "401": {
             "content": {
@@ -2071,7 +2468,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -2081,7 +2478,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown location"
           },
           "409": {
             "content": {
@@ -2091,20 +2488,101 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "A location already uses this code"
           },
           "422": {
+            "description": "Invalid body or query parameter, rejected by Pydantic"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create a location",
+        "tags": [
+          "Locations"
+        ]
+      }
+    },
+    "/locations/geocode": {
+      "get": {
+        "description": "Finds an address with the Base Adresse Nationale. Nothing is stored.",
+        "operationId": "geocode_address_locations_geocode_get",
+        "parameters": [
+          {
+            "description": "Free text address search",
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "description": "Free text address search",
+              "title": "Q",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/AddressLookup"
                 }
               }
             },
-            "description": "Validation Error"
+            "description": "The best matching address"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid token (write routes only, reads are public)"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No address matches this query"
+          },
+          "422": {
+            "description": "Invalid body or query parameter, rejected by Pydantic"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The address API is unreachable or answered an unusable response"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The address API did not answer within 5 seconds"
           }
         },
-        "summary": "Create Location",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Look up an address on the national address API",
         "tags": [
           "Locations"
         ]
@@ -2112,6 +2590,7 @@
     },
     "/locations/{location_id}": {
       "delete": {
+        "description": "Deletes a location. Refused while it still holds stock.",
         "operationId": "delete_location_locations__location_id__delete",
         "parameters": [
           {
@@ -2126,7 +2605,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Successful Response"
+            "description": "The location was deleted, no body"
           },
           "401": {
             "content": {
@@ -2136,7 +2615,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -2146,7 +2625,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown location"
           },
           "409": {
             "content": {
@@ -2156,25 +2635,24 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "The location still holds stock, orders or movements"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "Delete Location",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Delete a location",
         "tags": [
           "Locations"
         ]
       },
       "get": {
+        "description": "Returns one location by its id.",
         "operationId": "get_location_locations__location_id__get",
         "parameters": [
           {
@@ -2196,7 +2674,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The location"
           },
           "401": {
             "content": {
@@ -2206,7 +2684,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -2216,25 +2694,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown location"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "Get Location",
+        "summary": "Get a location",
         "tags": [
           "Locations"
         ]
       },
       "patch": {
+        "description": "Partially updates a location: only the fields sent in the body are changed.",
         "operationId": "update_location_locations__location_id__patch",
         "parameters": [
           {
@@ -2266,7 +2738,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The updated location"
           },
           "401": {
             "content": {
@@ -2276,7 +2748,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -2286,7 +2758,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown location"
           },
           "409": {
             "content": {
@@ -2296,20 +2768,18 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "A location already uses this code"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "Update Location",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update a location",
         "tags": [
           "Locations"
         ]
@@ -2317,6 +2787,7 @@
     },
     "/locations/{location_id}/stocks": {
       "get": {
+        "description": "Returns the quantity of each product held at this location.",
         "operationId": "list_location_stocks_locations__location_id__stocks_get",
         "parameters": [
           {
@@ -2342,7 +2813,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "Every stock line held at this location"
           },
           "401": {
             "content": {
@@ -2352,7 +2823,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -2362,20 +2833,13 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown location"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "List Location Stocks",
+        "summary": "List the stock of a location",
         "tags": [
           "Locations"
         ]
@@ -2383,9 +2847,11 @@
     },
     "/products": {
       "get": {
+        "description": "Returns the products, sorted by id, one page at a time.\n\nEvery filter is optional and they combine with each other (AND).\n`total` is the number of matching products before pagination, so the front\ncan compute the number of pages. Each product carries its `total_quantity`,\nthe sum of its stock over every location.",
         "operationId": "list_products_products_get",
         "parameters": [
           {
+            "description": "Case-insensitive search in the name, the SKU or the barcode",
             "in": "query",
             "name": "q",
             "required": false,
@@ -2399,10 +2865,12 @@
                   "type": "null"
                 }
               ],
+              "description": "Case-insensitive search in the name, the SKU or the barcode",
               "title": "Q"
             }
           },
           {
+            "description": "Keep only the products of this category",
             "in": "query",
             "name": "category_id",
             "required": false,
@@ -2415,10 +2883,12 @@
                   "type": "null"
                 }
               ],
+              "description": "Keep only the products of this category",
               "title": "Category Id"
             }
           },
           {
+            "description": "Keep only the products of this supplier",
             "in": "query",
             "name": "supplier_id",
             "required": false,
@@ -2431,25 +2901,30 @@
                   "type": "null"
                 }
               ],
+              "description": "Keep only the products of this supplier",
               "title": "Supplier Id"
             }
           },
           {
+            "description": "Keep only the products whose total quantity is at or below their reorder threshold",
             "in": "query",
             "name": "below_threshold",
             "required": false,
             "schema": {
               "default": false,
+              "description": "Keep only the products whose total quantity is at or below their reorder threshold",
               "title": "Below Threshold",
               "type": "boolean"
             }
           },
           {
+            "description": "How many products to return (page size)",
             "in": "query",
             "name": "limit",
             "required": false,
             "schema": {
               "default": 20,
+              "description": "How many products to return (page size)",
               "maximum": 100,
               "minimum": 1,
               "title": "Limit",
@@ -2457,11 +2932,13 @@
             }
           },
           {
+            "description": "How many matching products to skip",
             "in": "query",
             "name": "offset",
             "required": false,
             "schema": {
               "default": 0,
+              "description": "How many matching products to skip",
               "minimum": 0,
               "title": "Offset",
               "type": "integer"
@@ -2477,7 +2954,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "One page of products, with the total number of matches"
           },
           "401": {
             "content": {
@@ -2487,35 +2964,22 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "List Products",
+        "summary": "List the products",
         "tags": [
           "Products"
         ]
       },
       "post": {
+        "description": "Creates a product.\n\nWhen a `barcode` is given but no `description` or `image_url`, the API fills\nthem from Open Food Facts and stores them. If Open Food Facts is down or does\nnot know the barcode, the product is still created, without those fields.",
         "operationId": "create_product_products_post",
         "requestBody": {
           "content": {
@@ -2536,7 +3000,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created product"
           },
           "401": {
             "content": {
@@ -2546,7 +3010,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -2556,20 +3020,28 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown category or supplier"
           },
-          "422": {
+          "409": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             },
-            "description": "Validation Error"
+            "description": "A product already uses this SKU"
+          },
+          "422": {
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "Create Product",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create a product",
         "tags": [
           "Products"
         ]
@@ -2577,7 +3049,7 @@
     },
     "/products/lookup/{barcode}": {
       "get": {
-        "description": "Fetches product data from Open Food Facts to prefill the creation form.",
+        "description": "Fetches product data from Open Food Facts to prefill the creation form.\n\nNothing is stored: this route only reads. Fields that Open Food Facts\ndoes not provide come back as `null`.",
         "operationId": "lookup_product_products_lookup__barcode__get",
         "parameters": [
           {
@@ -2599,7 +3071,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The product data found on Open Food Facts"
           },
           "401": {
             "content": {
@@ -2609,7 +3081,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -2619,17 +3091,10 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Open Food Facts does not know this barcode"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           },
           "502": {
             "content": {
@@ -2639,10 +3104,25 @@
                 }
               }
             },
-            "description": "Bad Gateway"
+            "description": "Open Food Facts is unreachable or answered an unusable response"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Open Food Facts did not answer within 5 seconds"
           }
         },
-        "summary": "Lookup Product",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Look up a barcode on Open Food Facts",
         "tags": [
           "Products"
         ]
@@ -2650,6 +3130,7 @@
     },
     "/products/{product_id}": {
       "delete": {
+        "description": "Deletes a product by its id.",
         "operationId": "delete_product_products__product_id__delete",
         "parameters": [
           {
@@ -2664,7 +3145,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Successful Response"
+            "description": "The product was deleted, no body"
           },
           "401": {
             "content": {
@@ -2674,7 +3155,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -2684,25 +3165,34 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown product"
           },
-          "422": {
+          "409": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             },
-            "description": "Validation Error"
+            "description": "The product still has stock movements or order lines"
+          },
+          "422": {
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "Delete Product",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Delete a product",
         "tags": [
           "Products"
         ]
       },
       "get": {
+        "description": "Returns one product by its id.",
         "operationId": "get_product_products__product_id__get",
         "parameters": [
           {
@@ -2724,7 +3214,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The product, with its total quantity in stock"
           },
           "401": {
             "content": {
@@ -2734,7 +3224,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -2744,25 +3234,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown product"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "Get Product",
+        "summary": "Get a product",
         "tags": [
           "Products"
         ]
       },
       "patch": {
+        "description": "Partially updates a product: only the fields sent in the body are changed.\n\nThe SKU cannot be changed.",
         "operationId": "update_product_products__product_id__patch",
         "parameters": [
           {
@@ -2794,7 +3278,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The updated product"
           },
           "401": {
             "content": {
@@ -2804,7 +3288,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -2814,20 +3298,18 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown product, category or supplier"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "Update Product",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update a product",
         "tags": [
           "Products"
         ]
@@ -2835,9 +3317,11 @@
     },
     "/purchase-orders": {
       "get": {
+        "description": "Returns every purchase order, newest first.\n\nBoth filters are optional and combine with each other. An unknown supplier\nid is not an error here: it simply matches no order and returns an empty\nlist.",
         "operationId": "list_purchase_orders_purchase_orders_get",
         "parameters": [
           {
+            "description": "Keep only the orders of this supplier",
             "in": "query",
             "name": "supplier_id",
             "required": false,
@@ -2850,10 +3334,12 @@
                   "type": "null"
                 }
               ],
+              "description": "Keep only the orders of this supplier",
               "title": "Supplier Id"
             }
           },
           {
+            "description": "Keep only the orders in this status",
             "in": "query",
             "name": "order_status",
             "required": false,
@@ -2866,6 +3352,7 @@
                   "type": "null"
                 }
               ],
+              "description": "Keep only the orders in this status",
               "title": "Order Status"
             }
           }
@@ -2883,7 +3370,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The orders, each one with its lines and its computed total"
           },
           "401": {
             "content": {
@@ -2893,17 +3380,10 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
           },
           "409": {
             "content": {
@@ -2913,25 +3393,24 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "The order life cycle forbids the operation"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "List Purchase Orders",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List purchase orders",
         "tags": [
           "Purchase orders"
         ]
       },
       "post": {
+        "description": "Creates an order and its lines in one call.\n\nThe order always starts in status `draft`, whatever the payload asks for,\nand at least one line is required. The reference must be unique across\nevery order. `total_price` is computed from the lines and never stored.",
         "operationId": "create_purchase_order_purchase_orders_post",
         "requestBody": {
           "content": {
@@ -2952,7 +3431,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created order, in status draft, with its lines"
           },
           "401": {
             "content": {
@@ -2962,7 +3441,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -2972,7 +3451,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown supplier, location or product"
           },
           "409": {
             "content": {
@@ -2982,20 +3461,18 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Reference already used by another order"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Create Purchase Order",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create a purchase order",
         "tags": [
           "Purchase orders"
         ]
@@ -3003,6 +3480,7 @@
     },
     "/purchase-orders/{order_id}": {
       "delete": {
+        "description": "Deletes an order and its lines.\n\nOnly a `draft` or `cancelled` order can be deleted. A `sent` or `received`\norder is part of the stock history and must be cancelled instead.",
         "operationId": "delete_purchase_order_purchase_orders__order_id__delete",
         "parameters": [
           {
@@ -3017,7 +3495,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Successful Response"
+            "description": "Deleted, no body returned"
           },
           "401": {
             "content": {
@@ -3027,7 +3505,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3037,7 +3515,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown order"
           },
           "409": {
             "content": {
@@ -3047,25 +3525,24 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "The order is already sent or received"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Delete Purchase Order",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Delete a draft purchase order",
         "tags": [
           "Purchase orders"
         ]
       },
       "get": {
+        "description": "Returns one order, its lines included.",
         "operationId": "get_purchase_order_purchase_orders__order_id__get",
         "parameters": [
           {
@@ -3087,7 +3564,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The order with its lines and its computed total"
           },
           "401": {
             "content": {
@@ -3097,7 +3574,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3107,36 +3584,27 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown order"
           },
           "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Conflict"
+            "description": "Not returned by this route"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Get Purchase Order",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get a purchase order",
         "tags": [
           "Purchase orders"
         ]
       },
       "patch": {
-        "description": "Changing the status to \"received\" generates the incoming stock movements.",
+        "description": "Moves the order along its life cycle, or changes its delivery location.\n\nAllowed transitions: `draft` -> `sent` -> `received`, and `draft` or `sent`\n-> `cancelled`. Any other transition returns 409, and a `received` or\n`cancelled` order is closed: neither its status nor its location can change\nany more.\n\nMoving to `received` is the side of the feature that touches the stock: it\ngenerates one incoming movement per line and stamps `received_at`.",
         "operationId": "update_purchase_order_purchase_orders__order_id__patch",
         "parameters": [
           {
@@ -3168,7 +3636,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The updated order"
           },
           "401": {
             "content": {
@@ -3178,7 +3646,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3188,7 +3656,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown order or location"
           },
           "409": {
             "content": {
@@ -3198,20 +3666,18 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Invalid status transition, or order already closed"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Update Purchase Order",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update the status or the location of an order",
         "tags": [
           "Purchase orders"
         ]
@@ -3254,7 +3720,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3264,7 +3730,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown order"
           },
           "409": {
             "content": {
@@ -3274,20 +3740,18 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "The order life cycle forbids the operation"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "List Order Lines",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List the lines of an order",
         "tags": [
           "Purchase orders"
         ]
@@ -3334,7 +3798,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3344,7 +3808,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown order or product"
           },
           "409": {
             "content": {
@@ -3354,20 +3818,18 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Order no longer a draft, or product already in the order"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Create Order Line",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Add a line to a draft order",
         "tags": [
           "Purchase orders"
         ]
@@ -3408,7 +3870,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3418,7 +3880,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown order or line"
           },
           "409": {
             "content": {
@@ -3428,20 +3890,95 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Order no longer a draft, or last line of the order"
           },
           "422": {
+            "description": "Invalid body, rejected by Pydantic"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Delete a line of a draft order",
+        "tags": [
+          "Purchase orders"
+        ]
+      },
+      "get": {
+        "operationId": "get_order_line_purchase_orders__order_id__lines__line_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "required": true,
+            "schema": {
+              "title": "Order Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "line_id",
+            "required": true,
+            "schema": {
+              "title": "Line Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/OrderLineRead"
                 }
               }
             },
-            "description": "Validation Error"
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid token"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unknown order or line"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The order life cycle forbids the operation"
+          },
+          "422": {
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Delete Order Line",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get a line of an order",
         "tags": [
           "Purchase orders"
         ]
@@ -3497,7 +4034,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3507,7 +4044,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown order or line"
           },
           "409": {
             "content": {
@@ -3517,20 +4054,18 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Order no longer a draft"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Update Order Line",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update the quantity or the price of a line",
         "tags": [
           "Purchase orders"
         ]
@@ -3538,7 +4073,7 @@
     },
     "/replenishment/orders": {
       "post": {
-        "description": "Turns the suggestions of one supplier into a draft purchase order.",
+        "description": "Turns the suggestions of one supplier into a draft purchase order.\n\nQuantities are computed by the server, never taken from the client. A\nproduct that is no longer under its threshold, or that belongs to another\nsupplier, is refused with 409 and no order is created.",
         "operationId": "create_replenishment_order_replenishment_orders_post",
         "requestBody": {
           "content": {
@@ -3559,7 +4094,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created order, in status draft, with one line per product"
           },
           "401": {
             "content": {
@@ -3569,7 +4104,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3579,7 +4114,17 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "A product is not under its threshold or not sold by this supplier"
           },
           "422": {
             "content": {
@@ -3592,7 +4137,12 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Create Replenishment Order",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Generate a purchase order from the suggestions",
         "tags": [
           "Replenishment"
         ]
@@ -3600,7 +4150,7 @@
     },
     "/replenishment/suggestions": {
       "get": {
-        "description": "Lists the products whose total quantity is below their reorder threshold.",
+        "description": "Lists the products whose total quantity, over every location, is below\ntheir reorder threshold.\n\nThe suggested quantity brings the stock back to twice the threshold.\n`supplier_id` is optional: without it, products with no supplier are\nlisted too, with a null `supplier_id`, and cannot be ordered.",
         "operationId": "list_suggestions_replenishment_suggestions_get",
         "parameters": [
           {
@@ -3633,7 +4183,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "Each product under its reorder threshold, with the quantity to order"
           },
           "401": {
             "content": {
@@ -3643,7 +4193,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3653,7 +4203,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Resource not found"
           },
           "422": {
             "content": {
@@ -3666,7 +4216,12 @@
             "description": "Validation Error"
           }
         },
-        "summary": "List Suggestions",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List the products to reorder",
         "tags": [
           "Replenishment"
         ]
@@ -3674,9 +4229,11 @@
     },
     "/stock-movements": {
       "get": {
+        "description": "Returns the movement history, most recent first.\n\nEvery filter is optional and they combine with each other. A `location_id`\nmatches a movement whether that location is its source or its destination,\nso a transfer shows up on both sides.",
         "operationId": "list_stock_movements_stock_movements_get",
         "parameters": [
           {
+            "description": "Keep only the movements of this product",
             "in": "query",
             "name": "product_id",
             "required": false,
@@ -3689,10 +4246,12 @@
                   "type": "null"
                 }
               ],
+              "description": "Keep only the movements of this product",
               "title": "Product Id"
             }
           },
           {
+            "description": "Keep only the movements whose source or destination is this location",
             "in": "query",
             "name": "location_id",
             "required": false,
@@ -3705,10 +4264,12 @@
                   "type": "null"
                 }
               ],
+              "description": "Keep only the movements whose source or destination is this location",
               "title": "Location Id"
             }
           },
           {
+            "description": "Keep only this kind of movement",
             "in": "query",
             "name": "type",
             "required": false,
@@ -3721,15 +4282,18 @@
                   "type": "null"
                 }
               ],
+              "description": "Keep only this kind of movement",
               "title": "Type"
             }
           },
           {
+            "description": "How many movements to return",
             "in": "query",
             "name": "limit",
             "required": false,
             "schema": {
               "default": 50,
+              "description": "How many movements to return",
               "maximum": 200,
               "minimum": 1,
               "title": "Limit",
@@ -3750,7 +4314,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The movements, most recent first"
           },
           "401": {
             "content": {
@@ -3760,46 +4324,30 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
           },
           "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Conflict"
+            "description": "Not returned by this route"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "List Stock Movements",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List the stock movements",
         "tags": [
           "Stock movements"
         ]
       },
       "post": {
-        "description": "Records a movement and updates the stock of the locations involved.\nReturns 409 when the source location does not hold enough quantity.",
+        "description": "Records a movement and updates the stock of the locations involved.\n\nThree kinds of movement, each one with its own required locations:\n\n- `incoming`: needs `to_location_id`, adds the quantity, creates the stock\n  line if that product had none at that location yet.\n- `outgoing`: needs `from_location_id`, removes the quantity.\n- `transfer`: needs both, removes on one side and adds on the other.\n\nStock never goes negative: an `outgoing` or a `transfer` larger than what\nthe source holds is refused with 409 and nothing is written. The movement\nis stamped with the authenticated user, so the history says who did what.",
         "operationId": "create_stock_movement_stock_movements_post",
         "requestBody": {
           "content": {
@@ -3820,7 +4368,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The recorded movement, quantities already applied"
           },
           "401": {
             "content": {
@@ -3830,7 +4378,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token"
           },
           "404": {
             "content": {
@@ -3840,7 +4388,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown product or location"
           },
           "409": {
             "content": {
@@ -3850,20 +4398,18 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "The source location does not hold enough quantity"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Create Stock Movement",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Record a stock movement",
         "tags": [
           "Stock movements"
         ]
@@ -3871,6 +4417,7 @@
     },
     "/stocks": {
       "get": {
+        "description": "Returns the quantity held for each product at each location.",
         "operationId": "list_stocks_stocks_get",
         "responses": {
           "200": {
@@ -3885,7 +4432,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "Every stock line, one per product and location"
           },
           "401": {
             "content": {
@@ -3895,25 +4442,22 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
+          },
+          "422": {
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "List Stocks",
+        "summary": "List stock lines",
         "tags": [
           "Stocks"
         ]
       },
       "post": {
+        "description": "Registers the quantity of a product at a location.\n\nA product has at most one stock line per location: a second one for the\nsame pair is refused with 409. The quantity can be zero, never negative.",
         "operationId": "create_stock_stocks_post",
         "requestBody": {
           "content": {
@@ -3934,7 +4478,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created stock line"
           },
           "401": {
             "content": {
@@ -3944,7 +4488,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -3954,20 +4498,28 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown product or location"
           },
-          "422": {
+          "409": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             },
-            "description": "Validation Error"
+            "description": "A stock line already exists for this product at this location"
+          },
+          "422": {
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Create Stock",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create a stock line",
         "tags": [
           "Stocks"
         ]
@@ -3975,6 +4527,7 @@
     },
     "/stocks/{stock_id}": {
       "delete": {
+        "description": "Deletes one stock line. The product and the location are kept.",
         "operationId": "delete_stock_stocks__stock_id__delete",
         "parameters": [
           {
@@ -3989,7 +4542,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Successful Response"
+            "description": "The stock line is deleted"
           },
           "401": {
             "content": {
@@ -3999,7 +4552,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -4009,25 +4562,24 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown stock line"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Delete Stock",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Delete a stock line",
         "tags": [
           "Stocks"
         ]
       },
       "get": {
+        "description": "Returns one stock line.",
         "operationId": "get_stock_stocks__stock_id__get",
         "parameters": [
           {
@@ -4049,7 +4601,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The stock line"
           },
           "401": {
             "content": {
@@ -4059,7 +4611,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -4069,25 +4621,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown stock line"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Get Stock",
+        "summary": "Get a stock line",
         "tags": [
           "Stocks"
         ]
       },
       "patch": {
+        "description": "Sets the quantity directly, as an inventory correction.\n\nThe product and the location of a stock line cannot change. To move goods\nand keep a trace of who did it, use `POST /stock-movements` instead.",
         "operationId": "update_stock_stocks__stock_id__patch",
         "parameters": [
           {
@@ -4119,7 +4665,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The updated stock line"
           },
           "401": {
             "content": {
@@ -4129,7 +4675,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -4139,20 +4685,18 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown stock line"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Update Stock",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Correct the quantity of a stock line",
         "tags": [
           "Stocks"
         ]
@@ -4160,6 +4704,7 @@
     },
     "/suppliers": {
       "get": {
+        "description": "Returns every supplier.",
         "operationId": "list_suppliers_suppliers_get",
         "responses": {
           "200": {
@@ -4174,7 +4719,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "Every supplier"
           },
           "401": {
             "content": {
@@ -4184,25 +4729,22 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
+          },
+          "422": {
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "List Suppliers",
+        "summary": "List the suppliers",
         "tags": [
           "Suppliers"
         ]
       },
       "post": {
+        "description": "Creates a supplier. Only `name` is required; `email` must be a valid address when given.",
         "operationId": "create_supplier_suppliers_post",
         "requestBody": {
           "content": {
@@ -4223,7 +4765,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created supplier"
           },
           "401": {
             "content": {
@@ -4233,30 +4775,21 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Create Supplier",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create a supplier",
         "tags": [
           "Suppliers"
         ]
@@ -4264,6 +4797,7 @@
     },
     "/suppliers/{supplier_id}": {
       "delete": {
+        "description": "Deletes a supplier by its id.\n\nIts products are kept: their `supplier_id` becomes `null`.",
         "operationId": "delete_supplier_suppliers__supplier_id__delete",
         "parameters": [
           {
@@ -4278,7 +4812,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Successful Response"
+            "description": "The supplier was deleted, no body"
           },
           "401": {
             "content": {
@@ -4288,7 +4822,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -4298,25 +4832,34 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown supplier"
           },
-          "422": {
+          "409": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             },
-            "description": "Validation Error"
+            "description": "The supplier still has purchase orders"
+          },
+          "422": {
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Delete Supplier",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Delete a supplier",
         "tags": [
           "Suppliers"
         ]
       },
       "get": {
+        "description": "Returns one supplier by its id.",
         "operationId": "get_supplier_suppliers__supplier_id__get",
         "parameters": [
           {
@@ -4338,7 +4881,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The supplier"
           },
           "401": {
             "content": {
@@ -4348,7 +4891,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -4358,25 +4901,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown supplier"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Get Supplier",
+        "summary": "Get a supplier",
         "tags": [
           "Suppliers"
         ]
       },
       "patch": {
+        "description": "Partially updates a supplier: only the fields sent in the body are changed.",
         "operationId": "update_supplier_suppliers__supplier_id__patch",
         "parameters": [
           {
@@ -4408,7 +4945,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The updated supplier"
           },
           "401": {
             "content": {
@@ -4418,7 +4955,7 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
             "content": {
@@ -4428,20 +4965,18 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown supplier"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Update Supplier",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update a supplier",
         "tags": [
           "Suppliers"
         ]
@@ -4449,6 +4984,7 @@
     },
     "/users": {
       "get": {
+        "description": "Admin only.",
         "operationId": "list_users_users_get",
         "responses": {
           "200": {
@@ -4498,15 +5034,16 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
-        "summary": "List Users",
+        "summary": "List the users",
         "tags": [
           "Users"
         ]
       },
       "post": {
+        "description": "Admin only. Creates an account with the role given in the payload.\n\nVisitors create their own account with `POST /auth/register`.",
         "operationId": "create_user_users_post",
         "requestBody": {
           "content": {
@@ -4567,7 +5104,7 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Email already registered"
           },
           "422": {
             "content": {
@@ -4580,7 +5117,12 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Create User",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create an account",
         "tags": [
           "Users"
         ]
@@ -4588,6 +5130,7 @@
     },
     "/users/{user_id}": {
       "delete": {
+        "description": "Admin only.",
         "operationId": "delete_user_users__user_id__delete",
         "parameters": [
           {
@@ -4634,6 +5177,16 @@
             },
             "description": "Not Found"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The user still has stock movements"
+          },
           "422": {
             "content": {
               "application/json": {
@@ -4647,15 +5200,16 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
-        "summary": "Delete User",
+        "summary": "Delete a user",
         "tags": [
           "Users"
         ]
       },
       "get": {
+        "description": "A user can read their own account; only an admin can read another one.",
         "operationId": "get_user_users__user_id__get",
         "parameters": [
           {
@@ -4722,15 +5276,16 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
-        "summary": "Get User",
+        "summary": "Get a user",
         "tags": [
           "Users"
         ]
       },
       "patch": {
+        "description": "A user can edit their own `full_name`. Only an admin can also edit\n`role` and `is_active`, on themselves or on anyone else: a user editing\ntheir own account cannot change their own role or reactivate/deactivate\nthemselves, to prevent self-escalation to admin.",
         "operationId": "update_user_users__user_id__patch",
         "parameters": [
           {
@@ -4807,10 +5362,10 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
-        "summary": "Update User",
+        "summary": "Update a user",
         "tags": [
           "Users"
         ]

@@ -1,7 +1,12 @@
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
+from app.clients import adresse
 from app.models.stock import Stock
+from tests.test_stock_movements import create_product
+
+pytestmark = pytest.mark.usefixtures("authenticated")
 
 
 def create(client: TestClient, code: str = "A1", name: str = "Allee A1", description: str | None = "Rayon boissons") -> dict:
@@ -87,7 +92,7 @@ def test_delete_location_not_found(client: TestClient) -> None:
 
 def test_delete_location_rejects_when_stock_exists(client: TestClient, db_session: Session) -> None:
     created = create(client)
-    db_session.add(Stock(product_id=1, location_id=created["id"], quantity=5))
+    db_session.add(Stock(product_id=create_product(client), location_id=created["id"], quantity=5))
     db_session.commit()
 
     response = client.delete(f"/locations/{created['id']}")
@@ -103,8 +108,8 @@ def test_list_location_stocks_empty(client: TestClient) -> None:
 
 def test_list_location_stocks(client: TestClient, db_session: Session) -> None:
     created = create(client)
-    db_session.add(Stock(product_id=1, location_id=created["id"], quantity=5))
-    db_session.add(Stock(product_id=2, location_id=created["id"], quantity=12))
+    db_session.add(Stock(product_id=create_product(client, "CAFE-001"), location_id=created["id"], quantity=5))
+    db_session.add(Stock(product_id=create_product(client, "CAFE-002"), location_id=created["id"], quantity=12))
     db_session.commit()
 
     response = client.get(f"/locations/{created['id']}/stocks")
@@ -116,3 +121,39 @@ def test_list_location_stocks(client: TestClient, db_session: Session) -> None:
 def test_list_location_stocks_not_found(client: TestClient) -> None:
     response = client.get("/locations/999/stocks")
     assert response.status_code == 404
+
+
+# ---------- API Adresse (toujours simulee) ----------
+
+ADDRESS = {
+    "label": "8 Boulevard du Port 80000 Amiens",
+    "city": "Amiens",
+    "postcode": "80000",
+    "latitude": 49.897452,
+    "longitude": 2.298047,
+}
+
+
+def test_geocode_returns_address_data(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(adresse, "search_address", lambda query: ADDRESS)
+    response = client.get("/locations/geocode?q=8+boulevard+du+port+amiens")
+    assert response.status_code == 200
+    assert response.json()["city"] == "Amiens"
+
+
+@pytest.mark.parametrize(
+    ("error", "expected_status"),
+    [
+        (adresse.AdresseNotFoundError, 404),
+        (adresse.AdresseUnavailableError, 502),
+        (adresse.AdresseTimeoutError, 504),
+    ],
+)
+def test_geocode_maps_errors_to_http_codes(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, error: type[Exception], expected_status: int
+) -> None:
+    def fake_search(query: str) -> dict:
+        raise error(query)
+
+    monkeypatch.setattr(adresse, "search_address", fake_search)
+    assert client.get("/locations/geocode?q=adresse+inconnue").status_code == expected_status
