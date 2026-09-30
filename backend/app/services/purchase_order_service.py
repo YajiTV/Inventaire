@@ -30,7 +30,7 @@ class PurchaseOrderNotDeletableError(Exception):
     """Raised when deleting an order would lose a trace that must be kept."""
 
 
-# Order life cycle. A status with an empty set is final.
+# A status mapped to an empty set is final.
 ALLOWED_TRANSITIONS: dict[OrderStatus, set[OrderStatus]] = {
     OrderStatus.DRAFT: {OrderStatus.SENT, OrderStatus.CANCELLED},
     OrderStatus.SENT: {OrderStatus.RECEIVED, OrderStatus.CANCELLED},
@@ -38,8 +38,7 @@ ALLOWED_TRANSITIONS: dict[OrderStatus, set[OrderStatus]] = {
     OrderStatus.CANCELLED: set(),
 }
 
-# An order that has been sent to the supplier or received is part of the audit
-# trail: it is cancelled, not deleted.
+# A sent or received order is part of the audit trail: it is cancelled, not deleted.
 DELETABLE_STATUSES = {OrderStatus.DRAFT, OrderStatus.CANCELLED}
 
 CLOSED_STATUSES = {OrderStatus.RECEIVED, OrderStatus.CANCELLED}
@@ -64,8 +63,6 @@ def create_purchase_order(db: Session, payload: PurchaseOrderCreate) -> Purchase
     if purchase_order_repository.get_by_reference(db, payload.reference) is not None:
         raise PurchaseOrderReferenceAlreadyExistsError(payload.reference)
 
-    # Each of these raises its own not-found error, which the router maps to
-    # a 404: an order must never reference a row that does not exist.
     supplier_service.get_supplier(db, payload.supplier_id)
     location_service.get_location(db, payload.location_id)
     for line in payload.lines:
@@ -102,10 +99,9 @@ def update_purchase_order(
     if payload.status is not None and payload.status != order.status:
         apply_status(order, payload.status)
         if order.status is OrderStatus.RECEIVED:
+            # Only staged: save() commits the status and the stock changes together.
             _receive_into_stock(db, order, user_id)
 
-    # Single commit: the new status and, on reception, every stock movement
-    # and quantity are written together, or nothing is.
     return purchase_order_repository.save(db, order)
 
 
@@ -136,5 +132,4 @@ def delete_purchase_order(db: Session, order_id: int) -> None:
     order = get_purchase_order(db, order_id)
     if order.status not in DELETABLE_STATUSES:
         raise PurchaseOrderNotDeletableError(order.status)
-    # The lines are removed with the order (delete-orphan cascade).
     purchase_order_repository.delete(db, order)

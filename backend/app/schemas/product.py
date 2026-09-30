@@ -4,8 +4,6 @@ from pydantic import BaseModel, Field
 
 from app.schemas.common import ReadModel
 
-# "examples" = valeurs d'exemple affichées dans Swagger (bouton "Try it out" prérempli)
-
 
 class ProductBase(BaseModel):
     sku: str = Field(min_length=1, max_length=40, pattern=r"^[A-Z0-9-]+$", examples=["PATE-001"])

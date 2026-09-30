@@ -19,8 +19,7 @@ class StockMovement(Base):
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False, index=True)
     type: Mapped[MovementType] = mapped_column(Enum(MovementType, native_enum=True), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False)
-    # Which location is filled in depends on the type: an incoming movement has
-    # no source, an outgoing one has no target, a transfer has both.
+    # Depends on the type: "in" has no source, "out" no target, a transfer has both.
     source_location_id: Mapped[int | None] = mapped_column(
         ForeignKey("locations.id"), nullable=True, index=True
     )
@@ -28,7 +27,6 @@ class StockMovement(Base):
         ForeignKey("locations.id"), nullable=True, index=True
     )
     reason: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    # Who did it: the movement is the audit trail of the inventory.
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False

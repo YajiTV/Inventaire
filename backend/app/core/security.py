@@ -12,7 +12,7 @@ from app.repositories import user_repository
 from app.schemas.enums import UserRole
 
 settings = get_settings()
-# Reads "Authorization: Bearer <token>". tokenUrl is the form route used by Swagger's Authorize button.
+# tokenUrl is the form route behind Swagger's Authorize button.
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token", auto_error=False)
 
 

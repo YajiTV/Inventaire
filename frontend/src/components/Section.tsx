@@ -4,12 +4,10 @@ interface SectionProps {
   title: string
   action?: ReactNode
   shortage?: boolean
-  // flush: no inner padding, for a table that fills the block
   flush?: boolean
   children: ReactNode
 }
 
-// A printed block of the form: label strip on top, content below
 export function Section({ title, action, shortage = false, flush = false, children }: SectionProps) {
   return (
     <section className="min-w-0 border border-rule-strong">

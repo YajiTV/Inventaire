@@ -9,7 +9,6 @@ interface StatusMessageProps {
 
 export function StatusMessage({ loading, error, isEmpty, emptyMessage = 'Aucun élément' }: StatusMessageProps) {
   if (loading) {
-    // Blank ruled lines while the sheet fills in
     return (
       <div role="status" className="border border-rule-strong">
         <span className="sr-only">Chargement...</span>

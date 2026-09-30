@@ -13,7 +13,7 @@ export function saveMock<T>(key: string, data: T): void {
     try {
         localStorage.setItem(PREFIX + key, JSON.stringify(data))
     } catch {
-        // storage unavailable (private mode, quota): keep going in memory
+      // storage unavailable (private mode, quota): keep going in memory
     }
 }
 
@@ -23,7 +23,7 @@ export function resetMockStorage(): void {
             .filter((key) => key.startsWith(PREFIX))
             .forEach((key) => localStorage.removeItem(key))
     } catch {
-        // storage unavailable (private mode, quota): keep going in memory
+      // storage unavailable (private mode, quota): keep going in memory
     }
 }
 

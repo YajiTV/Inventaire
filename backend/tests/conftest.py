@@ -11,13 +11,11 @@ from app.models.user import User
 from app.schemas.enums import UserRole
 from app.services.password import hash_password
 
-# SQLite en memoire, une connexion partagee (StaticPool) pour que toutes les
-# sessions de test voient les memes tables le temps du test.
+# StaticPool: every session of a test shares the same in-memory database.
 engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False}, poolclass=StaticPool)
 
 
-# SQLite ignore les cles etrangeres par defaut : on les active pour que les tests
-# voient les memes refus que PostgreSQL (suppression d'une ressource encore utilisee).
+# SQLite ignores foreign keys by default: enabled to get the same refusals as PostgreSQL.
 @event.listens_for(engine, "connect")
 def _enable_foreign_keys(dbapi_connection, _record):
     dbapi_connection.execute("PRAGMA foreign_keys=ON")
@@ -28,7 +26,7 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 @pytest.fixture()
 def db_session():
-    import app.models.user  # noqa: F401 -- enregistre les tables sur Base.metadata
+    import app.models.user  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
     session = TestingSessionLocal()
@@ -50,8 +48,7 @@ def client(db_session: Session):
 
     app.dependency_overrides[get_db] = override_get_db
     try:
-        # base_url en https : le cookie refresh (Secure) n'est resend par le
-        # client de test que si le scheme est https, sinon httpx l'ignore.
+        # https: the Secure refresh cookie is only sent back over https.
         yield TestClient(app, base_url="https://testserver")
     finally:
         app.dependency_overrides.clear()

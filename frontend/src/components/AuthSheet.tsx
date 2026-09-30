@@ -7,7 +7,6 @@ interface AuthSheetProps {
   children: ReactNode
 }
 
-// Sign-in pages: the pad's cover on the left, the sheet to fill on the right
 export function AuthSheet({ title, children }: AuthSheetProps) {
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">

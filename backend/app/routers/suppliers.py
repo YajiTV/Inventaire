@@ -7,8 +7,6 @@ from app.schemas.common import ErrorResponse
 from app.schemas.supplier import SupplierCreate, SupplierRead, SupplierUpdate
 from app.services import supplier_service
 
-# Documentation Swagger : chaque route a un "summary" (titre dans Swagger), un docstring (description
-# détaillée), une "response_description" (la réponse en cas de succès) et ses codes d'erreur possibles.
 
 router = APIRouter(
     prefix="/suppliers",
@@ -23,7 +21,6 @@ router = APIRouter(
 SUPPLIER_NOT_FOUND = "Fournisseur introuvable"
 
 
-# GET /suppliers -> liste de tous les fournisseurs (200)
 @router.get(
     "",
     response_model=list[SupplierRead],
@@ -36,7 +33,6 @@ def list_suppliers(db: Session = Depends(get_db)):
     return supplier_service.list_suppliers(db)
 
 
-# POST /suppliers -> création (201), Pydantic valide le body (sinon 422 automatique)
 @router.post(
     "",
     dependencies=[Depends(get_current_user)],
@@ -51,7 +47,6 @@ def create_supplier(payload: SupplierCreate, db: Session = Depends(get_db)):
     return supplier_service.create_supplier(db, payload)
 
 
-# GET /suppliers/{id} -> un fournisseur (200) ou 404
 @router.get(
     "/{supplier_id}",
     response_model=SupplierRead,
@@ -66,7 +61,6 @@ def get_supplier(supplier_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=SUPPLIER_NOT_FOUND) from exc
 
 
-# PATCH /suppliers/{id} -> modification partielle (200) ou 404
 @router.patch(
     "/{supplier_id}",
     dependencies=[Depends(get_current_user)],
@@ -82,7 +76,6 @@ def update_supplier(supplier_id: int, payload: SupplierUpdate, db: Session = Dep
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=SUPPLIER_NOT_FOUND) from exc
 
 
-# DELETE /suppliers/{id} -> suppression (204, pas de body) ou 404
 @router.delete(
     "/{supplier_id}",
     dependencies=[Depends(get_current_user)],

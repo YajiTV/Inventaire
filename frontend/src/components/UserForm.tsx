@@ -19,9 +19,7 @@ export function UserForm({ onSubmit }: UserFormProps) {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
 
-    // No role field here: the API always creates operator accounts through
-    // this endpoint, whatever role is sent. An admin can be promoted
-    // afterwards from the users table below.
+    // No role field: this endpoint always creates operators, an admin is promoted afterwards from the table
     const user: UserCreate = {
       email: email.trim(),
       full_name: fullName.trim(),

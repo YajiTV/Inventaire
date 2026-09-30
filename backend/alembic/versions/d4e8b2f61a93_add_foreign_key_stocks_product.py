@@ -10,7 +10,6 @@ from typing import Sequence, Union
 from alembic import op
 
 
-# revision identifiers, used by Alembic.
 revision: str = 'd4e8b2f61a93'
 down_revision: Union[str, Sequence[str], None] = 'a1f9c7d3e820'
 branch_labels: Union[str, Sequence[str], None] = None
@@ -19,7 +18,6 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
-    # Stock lines pointing to a deleted product would block the constraint
     op.execute("DELETE FROM stocks WHERE product_id NOT IN (SELECT id FROM products)")
     op.create_foreign_key(op.f('fk_stocks_product_id_products'), 'stocks', 'products', ['product_id'], ['id'], ondelete='CASCADE')
 

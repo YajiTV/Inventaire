@@ -6,13 +6,10 @@ from app.clients import openfoodfacts
 from app.models.location import Location
 from app.models.stock import Stock
 
-# Tests API du CRUD Produits, des relations, des filtres/pagination et de l'enrichissement Open Food Facts.
-# Chaque test part d'une base vide (fixture "client" de conftest.py).
 
 pytestmark = pytest.mark.usefixtures("authenticated")
 
 
-# Réponse d'Open Food Facts utilisée par les tests qui simulent un produit trouvé
 NUTELLA = {
     "barcode": "3017620422003",
     "name": "Nutella",
@@ -21,8 +18,6 @@ NUTELLA = {
 }
 
 
-# Par défaut (autouse = pour TOUS les tests de ce fichier), Open Food Facts est "injoignable" :
-# aucun test n'appelle la vraie API, les tests restent rapides et marchent sans internet.
 @pytest.fixture(autouse=True)
 def off_unavailable(monkeypatch: pytest.MonkeyPatch) -> None:
     def fake_fetch(barcode: str) -> dict:
@@ -31,21 +26,18 @@ def off_unavailable(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(openfoodfacts, "fetch_product", fake_fetch)
 
 
-# Crée une catégorie et renvoie son id
 def create_category(client: TestClient, name: str = "Epicerie") -> int:
     response = client.post("/categories", json={"name": name})
     assert response.status_code == 201
     return response.json()["id"]
 
 
-# Crée un fournisseur et renvoie son id
 def create_supplier(client: TestClient, name: str = "Ferrero") -> int:
     response = client.post("/suppliers", json={"name": name})
     assert response.status_code == 201
     return response.json()["id"]
 
 
-# Crée un produit via l'API ; "extra" permet de changer ou d'ajouter des champs
 def create(client: TestClient, category_id: int, sku: str = "PATE-001", **extra) -> dict:
     payload = {"sku": sku, "name": "Pate a tartiner", "unit_price": "4.50", "category_id": category_id}
     payload.update(extra)
@@ -54,16 +46,12 @@ def create(client: TestClient, category_id: int, sku: str = "PATE-001", **extra)
     return response.json()
 
 
-# Ajoute du stock directement en base (la route POST /stocks n'est pas encore codée)
 def add_stock(db_session: Session, product_id: int, quantity: int, code: str = "A1") -> None:
     location = Location(code=code, name=f"Zone {code}")
     db_session.add(location)
     db_session.commit()
     db_session.add(Stock(product_id=product_id, location_id=location.id, quantity=quantity))
     db_session.commit()
-
-
-# ---------- CRUD ----------
 
 
 def test_create_product(client: TestClient) -> None:
@@ -129,9 +117,6 @@ def test_delete_product_not_found(client: TestClient) -> None:
     assert response.status_code == 404
 
 
-# ---------- Relations ----------
-
-
 def test_create_product_with_unknown_category(client: TestClient) -> None:
     response = client.post("/products", json={"sku": "PATE-001", "name": "Pate", "unit_price": "1.00", "category_id": 999})
     assert response.status_code == 404
@@ -160,19 +145,13 @@ def test_update_product_with_unknown_supplier(client: TestClient) -> None:
     assert response.status_code == 404
 
 
-# ---------- Filtres et pagination ----------
-
-
 def test_list_products_search_in_name_sku_and_barcode(client: TestClient) -> None:
     category_id = create_category(client)
     create(client, category_id, sku="CAFE-001", name="Cafe moulu")
     create(client, category_id, sku="THE-001", name="The vert", barcode="12345678")
 
-    # Recherche sans tenir compte des majuscules, dans le nom
     assert client.get("/products?q=CAFE").json()["total"] == 1
-    # dans le SKU
     assert client.get("/products?q=the-0").json()["total"] == 1
-    # dans le code-barres
     assert client.get("/products?q=2345").json()["items"][0]["sku"] == "THE-001"
 
 
@@ -186,7 +165,6 @@ def test_list_products_filter_by_category_and_supplier(client: TestClient) -> No
 
     assert client.get(f"/products?category_id={epicerie}").json()["total"] == 2
     assert client.get(f"/products?supplier_id={ferrero}").json()["total"] == 2
-    # Deux filtres ensemble = ET
     both = client.get(f"/products?category_id={epicerie}&supplier_id={ferrero}").json()
     assert [p["sku"] for p in both["items"]] == ["P-1"]
 
@@ -228,9 +206,6 @@ def test_list_products_rejects_invalid_pagination(client: TestClient, query: str
     assert client.get(f"/products?{query}").status_code == 422
 
 
-# ---------- Open Food Facts (toujours simulé) ----------
-
-
 def test_lookup_returns_open_food_facts_data(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(openfoodfacts, "fetch_product", lambda barcode: NUTELLA)
     response = client.get("/products/lookup/3017620422003")
@@ -260,7 +235,6 @@ def test_create_product_is_enriched_by_open_food_facts(client: TestClient, monke
     monkeypatch.setattr(openfoodfacts, "fetch_product", lambda barcode: NUTELLA)
     created = create(client, create_category(client), barcode="3017620422003")
 
-    # Les infos sont enregistrées en base : on les relit avec un GET
     body = client.get(f"/products/{created['id']}").json()
     assert body["description"] == "Pate a tartiner"
     assert body["image_url"] == "https://images.openfoodfacts.org/nutella.jpg"
@@ -274,7 +248,6 @@ def test_create_product_keeps_its_own_description(client: TestClient, monkeypatc
 
 
 def test_create_product_works_when_open_food_facts_is_down(client: TestClient) -> None:
-    # La fixture autouse simule déjà une panne d'Open Food Facts
     created = create(client, create_category(client), barcode="3017620422003")
     assert created["description"] is None
     assert created["image_url"] is None

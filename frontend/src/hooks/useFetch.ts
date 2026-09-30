@@ -7,14 +7,14 @@ export function useFetch<T>(fetcher: () => Promise<T>, initialData: T, key: stri
   // Loading is derived: true until the request for the current key has finished
   const loading = loadedKey !== key
 
-  // fetcher is a new function on every render: keep the latest one in a ref so that key alone decides when to refetch
+  // fetcher is a new function on every render: only key decides when to refetch
   const fetcherRef = useRef(fetcher)
   useEffect(() => {
     fetcherRef.current = fetcher
   })
 
   useEffect(() => {
-    // Ignore responses that arrive after the key changed or the component unmounted
+    // Ignore responses arriving after the key changed or the component unmounted
     let cancelled = false
 
     fetcherRef.current()

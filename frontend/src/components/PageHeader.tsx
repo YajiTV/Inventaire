@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 
 interface PageHeaderProps {
   title: string
-  // Real identifier of the sheet (date, reference, SKU), printed in red top right
   serial?: string
   back?: ReactNode
   actions?: ReactNode

@@ -1,12 +1,10 @@
 import pytest
 from fastapi.testclient import TestClient
 
-# Tests API du CRUD Fournisseurs : chaque test part d'une base vide (fixture "client" de conftest.py)
 
 pytestmark = pytest.mark.usefixtures("authenticated")
 
 
-# Crée un fournisseur via l'API et renvoie le JSON de la réponse
 def create(client: TestClient, name: str = "Brasserie du Nord", email: str | None = "contact@brasserie.fr") -> dict:
     response = client.post("/suppliers", json={"name": name, "email": email, "phone": "0320000000"})
     assert response.status_code == 201
@@ -58,7 +56,6 @@ def test_update_supplier_changes_only_sent_fields(client: TestClient) -> None:
     response = client.patch(f"/suppliers/{created['id']}", json={"name": "Brasserie du Sud"})
     assert response.status_code == 200
     assert response.json()["name"] == "Brasserie du Sud"
-    # Le PATCH ne touche pas aux champs non envoyés
     assert response.json()["email"] == "contact@brasserie.fr"
 
 

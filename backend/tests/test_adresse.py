@@ -3,9 +3,6 @@ import pytest
 
 from app.clients import adresse
 
-# Tests unitaires du client Adresse (BAN) : on remplace httpx.get par une fausse fonction,
-# pour simuler chaque reponse possible sans jamais appeler la vraie API.
-
 
 def fake_response(status_code: int, text: str) -> httpx.Response:
     return httpx.Response(status_code, text=text, request=httpx.Request("GET", "https://test"))

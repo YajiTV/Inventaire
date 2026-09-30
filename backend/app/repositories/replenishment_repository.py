@@ -5,9 +5,6 @@ from app.models.product import Product
 from app.models.stock import Stock
 
 
-# Repository = the only layer talking to the database through the session.
-
-
 def list_below_threshold(db: Session, supplier_id: int | None = None) -> list[tuple[Product, int]]:
     """Products whose total quantity, summed over every location, is under their threshold.
 

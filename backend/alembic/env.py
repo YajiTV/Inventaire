@@ -8,29 +8,17 @@ from alembic import context
 from app.core.config import get_settings
 from app.db.base import Base
 
-# Import every module that defines a model here so it registers on
-# Base.metadata before autogenerate compares it to the database.
+# Registers every model on Base.metadata so autogenerate can compare them.
 import app.models  # noqa: F401
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
 config = context.config
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 config.set_main_option("sqlalchemy.url", get_settings().database_url)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
 target_metadata = Base.metadata
-
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
 
 
 def run_migrations_offline() -> None:

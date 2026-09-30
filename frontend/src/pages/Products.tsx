@@ -138,7 +138,7 @@ export default function Products() {
         if (!window.confirm(`Supprimer le produit "${p.name}" ?`)) return;
 
         const deleted = await feedback.run(() => removeProduct(p.id), "Produit supprimé avec succès.");
-        // Deleted the last item of a page: go back one page instead of showing an empty one
+        // Last item of a page deleted: go back one page instead of showing an empty one
         if (deleted && products.length === 1 && offset > 0) {
             setOffset(offset - PRODUCTS_PAGE_SIZE);
         }

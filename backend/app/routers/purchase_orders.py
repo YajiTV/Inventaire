@@ -23,7 +23,6 @@ from app.services import (
 router = APIRouter(
     prefix="/purchase-orders",
     tags=["Purchase orders"],
-    # Applied to every route below: an order carries supplier prices, it is not public data.
     dependencies=[Depends(get_current_user)],
     responses={
         401: {"model": ErrorResponse, "description": "Missing or invalid token"},
@@ -187,9 +186,7 @@ def delete_purchase_order(order_id: int, db: Session = Depends(get_db)) -> None:
         ) from exc
 
 
-# Order line sub-resource, owned by the Order line resource. Its own router gives
-# it its own "Order lines" section in Swagger, with the same URL prefix and the
-# same token requirement as the orders.
+# Separate router only to get its own "Order lines" section in Swagger.
 lines_router = APIRouter(
     prefix=router.prefix,
     tags=["Order lines"],

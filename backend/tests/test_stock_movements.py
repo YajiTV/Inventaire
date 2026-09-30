@@ -86,7 +86,6 @@ def test_outgoing_movement_refuses_to_go_negative(client: TestClient, auth: dict
 
     response = move(client, auth, product_id=product_id, type="out", quantity=4, source_location_id=location_id)
     assert response.status_code == 409
-    # The refused movement changed nothing.
     assert stock_of(db_session, product_id, location_id) == 3
 
 
@@ -134,7 +133,6 @@ def test_transfer_refuses_an_insufficient_source(client: TestClient, auth: dict[
         target_location_id=target_id,
     )
     assert response.status_code == 409
-    # Nothing arrived at the target either: the whole movement was rolled back.
     assert stock_of(db_session, product_id, target_id) == 0
 
 

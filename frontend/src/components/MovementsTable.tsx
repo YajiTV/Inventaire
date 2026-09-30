@@ -9,7 +9,6 @@ type MovementsTableProps = {
   movements: StockMovementRead[]
   products: ProductRead[]
   locations: LocationRead[]
-  // Movement just recorded by the user, stamped in the list
   freshId?: number
   framed?: boolean
 }
@@ -60,7 +59,6 @@ export function MovementsTable({ movements, products, locations, freshId, framed
 
   return (
     <>
-      {/* Phones: one slip per line, product and quantity first */}
       <ul className={`sm:hidden ${framed ? 'border border-rule-strong' : ''}`}>
         {rows.map(({ movement, product, day, time, quantity }) => (
           <li key={movement.id} className="border-b border-rule px-3 py-3 last:border-b-0">

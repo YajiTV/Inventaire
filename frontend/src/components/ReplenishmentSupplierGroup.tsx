@@ -16,7 +16,6 @@ type ReplenishmentSupplierGroupProps = {
   onTrigger: (supplierId: number, productIds: number[], locationId: number) => Promise<PurchaseOrderRead>
 }
 
-// A draft purchase order for one supplier, stamped once generated
 export function ReplenishmentSupplierGroup({
   supplierId,
   supplierName,

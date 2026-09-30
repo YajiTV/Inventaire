@@ -20,7 +20,6 @@ class PurchaseOrderCreate(PurchaseOrderBase):
 
     @model_validator(mode="after")
     def check_distinct_products(self) -> Self:
-        # Same rule as POST /purchase-orders/{id}/lines: one line per product.
         product_ids = [line.product_id for line in self.lines]
         if len(product_ids) != len(set(product_ids)):
             raise ValueError("each product can appear only once in the lines of an order")

@@ -35,7 +35,6 @@ function addUser(payload: UserCreate, role: UserRead['role']): UserRead {
 export const userHandlers = [
     http.get('*/users', () => HttpResponse.json(users)),
 
-    // Public sign-up: always an operator, like the real API
     http.post('*/auth/register', async ({request}) => {
         const payload = (await request.json()) as UserCreate
         return HttpResponse.json(addUser(payload, 'operator'), {status: 201})

@@ -10,7 +10,6 @@ class Stock(Base):
     __table_args__ = (UniqueConstraint("product_id", "location_id"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    # Supprimer un produit supprime ses lignes de stock
     product_id: Mapped[int] = mapped_column(
         ForeignKey("products.id", ondelete="CASCADE"), nullable=False, index=True
     )

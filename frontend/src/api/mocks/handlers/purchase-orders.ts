@@ -18,7 +18,7 @@ function computeTotalPrice(lines: OrderLineRead[]): string {
     return total.toFixed(2)
 }
 
-// Shared with the replenishment handler: a generated order must show up in the orders list
+// Also used by the replenishment handler, so a generated order shows up in the orders list
 export function createPurchaseOrder(payload: PurchaseOrderCreate): PurchaseOrderRead {
     const orderId = nextOrderId++
     const lines: OrderLineRead[] = payload.lines.map((line) => ({

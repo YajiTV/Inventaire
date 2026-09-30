@@ -10,7 +10,6 @@ from app.models.user import User
 from app.schemas.enums import UserRole
 from app.services.password import hash_password
 
-# One route per protected area: auth, users (admin), orders, replenishment.
 PROTECTED_ROUTES = ["/auth/me", "/users", "/purchase-orders", "/replenishment/suggestions"]
 
 
@@ -66,17 +65,13 @@ def test_token_signed_with_another_secret_is_rejected(client: TestClient, db_ses
 def test_tampered_token_is_rejected(client: TestClient, db_session: Session) -> None:
     user = create_user(db_session)
     header, payload, signature = create_access_token(user.id).split(".")
-    # Flip the first character of the signature: the payload is untouched, the signature no longer matches.
-    # Not the last one: its low bits are base64 padding, so changing it can decode to the same bytes.
+    # Not the last character: its low bits are base64 padding and may decode to the same bytes.
     tampered_signature = ("A" if signature[0] != "A" else "B") + signature[1:]
     tampered = ".".join([header, payload, tampered_signature])
     assert client.get("/auth/me", headers=bearer(tampered)).status_code == 401
 
 
 def test_refresh_token_cannot_be_used_as_access_token(client: TestClient, db_session: Session) -> None:
-    # The refresh cookie is an opaque random string, not a JWT: it fails the
-    # very first step of decode_token, for a different reason than a
-    # wrong-type JWT would, but the outcome must be the same, 401.
     user = create_user(db_session)
     login = client.post("/auth/login", json={"email": user.email, "password": "s3cret-pass"})
     raw_refresh_token = login.cookies[settings.refresh_cookie_name]

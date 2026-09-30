@@ -11,8 +11,7 @@ class RefreshToken(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    # Only the sha256 hash of the raw token is stored: a leaked database dump
-    # never hands out a token that can actually be replayed.
+    # Only the sha256 of the raw token is stored: a leaked dump gives no usable token.
     token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

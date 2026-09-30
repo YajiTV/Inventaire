@@ -8,9 +8,6 @@ from app.schemas.common import ErrorResponse, Page
 from app.schemas.product import ProductCreate, ProductLookup, ProductRead, ProductUpdate
 from app.services import product_service
 
-# Documentation Swagger : chaque route a un "summary" (titre dans Swagger), un docstring (description
-# détaillée), une "response_description" (la réponse en cas de succès) et ses codes d'erreur possibles.
-# Tout est écrit en anglais, comme le reste de la doc de l'équipe.
 
 router = APIRouter(
     prefix="/products",
@@ -27,7 +24,6 @@ CATEGORY_NOT_FOUND = "Categorie introuvable"
 SUPPLIER_NOT_FOUND = "Fournisseur introuvable"
 
 
-# GET /products -> liste filtrée et paginée au format Page (items, total, limit, offset)
 @router.get(
     "",
     response_model=Page[ProductRead],
@@ -59,8 +55,6 @@ def list_products(
     return product_service.list_products(db, q, category_id, supplier_id, below_threshold, limit, offset)
 
 
-# POST /products -> création (201), 409 si le SKU existe déjà,
-# 404 si la catégorie ou le fournisseur n'existe pas, 422 si le body est invalide
 @router.post(
     "",
     dependencies=[Depends(get_current_user)],
@@ -91,8 +85,6 @@ def create_product(payload: ProductCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=SUPPLIER_NOT_FOUND) from exc
 
 
-# GET /products/lookup/{barcode} -> infos Open Food Facts pour préremplir le formulaire (200),
-# 404 si le code-barres est inconnu, 502 si Open Food Facts est en panne, 504 s'il est trop lent
 @router.get(
     "/lookup/{barcode}",
     dependencies=[Depends(get_current_user)],
@@ -122,7 +114,6 @@ def lookup_product(barcode: str):
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Open Food Facts est indisponible") from exc
 
 
-# GET /products/{id} -> un produit (200) ou 404
 @router.get(
     "/{product_id}",
     response_model=ProductRead,
@@ -138,8 +129,6 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=PRODUCT_NOT_FOUND) from exc
 
 
-# PATCH /products/{id} -> modification partielle (200),
-# 404 si le produit, la catégorie ou le fournisseur n'existe pas
 @router.patch(
     "/{product_id}",
     dependencies=[Depends(get_current_user)],
@@ -164,7 +153,6 @@ def update_product(product_id: int, payload: ProductUpdate, db: Session = Depend
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=SUPPLIER_NOT_FOUND) from exc
 
 
-# DELETE /products/{id} -> suppression (204, pas de body) ou 404
 @router.delete(
     "/{product_id}",
     dependencies=[Depends(get_current_user)],

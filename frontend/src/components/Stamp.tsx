@@ -3,7 +3,6 @@ import type { ReactNode } from 'react'
 interface StampProps {
   children: ReactNode
   tone?: 'red' | 'ink'
-  // Slam the stamp down once, for something the user just created
   fresh?: boolean
 }
 

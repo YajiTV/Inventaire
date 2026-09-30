@@ -2,8 +2,6 @@ import type { ReactNode } from 'react'
 
 type Align = 'left' | 'right'
 
-// Ruled table of the pad: printed header row, one rule per line.
-// framed=false when the table already sits inside a bordered block.
 export function Ledger({ children, framed = true }: { children: ReactNode; framed?: boolean }) {
   return (
     <div className={`relative overflow-x-auto ${framed ? 'border border-rule-strong' : ''}`}>
@@ -33,7 +31,6 @@ export function Td({ children, align = 'left', muted = false }: { children?: Rea
   )
 }
 
-// shortage: the line is on the pink copy
 export function Tr({ children, shortage = false }: { children: ReactNode; shortage?: boolean }) {
   return (
     <tr className={`transition-colors duration-150 ${shortage ? 'bg-rose/60' : 'hover:bg-paper-2'}`}>{children}</tr>

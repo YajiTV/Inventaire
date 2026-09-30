@@ -18,7 +18,6 @@ export function StockTable({ rows }: StockTableProps) {
 
   return (
     <>
-      {/* Phones: product and quantity first, the rest on the line below */}
       <ul className="border border-rule-strong sm:hidden">
         {rows.map((row) => (
           <li key={row.id} className={`border-b border-rule px-3 py-3 last:border-b-0 ${row.belowThreshold ? 'bg-rose/60' : ''}`}>

@@ -1,6 +1,5 @@
 import type { MovementType } from '../types/api'
 
-// Shared Tailwind class strings of the carbon-copy pad
 
 const BUTTON_BASE =
   'inline-flex h-9 items-center justify-center gap-2 whitespace-nowrap px-3 text-sm font-semibold transition-[transform,background-color,color] duration-150 ease-out-strong active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100'
@@ -19,7 +18,6 @@ export const FIELD_LABEL = 'px-2 pt-1.5 text-[11px] font-semibold uppercase trac
 export const FIELD_CONTROL =
   'w-full bg-transparent px-2 pb-1.5 pt-0.5 text-[15px] text-ink placeholder:text-print focus-visible:outline-none'
 
-// Colour law of the pad: yellow copy = in, pink copy = out, blue copy = transfer
 export const MOVEMENT_COPY: Record<MovementType, string> = {
   in: 'bg-canary',
   out: 'bg-rose',

@@ -6,8 +6,6 @@ from app.models.stock_movement import StockMovement
 
 from scripts.seed import ADMIN_EMAIL, ADMIN_PASSWORD, seed
 
-# Tests du script de seed, sur la base SQLite de test (vide au départ)
-
 
 def test_seed_inserts_the_demo_data(client: TestClient, db_session: Session) -> None:
     assert seed(db_session) is True

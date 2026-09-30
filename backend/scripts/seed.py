@@ -25,13 +25,9 @@ from app.models.user import User
 from app.schemas.enums import MovementType, UserRole
 from app.services.password import hash_password
 
-# Compte de démo pour se connecter sur la vraie API (même email que dans docs/demo.md)
 ADMIN_EMAIL = "admin@inventaire.fr"
 ADMIN_PASSWORD = "admin1234"
 
-# Les données sont décrites comme des listes de dictionnaires, puis transformées en objets
-# SQLAlchemy dans seed(). Les produits désignent leur catégorie, leur fournisseur et leurs
-# emplacements par leur NOM ou leur CODE : les id seront donnés par Postgres à l'insertion.
 
 CATEGORIES = [
     {"name": "Pains et viandes", "description": "Pains à burger et steaks surgelés"},
@@ -53,8 +49,6 @@ LOCATIONS = [
     {"code": "RES-01", "name": "Réserve sèche", "description": "Stock ambiant à l'arrière du restaurant"},
 ]
 
-# "stocks" = quantité par code d'emplacement. Steak haché (120 / seuil 300) et Sirop cola (5 / seuil 12)
-# sont volontairement sous leur seuil : c'est le cœur de la démo du réapprovisionnement.
 PRODUCTS = [
     {"sku": "PAIN-BIGM-001", "name": "Pain Big Mac", "description": "Pain à trois étages pour burger double", "barcode": "3270190115007", "unit_price": "0.18", "reorder_threshold": 200, "category": "Pains et viandes", "supplier": "Boulangerie de l'Est", "stocks": {"RES-01": 360, "CUIS-01": 120}},
     {"sku": "STEA-HAC-045", "name": "Steak haché 45g", "description": "Steak de bœuf surgelé, carton de 100", "barcode": "3270190115014", "unit_price": "0.42", "reorder_threshold": 300, "category": "Pains et viandes", "supplier": "Viandes du Charolais", "stocks": {"CONG-01": 90, "CUIS-01": 30}},
@@ -64,8 +58,6 @@ PRODUCTS = [
     {"sku": "SAUC-KET-DOS", "name": "Dosette de ketchup", "description": "Dosette individuelle de 10g", "barcode": "3270190115021", "unit_price": "0.05", "reorder_threshold": 500, "category": "Sauces et condiments", "supplier": "Distri Ouest", "stocks": {"RES-01": 900, "CUIS-01": 300}},
 ]
 
-# Historique des mouvements, fait par le compte admin. Le produit est désigné par son SKU,
-# les emplacements par leur code (None = pas de source pour une entrée, pas de cible pour une sortie).
 MOVEMENTS = [
     {"sku": "PAIN-BIGM-001", "type": MovementType.IN, "quantity": 480, "source": None, "target": "RES-01", "reason": "Livraison Boulangerie de l'Est", "created_at": "2026-09-15T05:30:00+00:00"},
     {"sku": "PAIN-BIGM-001", "type": MovementType.TRANSFER, "quantity": 120, "source": "RES-01", "target": "CUIS-01", "reason": "Réassort avant le service du midi", "created_at": "2026-09-15T10:15:00+00:00"},
@@ -76,13 +68,10 @@ MOVEMENTS = [
 ]
 
 
-# Insère tout le jeu de démo. Renvoie False (sans rien faire) si la base contient déjà des produits.
 def seed(db: Session) -> bool:
     if db.execute(select(Product)).scalars().first() is not None:
         return False
 
-    # 1. Catégories, fournisseurs, emplacements. On garde chaque objet dans un dictionnaire
-    #    (nom ou code -> objet) pour pouvoir le retrouver quand on crée les produits.
     categories = {}
     for data in CATEGORIES:
         category = Category(name=data["name"], description=data["description"])
@@ -101,10 +90,8 @@ def seed(db: Session) -> bool:
         db.add(location)
         locations[data["code"]] = location
 
-    # flush = envoie les INSERT à Postgres SANS valider (pas de commit) : les objets reçoivent leur id
     db.flush()
 
-    # 2. Produits, puis leurs lignes de stock
     products = {}
     for data in PRODUCTS:
         product = Product(
@@ -123,7 +110,6 @@ def seed(db: Session) -> bool:
         for code, quantity in data["stocks"].items():
             db.add(Stock(product_id=product.id, location_id=locations[code].id, quantity=quantity))
 
-    # 3. Le compte admin de démo (seulement s'il n'existe pas déjà) : il est l'auteur des mouvements
     admin = db.execute(select(User).where(User.email == ADMIN_EMAIL)).scalars().first()
     if admin is None:
         admin = User(
@@ -136,8 +122,7 @@ def seed(db: Session) -> bool:
         db.add(admin)
         db.flush()
 
-    # 4. L'historique des mouvements. Les quantités de "stocks" ci-dessus sont l'état actuel :
-    #    on n'applique pas ces mouvements, ils servent seulement de trace à afficher.
+    # History only: the stock quantities above are already the current state.
     for data in MOVEMENTS:
         db.add(
             StockMovement(
@@ -152,7 +137,6 @@ def seed(db: Session) -> bool:
             )
         )
 
-    # Un seul commit à la fin : soit tout est enregistré, soit rien (pas de base à moitié remplie)
     db.commit()
     return True
 
