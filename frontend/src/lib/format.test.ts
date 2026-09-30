@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { formatMoney, formatQuantity, slipNumber } from './format'
 
-// fr-FR uses narrow no-break spaces; normalise them to compare
+// fr-FR uses narrow no-break spaces
 const plain = (s: string) => s.replace(/\s/g, ' ')
 
 describe('format', () => {

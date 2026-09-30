@@ -35,8 +35,6 @@ def create_stock_movement(db: Session, payload: StockMovementCreate, user_id: in
         if location_id is not None:
             location_service.get_location(db, location_id)
 
-    # A transfer is an outgoing movement followed by an incoming one, so both
-    # sides go through the same two helpers.
     if payload.source_location_id is not None:
         _remove_quantity(db, payload.product_id, payload.source_location_id, payload.quantity)
     if payload.target_location_id is not None:
@@ -51,8 +49,6 @@ def create_stock_movement(db: Session, payload: StockMovementCreate, user_id: in
         reason=payload.reason,
         user_id=user_id,
     )
-    # Single commit: either the movement and the new quantities are both
-    # written, or nothing is.
     return stock_movement_repository.create(db, movement)
 
 
@@ -88,7 +84,6 @@ def _remove_quantity(db: Session, product_id: int, location_id: int, quantity: i
 def _add_quantity(db: Session, product_id: int, location_id: int, quantity: int) -> None:
     stock = stock_repository.get_by_product_and_location(db, product_id, location_id, for_update=True)
     if stock is None:
-        # First time this product enters this location: the stock line is created.
         stock = Stock(product_id=product_id, location_id=location_id, quantity=quantity)
         stock_movement_repository.stage(db, stock)
         return

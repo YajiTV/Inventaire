@@ -21,7 +21,6 @@ import { formatMoney, formatQuantity } from '../lib/format'
 
 const PREVIEW_SIZE = 5
 
-// What each copy of the pad stands for, shown on the public page
 const COLOUR_LAW = [
   { swatch: 'bg-paper', name: 'Blanc', meaning: 'Stock', text: 'Quantités par produit et par emplacement.' },
   { swatch: 'bg-canary', name: 'Jaune', meaning: 'Entrée', text: 'Livraisons reçues, ajoutées au stock.' },
@@ -78,7 +77,6 @@ function Welcome() {
   )
 }
 
-// Illustrative movement slip in triplicate (demo content, not live data)
 function SamplePad() {
   return (
     <figure aria-label="Exemple de bon de mouvement" className="relative mx-auto w-full max-w-sm pt-6 pr-6">

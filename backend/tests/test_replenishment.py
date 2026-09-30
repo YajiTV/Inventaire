@@ -55,7 +55,6 @@ def test_suggestions_sum_the_stock_of_every_location(client: TestClient, db_sess
     item = suggestions(client)[product]
     assert item["current_quantity"] == 5
     assert item["reorder_threshold"] == 10
-    # Back to twice the threshold: 2 x 10 - 5
     assert item["suggested_quantity"] == 15
 
 
@@ -90,7 +89,6 @@ def test_suggestions_can_be_filtered_by_supplier(client: TestClient) -> None:
     orphan = create_product(client, "C-001", threshold=4, supplier_id=None)
 
     assert set(suggestions(client, supplier_id=first)) == {mine}
-    # Without the filter, a product with no supplier is listed, but with a null supplier.
     everything = suggestions(client)
     assert set(everything) == {mine, other, orphan}
     assert everything[orphan]["supplier_id"] is None
@@ -137,7 +135,6 @@ def test_create_order_rejects_a_product_that_is_not_under_its_threshold(
 
     payload = {"supplier_id": supplier, "location_id": location, "product_ids": [enough]}
     assert client.post("/replenishment/orders", json=payload).status_code == 409
-    # Nothing was created.
     assert client.get("/purchase-orders").json() == []
 
 

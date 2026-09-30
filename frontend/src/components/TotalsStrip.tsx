@@ -10,7 +10,6 @@ export interface Total {
   shortage?: boolean
 }
 
-// The totals line at the top of a sheet: one printed box per figure
 export function TotalsStrip({ totals }: { totals: Total[] }) {
   return (
     <dl className="grid grid-cols-2 border-t border-l border-rule-strong max-sm:[&>*:last-child:nth-child(odd)]:col-span-2 sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]">

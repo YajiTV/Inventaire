@@ -3,11 +3,7 @@
 /* dark: follows the .dark class set by ThemeContext, not prefers-color-scheme */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/*
-  Carbon-copy order pad palette.
-  Colour law: paper = stock, canary = stock in, rose = stock out or shortage, sky = transfer.
-  Every token switches in .dark, so components never need dark: variants.
-*/
+/* Every token switches in .dark, so components never need dark: variants */
 :root {
   --paper: #ffffff;
   --paper-2: #f3f4fb;
@@ -76,7 +72,6 @@
   }
 }
 
-/* Row of punched holes between the stub and the sheet */
 @utility perforation {
   height: 6px;
   background-image: radial-gradient(circle, var(--rule-strong) 1.5px, transparent 2px);
@@ -126,7 +121,6 @@
     --animate-stamp: none;
   }
 
-  /* Keep colour feedback, drop the press movement */
   :active {
     scale: none !important;
   }

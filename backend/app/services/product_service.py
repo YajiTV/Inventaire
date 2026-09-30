@@ -6,28 +6,22 @@ from app.repositories import category_repository, product_repository, supplier_r
 from app.schemas.product import ProductCreate, ProductUpdate
 
 
-# Erreur métier : l'id demandé n'existe pas (le router la transformera en 404)
 class ProductNotFoundError(Exception):
     pass
 
 
-# Erreur métier : un produit avec ce SKU existe déjà (le router la transformera en 409)
 class ProductSkuAlreadyExistsError(Exception):
     pass
 
 
-# Erreur métier : la catégorie envoyée n'existe pas (le router la transformera en 404)
 class UnknownCategoryError(Exception):
     pass
 
 
-# Erreur métier : le fournisseur envoyé n'existe pas (le router la transformera en 404)
 class UnknownSupplierError(Exception):
     pass
 
 
-# Vérifie que la catégorie et le fournisseur existent avant d'écrire en base.
-# None = champ non envoyé (PATCH) ou pas de fournisseur : rien à vérifier.
 def check_relations(db: Session, category_id: int | None, supplier_id: int | None) -> None:
     if category_id is not None and category_repository.get_by_id(db, category_id) is None:
         raise UnknownCategoryError(category_id)
@@ -35,17 +29,11 @@ def check_relations(db: Session, category_id: int | None, supplier_id: int | Non
         raise UnknownSupplierError(supplier_id)
 
 
-# total_quantity n'est pas une colonne de la table products : on la calcule à partir
-# de la table stocks, puis on l'accroche à l'objet pour que ProductRead puisse la lire
 def add_total_quantity(db: Session, product: Product) -> Product:
     product.total_quantity = product_repository.get_total_quantity(db, product.id)
     return product
 
 
-# Enrichissement à la création : si le produit a un code-barres mais pas d'image ou pas de
-# description, on complète avec Open Food Facts, et ces infos sont enregistrées en base avec le produit.
-# Si Open Food Facts ne répond pas ou ne connaît pas le code, on crée le produit quand même :
-# c'est un bonus, pas une condition.
 def fill_from_openfoodfacts(product: Product) -> None:
     if product.barcode is None:
         return
@@ -53,6 +41,7 @@ def fill_from_openfoodfacts(product: Product) -> None:
         return
     try:
         info = openfoodfacts.fetch_product(product.barcode)
+    # Best effort: the product is still created without the extra data.
     except openfoodfacts.OpenFoodFactsError:
         return
     if product.image_url is None:
@@ -61,7 +50,6 @@ def fill_from_openfoodfacts(product: Product) -> None:
         product.description = info["description"]
 
 
-# Liste filtrée et paginée : renvoie un dictionnaire au format Page (items, total, limit, offset)
 def list_products(
     db: Session,
     q: str | None,
@@ -71,14 +59,12 @@ def list_products(
     limit: int,
     offset: int,
 ) -> dict:
-    # 1. Les filtres sur les colonnes sont faits en SQL par le repository
     products = product_repository.list_filtered(db, q, category_id, supplier_id)
 
-    # 2. On calcule le stock total de chaque produit
     for product in products:
         add_total_quantity(db, product)
 
-    # 3. Le filtre "sous le seuil" se fait en Python, car total_quantity vient d'une autre table
+    # total_quantity comes from another table, so this filter runs in Python, before paginating.
     if below_threshold:
         below = []
         for product in products:
@@ -86,14 +72,11 @@ def list_products(
                 below.append(product)
         products = below
 
-    # 4. Pagination : total = nombre de résultats AVANT de découper,
-    #    puis on garde seulement la tranche [offset, offset + limit]
     total = len(products)
     page_items = products[offset:offset + limit]
     return {"items": page_items, "total": total, "limit": limit, "offset": offset}
 
 
-# Un produit par son id (avec son stock total), erreur s'il n'existe pas
 def get_product(db: Session, product_id: int) -> Product:
     product = product_repository.get_by_id(db, product_id)
     if product is None:
@@ -101,8 +84,6 @@ def get_product(db: Session, product_id: int) -> Product:
     return add_total_quantity(db, product)
 
 
-# Création : on refuse un SKU déjà utilisé, une catégorie ou un fournisseur inexistant,
-# puis on transforme le payload en objet Product
 def create_product(db: Session, payload: ProductCreate) -> Product:
     if product_repository.get_by_sku(db, payload.sku) is not None:
         raise ProductSkuAlreadyExistsError(payload.sku)
@@ -122,8 +103,6 @@ def create_product(db: Session, payload: ProductCreate) -> Product:
     return product_repository.create(db, product)
 
 
-# Modification partielle (PATCH) : on ne change que les champs envoyés
-# (le SKU n'est pas modifiable, il n'est pas dans ProductUpdate)
 def update_product(db: Session, product_id: int, payload: ProductUpdate) -> Product:
     product = get_product(db, product_id)
     check_relations(db, payload.category_id, payload.supplier_id)
@@ -147,14 +126,10 @@ def update_product(db: Session, product_id: int, payload: ProductUpdate) -> Prod
     return add_total_quantity(db, product)
 
 
-# Suppression (get_product lève déjà l'erreur si l'id n'existe pas)
 def delete_product(db: Session, product_id: int) -> None:
     product = get_product(db, product_id)
     product_repository.delete(db, product)
 
 
-# Préremplissage : infos d'un produit sur Open Food Facts à partir de son code-barres.
-# Le service passe par le client (comme il passe par le repository pour la base) ;
-# les erreurs OpenFoodFacts...Error remontent telles quelles jusqu'au router.
 def lookup_product(barcode: str) -> dict:
     return openfoodfacts.fetch_product(barcode)

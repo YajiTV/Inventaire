@@ -6,9 +6,6 @@ from sqlalchemy.orm import Session
 from app.models.refresh_token import RefreshToken
 
 
-# Repository = the only layer talking to the database through the session.
-
-
 def create(db: Session, user_id: int, token_hash: str, expires_at: datetime) -> RefreshToken:
     record = RefreshToken(user_id=user_id, token_hash=token_hash, expires_at=expires_at)
     db.add(record)

@@ -25,16 +25,14 @@ class PurchaseOrder(Base):
     ordered_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
-    # Filled in when the order moves to "received", stays null otherwise.
     received_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    # selectin loading: the read schema always exposes the lines, so the list
-    # endpoint would otherwise issue one extra query per order.
+    # selectin: the lines are always serialized, this avoids one query per order in lists.
     lines: Mapped[list["OrderLine"]] = relationship(
         back_populates="order", cascade="all, delete-orphan", lazy="selectin"
     )
 
+    # Derived, never stored, so it cannot drift from the lines.
     @property
     def total_price(self) -> Decimal:
-        # Derived, never stored: a column would drift as soon as a line changes.
         return sum((line.quantity * line.unit_price for line in self.lines), Decimal("0.00"))

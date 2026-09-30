@@ -52,9 +52,7 @@ def create_location(payload: LocationCreate, db: Session = Depends(get_db)) -> L
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=LOCATION_CODE_TAKEN) from exc
 
 
-# GET /locations/geocode -> interroge l'API Adresse (BAN, data.gouv.fr) sur une recherche libre,
-# ne stocke rien : sert a preremplir/valider une adresse avant de creer un emplacement.
-# Route statique : doit rester avant /{location_id} sinon FastAPI essaie de convertir "geocode" en int.
+# Must stay before /{location_id}, otherwise FastAPI parses "geocode" as an id.
 @router.get(
     "/geocode",
     dependencies=[Depends(get_current_user)],

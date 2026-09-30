@@ -152,7 +152,6 @@ def test_status_follows_the_life_cycle(client: TestClient) -> None:
 
 def test_status_refuses_an_invalid_transition(client: TestClient) -> None:
     order_id = create_order(client)["id"]
-    # draft -> received skips the "sent" step
     assert client.patch(f"/purchase-orders/{order_id}", json={"status": "received"}).status_code == 409
 
 
@@ -214,7 +213,6 @@ def test_receiving_an_order_puts_its_lines_into_stock(client: TestClient) -> Non
     assert stock_at(client, product_id, location_id) == 0
 
     assert client.patch(f"/purchase-orders/{order['id']}", json={"status": "sent"}).status_code == 200
-    # Sending the order does not touch the stock, only the reception does.
     assert stock_at(client, product_id, location_id) == 0
 
     assert client.patch(f"/purchase-orders/{order['id']}", json={"status": "received"}).status_code == 200

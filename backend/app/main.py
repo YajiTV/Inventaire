@@ -47,9 +47,8 @@ for module in (
 app.include_router(purchase_orders.lines_router)
 
 
-# The database refused the write, most often a delete on a row still referenced
-# elsewhere (a category that has products, a supplier that has orders...).
-# It is a conflict with the current data, not a server error: 409 instead of 500.
+# Mostly a delete on a row still referenced elsewhere (a category with products...):
+# a conflict with the current data, so 409 rather than 500.
 @app.exception_handler(IntegrityError)
 def integrity_error_handler(_request: Request, _exc: IntegrityError) -> JSONResponse:
     return JSONResponse(

@@ -5,9 +5,6 @@ from app.models.stock_movement import StockMovement
 from app.schemas.enums import MovementType
 
 
-# Repository = the only layer talking to the database through the session.
-
-
 def list_all(
     db: Session,
     product_id: int | None = None,
@@ -19,7 +16,6 @@ def list_all(
     if product_id is not None:
         stmt = stmt.where(StockMovement.product_id == product_id)
     if location_id is not None:
-        # A location matches whether the goods left it or arrived in it.
         stmt = stmt.where(
             or_(
                 StockMovement.source_location_id == location_id,

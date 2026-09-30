@@ -64,8 +64,6 @@ def update_line(db: Session, order_id: int, line_id: int, payload: OrderLineUpda
     if line is None:
         raise OrderLineNotFoundError(line_id)
 
-    # product_id is not in OrderLineUpdate: changing the product means
-    # deleting the line and creating another one.
     if payload.quantity is not None:
         line.quantity = payload.quantity
     if payload.unit_price is not None:

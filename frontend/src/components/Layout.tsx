@@ -4,7 +4,6 @@ import { useAuth } from '../hooks/useAuth'
 import { getInitials, roleLabel } from '../lib/users'
 import { ThemeToggle } from './ThemeToggle'
 
-// The pad's tabs, grouped like the sections of the binder
 const NAV_GROUPS = [
   { title: null, links: [{ to: '/', label: 'Accueil' }] },
   {

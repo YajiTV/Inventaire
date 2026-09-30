@@ -14,7 +14,6 @@ type MovementFormProps = {
   onSubmit: (movement: StockMovementCreate) => Promise<void>
 }
 
-// One carbon copy per movement type, in the colour of the pad
 const TYPE_OPTIONS: { value: MovementType; label: string; hint: string }[] = [
   { value: 'in', label: 'Entrée', hint: 'Livraison reçue' },
   { value: 'out', label: 'Sortie', hint: 'Consommé ou jeté' },

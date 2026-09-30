@@ -10,7 +10,6 @@ export function formatQuantity(value: number): string {
   return QUANTITY.format(value)
 }
 
-// Movement slip number printed in red, from the movement id
 export function slipNumber(id: number): string {
   return `N° ${String(id).padStart(6, '0')}`
 }

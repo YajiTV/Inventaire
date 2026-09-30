@@ -5,9 +5,6 @@ from app.models.purchase_order import PurchaseOrder
 from app.schemas.enums import OrderStatus
 
 
-# Repository = the only layer talking to the database through the session.
-
-
 def get_by_id(db: Session, order_id: int) -> PurchaseOrder | None:
     return db.get(PurchaseOrder, order_id)
 
@@ -23,8 +20,6 @@ def list_all(
     order_status: OrderStatus | None = None,
 ) -> list[PurchaseOrder]:
     stmt = select(PurchaseOrder)
-    # Both filters are optional query parameters, so each one is applied only
-    # when the client sent it.
     if supplier_id is not None:
         stmt = stmt.where(PurchaseOrder.supplier_id == supplier_id)
     if order_status is not None:
@@ -34,8 +29,6 @@ def list_all(
 
 
 def create(db: Session, order: PurchaseOrder) -> PurchaseOrder:
-    # The lines are cascaded with the order, so a single commit writes the
-    # whole aggregate or nothing at all.
     db.add(order)
     db.commit()
     db.refresh(order)

@@ -17,7 +17,7 @@ def get_db() -> Generator[Session, None, None]:
     try:
         yield db
     except Exception:
-        # A failed commit leaves the session unusable until it is rolled back
+        # A failed commit leaves the session unusable until it is rolled back.
         db.rollback()
         raise
     finally:

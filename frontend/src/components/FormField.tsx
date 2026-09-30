@@ -10,7 +10,6 @@ interface FormFieldProps {
   type?: InputHTMLAttributes<HTMLInputElement>['type']
   placeholder?: string
   required?: boolean
-  // Inline edit inside a table row: the label stays for screen readers only
   compact?: boolean
 }
 

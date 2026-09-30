@@ -60,7 +60,6 @@ def test_create_line_updates_the_order_total(client: TestClient) -> None:
     order = create_order(client)
     line = add_line(client, order["id"], create_product(client, sku="SKU-EXTRA"), quantity=2)
     assert line["order_id"] == order["id"]
-    # 3 x 12.50 (existing line) + 2 x 4.00 (new line)
     assert client.get(f"/purchase-orders/{order['id']}").json()["total_price"] == "45.50"
 
 

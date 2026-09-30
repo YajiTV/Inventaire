@@ -52,12 +52,9 @@ def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
+# SQLite (tests) reads DateTime(timezone=True) back as naive, Postgres as aware.
+# Every value is written as UTC, so a naive one is UTC too.
 def _as_aware_utc(value: datetime) -> datetime:
-    # SQLite (used by the test suite) round-trips DateTime(timezone=True) as
-    # a naive datetime; Postgres returns a timezone-aware one for the same
-    # column type. Every value here is written as UTC, so a naive value read
-    # back is always UTC too: this makes both sides comparable regardless of
-    # which database produced them.
     return value if value.tzinfo is not None else value.replace(tzinfo=timezone.utc)
 
 
@@ -66,10 +63,8 @@ def _hash_refresh_token(raw_token: str) -> str:
 
 
 def _issue_refresh_token(db: Session, user_id: int) -> str:
-    # Opaque, random, never a JWT: unlike a signed token, it grants nothing by
-    # itself, it only names a row in refresh_tokens. That row is what makes
-    # revocation possible, which a self-contained JWT cannot offer short of
-    # a separate blacklist.
+    # Opaque random value, not a JWT: it only names a row in refresh_tokens,
+    # which is what makes revocation possible.
     raw_token = secrets.token_urlsafe(32)
     expires_at = _utcnow() + timedelta(days=settings.refresh_token_expire_days)
     refresh_token_repository.create(db, user_id, _hash_refresh_token(raw_token), expires_at)

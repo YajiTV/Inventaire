@@ -5,11 +5,9 @@ interface WorkbenchProps {
   children: ReactNode
   formTitle: string
   form: ReactNode
-  // wide tables keep the full width: the blank slip sits above them instead
   formOnTop?: boolean
 }
 
-// The register on the left, the blank slip to fill on the right
 export function Workbench({ children, formTitle, form, formOnTop = false }: WorkbenchProps) {
   if (formOnTop) {
     return (

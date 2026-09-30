@@ -12,7 +12,6 @@ const COLUMNS = {
   4: 'sm:grid-cols-2 lg:grid-cols-4',
 }
 
-// Pre-printed boxes of a form sheet: label in the corner, value below
 export function FactGrid({ facts, columns = 4 }: { facts: Fact[]; columns?: 3 | 4 }) {
   return (
     <dl className={`grid grid-cols-1 border-t border-l border-rule-strong ${COLUMNS[columns]}`}>

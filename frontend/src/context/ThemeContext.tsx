@@ -23,7 +23,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEY, theme)
     } catch {
-      // storage unavailable: theme just won't persist
+      // storage unavailable: the theme just won't persist
     }
   }, [theme])
 

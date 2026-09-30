@@ -123,8 +123,6 @@ def test_list_location_stocks_not_found(client: TestClient) -> None:
     assert response.status_code == 404
 
 
-# ---------- API Adresse (toujours simulee) ----------
-
 ADDRESS = {
     "label": "8 Boulevard du Port 80000 Amiens",
     "city": "Amiens",

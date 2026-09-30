@@ -20,7 +20,7 @@ export function AuthProvider({children}: {children: ReactNode}) {
         const data: TokenResponse = await response.json()
         setAccessToken(data.access_token)
 
-        // accessToken state is not updated yet, so pass the token explicitly
+        // accessToken state is not updated yet, so the token is passed explicitly
         const meResponse = await apiFetch('/auth/me', {
             headers: {Authorization: `Bearer ${data.access_token}`}
         })
@@ -48,8 +48,8 @@ export function AuthProvider({children}: {children: ReactNode}) {
         setUser(updated)
     }
 
-    // The refresh token is single-use: callers asking at the same time (StrictMode, parallel 401s)
-    // share one request, otherwise the second one is seen as a reuse and the session is revoked
+    // The refresh token is single-use: concurrent callers (StrictMode, parallel 401s) share one request,
+    // otherwise the second one is seen as a reuse and the session is revoked
     function refresh(): Promise<string | null> {
         if (pendingRefresh.current === null) {
             pendingRefresh.current = requestRefresh().finally(() => {
@@ -91,8 +91,8 @@ export function AuthProvider({children}: {children: ReactNode}) {
         restore()
     }, [])
 
-    // No deps on purpose: keeps apiFetch (outside React) in sync with the latest token
     useEffect(() => {
+        // No deps on purpose: keeps apiFetch, outside React, in sync with the latest token
         registerAuth(accessToken, refresh, handleSessionExpired)
     })
 

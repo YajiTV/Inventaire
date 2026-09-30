@@ -21,7 +21,6 @@ export default function Movements() {
   const { movements, loading: movementsLoading, error: movementsError } = useStockMovements(filters)
   const { products, loading: productsLoading, error: productsError } = useAllProducts()
   const { locations, loading: locationsLoading, error: locationsError } = useLocations()
-  // Set by NewMovement after a successful save
   const freshId = (useLocation().state as { freshId?: number } | null)?.freshId
 
   const loading = movementsLoading || productsLoading || locationsLoading

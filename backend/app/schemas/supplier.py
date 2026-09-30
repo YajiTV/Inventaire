@@ -2,8 +2,6 @@ from pydantic import BaseModel, EmailStr, Field
 
 from app.schemas.common import ReadModel
 
-# "examples" = valeurs d'exemple affichées dans Swagger (bouton "Try it out" prérempli)
-
 
 class SupplierBase(BaseModel):
     name: str = Field(min_length=1, max_length=120, examples=["Ferrero France"])
