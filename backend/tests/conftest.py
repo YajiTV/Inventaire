@@ -75,3 +75,10 @@ def auth(client: TestClient, db_session: Session) -> dict[str, str]:
     )
     assert response.status_code == 200
     return {"Authorization": f"Bearer {response.json()['access_token']}"}
+
+
+@pytest.fixture()
+def authenticated(client: TestClient, auth: dict[str, str]) -> None:
+    """Sends the operator token on every request of the test, helpers included.
+    Enabled per module with: pytestmark = pytest.mark.usefixtures("authenticated")"""
+    client.headers.update(auth)

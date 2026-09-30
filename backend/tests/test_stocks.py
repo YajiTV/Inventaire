@@ -1,6 +1,9 @@
+import pytest
 from fastapi.testclient import TestClient
 
 from tests.test_stock_movements import create_location, create_product
+
+pytestmark = pytest.mark.usefixtures("authenticated")
 
 
 def create_stock(client: TestClient, quantity: int = 5) -> dict:

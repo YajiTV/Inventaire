@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.clients import openfoodfacts
+from app.core.security import get_current_user
 from app.db.session import get_db
 from app.schemas.common import ErrorResponse, Page
 from app.schemas.product import ProductCreate, ProductLookup, ProductRead, ProductUpdate
@@ -15,7 +16,7 @@ router = APIRouter(
     prefix="/products",
     tags=["Products"],
     responses={
-        401: {"model": ErrorResponse},
+        401: {"model": ErrorResponse, "description": "Missing or invalid token (write routes only, reads are public)"},
         404: {"model": ErrorResponse, "description": "Resource not found"},
         422: {"description": "Invalid body or query parameter, rejected by Pydantic"},
     },
@@ -62,6 +63,7 @@ def list_products(
 # 404 si la catégorie ou le fournisseur n'existe pas, 422 si le body est invalide
 @router.post(
     "",
+    dependencies=[Depends(get_current_user)],
     response_model=ProductRead,
     status_code=status.HTTP_201_CREATED,
     summary="Create a product",
@@ -93,6 +95,7 @@ def create_product(payload: ProductCreate, db: Session = Depends(get_db)):
 # 404 si le code-barres est inconnu, 502 si Open Food Facts est en panne, 504 s'il est trop lent
 @router.get(
     "/lookup/{barcode}",
+    dependencies=[Depends(get_current_user)],
     response_model=ProductLookup,
     summary="Look up a barcode on Open Food Facts",
     response_description="The product data found on Open Food Facts",
@@ -139,6 +142,7 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
 # 404 si le produit, la catégorie ou le fournisseur n'existe pas
 @router.patch(
     "/{product_id}",
+    dependencies=[Depends(get_current_user)],
     response_model=ProductRead,
     summary="Update a product",
     response_description="The updated product",
@@ -163,6 +167,7 @@ def update_product(product_id: int, payload: ProductUpdate, db: Session = Depend
 # DELETE /products/{id} -> suppression (204, pas de body) ou 404
 @router.delete(
     "/{product_id}",
+    dependencies=[Depends(get_current_user)],
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete a product",
     response_description="The product was deleted, no body",

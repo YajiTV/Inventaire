@@ -1,6 +1,9 @@
+import pytest
 from fastapi.testclient import TestClient
 
 # Tests API du CRUD Fournisseurs : chaque test part d'une base vide (fixture "client" de conftest.py)
+
+pytestmark = pytest.mark.usefixtures("authenticated")
 
 
 # Crée un fournisseur via l'API et renvoie le JSON de la réponse

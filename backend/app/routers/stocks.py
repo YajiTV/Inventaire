@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.security import get_current_user
 from app.db.session import get_db
 from app.schemas.common import ErrorResponse
 from app.schemas.stock import StockCreate, StockRead, StockUpdate
@@ -14,6 +15,7 @@ router = APIRouter(
     prefix="/stocks",
     tags=["Stocks"],
     responses={
+        401: {"model": ErrorResponse, "description": "Missing or invalid token (write routes only, reads are public)"},
         404: {"model": ErrorResponse, "description": "Resource not found"},
         422: {"description": "Invalid body, rejected by Pydantic"},
     },
@@ -34,6 +36,7 @@ def list_stocks(db: Session = Depends(get_db)) -> list[StockRead]:
 
 @router.post(
     "",
+    dependencies=[Depends(get_current_user)],
     response_model=StockRead,
     status_code=status.HTTP_201_CREATED,
     summary="Create a stock line",
@@ -80,6 +83,7 @@ def get_stock(stock_id: int, db: Session = Depends(get_db)) -> StockRead:
 
 @router.patch(
     "/{stock_id}",
+    dependencies=[Depends(get_current_user)],
     response_model=StockRead,
     summary="Correct the quantity of a stock line",
     response_description="The updated stock line",
@@ -100,6 +104,7 @@ def update_stock(stock_id: int, payload: StockUpdate, db: Session = Depends(get_
 
 @router.delete(
     "/{stock_id}",
+    dependencies=[Depends(get_current_user)],
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete a stock line",
     response_description="The stock line is deleted",

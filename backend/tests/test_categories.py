@@ -1,4 +1,7 @@
+import pytest
 from fastapi.testclient import TestClient
+
+pytestmark = pytest.mark.usefixtures("authenticated")
 
 
 def create(client: TestClient, name: str = "Boissons", description: str | None = "Sirops et jus") -> dict:

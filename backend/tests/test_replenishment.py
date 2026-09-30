@@ -6,10 +6,7 @@ from app.models.stock import Stock
 from tests.test_purchase_orders import create_location, create_supplier
 
 
-@pytest.fixture(autouse=True)
-def _authenticated(client: TestClient, auth: dict[str, str]) -> None:
-    """Every replenishment route needs a token, helpers below included."""
-    client.headers.update(auth)
+pytestmark = pytest.mark.usefixtures("authenticated")
 
 
 def create_product(

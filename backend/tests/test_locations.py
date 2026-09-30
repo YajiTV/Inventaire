@@ -6,6 +6,8 @@ from app.clients import adresse
 from app.models.stock import Stock
 from tests.test_stock_movements import create_product
 
+pytestmark = pytest.mark.usefixtures("authenticated")
+
 
 def create(client: TestClient, code: str = "A1", name: str = "Allee A1", description: str | None = "Rayon boissons") -> dict:
     response = client.post("/locations", json={"code": code, "name": name, "description": description})
