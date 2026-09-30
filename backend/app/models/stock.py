@@ -10,9 +10,10 @@ class Stock(Base):
     __table_args__ = (UniqueConstraint("product_id", "location_id"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    # Pas de contrainte FK vers "products" : cette table n'existe pas encore
-    # (ressource Produit hors perimetre de cette PR).
-    product_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    # Supprimer un produit supprime ses lignes de stock
+    product_id: Mapped[int] = mapped_column(
+        ForeignKey("products.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     location_id: Mapped[int] = mapped_column(ForeignKey("locations.id"), nullable=False, index=True)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
