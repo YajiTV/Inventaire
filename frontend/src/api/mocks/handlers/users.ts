@@ -18,22 +18,32 @@ export let users: UserRead[] = loadMock('users', seedUsers)
 
 let nextId = nextIdFrom(users)
 
+function addUser(payload: UserCreate, role: UserRead['role']): UserRead {
+    const created: UserRead = {
+        id: nextId++,
+        email: payload.email,
+        full_name: payload.full_name,
+        role,
+        is_active: true,
+        created_at: new Date().toISOString()
+    }
+    users.push(created)
+    saveMock('users', users)
+    return created
+}
+
 export const userHandlers = [
     http.get('*/users', () => HttpResponse.json(users)),
 
+    // Public sign-up: always an operator, like the real API
+    http.post('*/auth/register', async ({request}) => {
+        const payload = (await request.json()) as UserCreate
+        return HttpResponse.json(addUser(payload, 'operator'), {status: 201})
+    }),
+
     http.post('*/users', async ({request}) => {
         const payload = (await request.json()) as UserCreate
-        const created: UserRead = {
-            id: nextId++,
-            email: payload.email,
-            full_name: payload.full_name,
-            role: payload.role ?? 'operator',
-            is_active: true,
-            created_at: new Date().toISOString()
-        }
-        users.push(created)
-        saveMock('users', users)
-        return HttpResponse.json(created, {status: 201})
+        return HttpResponse.json(addUser(payload, payload.role ?? 'operator'), {status: 201})
     }),
 
     http.get('*/users/:id', ({params}) => {

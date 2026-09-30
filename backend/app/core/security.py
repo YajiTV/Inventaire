@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 
 import jwt
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -12,7 +12,8 @@ from app.repositories import user_repository
 from app.schemas.enums import UserRole
 
 settings = get_settings()
-bearer_scheme = HTTPBearer(auto_error=False)
+# Reads "Authorization: Bearer <token>". tokenUrl is the form route used by Swagger's Authorize button.
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token", auto_error=False)
 
 
 def _create_token(user_id: int, token_type: str, expires_delta: timedelta) -> str:
@@ -43,13 +44,13 @@ def decode_token(token: str, expected_type: str) -> int:
 
 
 def get_current_user(
-    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    token: str | None = Depends(oauth2_scheme),
     db: Session = Depends(get_db),
 ) -> User:
-    if credentials is None:
+    if token is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Non authentifie")
 
-    user_id = decode_token(credentials.credentials, expected_type="access")
+    user_id = decode_token(token, expected_type="access")
     user = user_repository.get_by_id(db, user_id)
     if user is None or not user.is_active:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Non authentifie")

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -7,7 +8,7 @@ from app.db.session import get_db
 from app.models.user import User
 from app.schemas.auth import LoginRequest, TokenResponse
 from app.schemas.common import ErrorResponse
-from app.schemas.user import UserRead
+from app.schemas.user import UserCreate, UserRead
 from app.services import auth_service
 
 settings = get_settings()
@@ -31,6 +32,37 @@ def _set_refresh_cookie(response: Response, refresh_token: str) -> None:
     )
 
 
+def _log_in(db: Session, response: Response, email: str, password: str) -> TokenResponse:
+    try:
+        user = auth_service.authenticate(db, email, password)
+    except auth_service.InvalidCredentialsError as exc:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Identifiants invalides") from exc
+
+    access_token, refresh_token = auth_service.issue_tokens(db, user)
+    _set_refresh_cookie(response, refresh_token)
+    return TokenResponse(access_token=access_token, expires_in=settings.access_token_expire_minutes * 60)
+
+
+@router.post(
+    "/register",
+    response_model=UserRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Register a new account",
+    responses={409: {"model": ErrorResponse, "description": "Email already registered"}},
+)
+def register(payload: UserCreate, db: Session = Depends(get_db)) -> UserRead:
+    """
+    Public: no token required.
+
+    The role in the payload is ignored, the account is always created as
+    `operator`. An admin can promote it afterwards with `PATCH /users/{user_id}`.
+    """
+    try:
+        return auth_service.register_user(db, payload)
+    except auth_service.EmailAlreadyRegisteredError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Un compte existe deja avec cet email") from exc
+
+
 @router.post(
     "/login",
     response_model=TokenResponse,
@@ -50,14 +82,26 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
     is opaque (not a JWT) and tracked server-side, which is what lets
     `/auth/refresh` rotate it and `/auth/logout` revoke it.
     """
-    try:
-        user = auth_service.authenticate(db, payload.email, payload.password)
-    except auth_service.InvalidCredentialsError as exc:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Identifiants invalides") from exc
+    return _log_in(db, response, payload.email, payload.password)
 
-    access_token, refresh_token = auth_service.issue_tokens(db, user)
-    _set_refresh_cookie(response, refresh_token)
-    return TokenResponse(access_token=access_token, expires_in=settings.access_token_expire_minutes * 60)
+
+@router.post(
+    "/token",
+    response_model=TokenResponse,
+    summary="Log in with a form (Swagger)",
+    responses={401: {"model": ErrorResponse, "description": "Invalid email or password"}},
+)
+def login_form(
+    response: Response,
+    form: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
+) -> TokenResponse:
+    """
+    Same as `/auth/login`, but reads an OAuth2 form (`username` = email, `password`).
+
+    This is the route behind Swagger's Authorize button.
+    """
+    return _log_in(db, response, form.username, form.password)
 
 
 @router.post(
