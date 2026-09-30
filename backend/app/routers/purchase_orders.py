@@ -223,6 +223,21 @@ def create_order_line(order_id: int, payload: OrderLineCreate, db: Session = Dep
         ) from exc
 
 
+@router.get(
+    "/{order_id}/lines/{line_id}",
+    response_model=OrderLineRead,
+    summary="Get a line of an order",
+    responses={404: {"model": ErrorResponse, "description": "Unknown order or line"}},
+)
+def get_order_line(order_id: int, line_id: int, db: Session = Depends(get_db)):
+    try:
+        return order_line_service.get_line(db, order_id, line_id)
+    except purchase_order_service.PurchaseOrderNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ORDER_NOT_FOUND) from exc
+    except order_line_service.OrderLineNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=LINE_NOT_FOUND) from exc
+
+
 @router.patch(
     "/{order_id}/lines/{line_id}",
     response_model=OrderLineRead,
