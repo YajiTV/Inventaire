@@ -28,6 +28,7 @@ def test_order_lines_require_authentication(client: TestClient) -> None:
     line_id = order["lines"][0]["id"]
     client.headers.pop("Authorization")
     assert client.get(lines_url(order["id"])).status_code == 401
+    assert client.get(f"{lines_url(order['id'])}/{line_id}").status_code == 401
     assert client.post(lines_url(order["id"]), json={}).status_code == 401
     assert client.patch(f"{lines_url(order['id'])}/{line_id}", json={}).status_code == 401
     assert client.delete(f"{lines_url(order['id'])}/{line_id}").status_code == 401
@@ -42,6 +43,20 @@ def test_list_order_lines(client: TestClient) -> None:
 
 def test_list_lines_of_unknown_order_returns_404(client: TestClient) -> None:
     assert client.get(lines_url(9999)).status_code == 404
+
+
+def test_get_one_line(client: TestClient) -> None:
+    order = create_order(client)
+    line = order["lines"][0]
+    response = client.get(f"{lines_url(order['id'])}/{line['id']}")
+    assert response.status_code == 200
+    assert response.json() == line
+
+
+def test_get_unknown_line_or_order_returns_404(client: TestClient) -> None:
+    order = create_order(client)
+    assert client.get(f"{lines_url(order['id'])}/9999").status_code == 404
+    assert client.get(f"{lines_url(9999)}/{order['lines'][0]['id']}").status_code == 404
 
 
 def test_create_line_updates_the_order_total(client: TestClient) -> None:

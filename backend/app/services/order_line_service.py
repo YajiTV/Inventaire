@@ -35,6 +35,14 @@ def list_lines(db: Session, order_id: int) -> list[OrderLine]:
     return list(purchase_order_service.get_purchase_order(db, order_id).lines)
 
 
+def get_line(db: Session, order_id: int, line_id: int) -> OrderLine:
+    purchase_order_service.get_purchase_order(db, order_id)
+    line = order_line_repository.get_in_order(db, order_id, line_id)
+    if line is None:
+        raise OrderLineNotFoundError(line_id)
+    return line
+
+
 def create_line(db: Session, order_id: int, payload: OrderLineCreate) -> OrderLine:
     order = _get_draft_order(db, order_id)
     product_service.get_product(db, payload.product_id)
