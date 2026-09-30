@@ -1,6 +1,6 @@
 """
 Fills the database with the demo data set (same data as the front mocks, frontend/src/api/mocks/seed.ts):
-4 categories, 4 suppliers, 3 locations, 6 products, 10 stock lines and one admin account.
+4 categories, 4 suppliers, 3 locations, 6 products, 10 stock lines, 6 stock movements and one admin account.
 
     .venv/bin/python -m scripts.seed
 
@@ -8,6 +8,7 @@ Run it on an empty database (after "alembic upgrade head"). If products already 
 the script does nothing, so running it twice never creates duplicates.
 """
 
+from datetime import datetime
 from decimal import Decimal
 
 from sqlalchemy import select
@@ -18,9 +19,10 @@ from app.models.category import Category
 from app.models.location import Location
 from app.models.product import Product
 from app.models.stock import Stock
+from app.models.stock_movement import StockMovement
 from app.models.supplier import Supplier
 from app.models.user import User
-from app.schemas.enums import UserRole
+from app.schemas.enums import MovementType, UserRole
 from app.services.password import hash_password
 
 # Compte de démo pour se connecter sur la vraie API (même email que dans docs/demo.md)
@@ -62,6 +64,17 @@ PRODUCTS = [
     {"sku": "SAUC-KET-DOS", "name": "Dosette de ketchup", "description": "Dosette individuelle de 10g", "barcode": "3270190115021", "unit_price": "0.05", "reorder_threshold": 500, "category": "Sauces et condiments", "supplier": "Distri Ouest", "stocks": {"RES-01": 900, "CUIS-01": 300}},
 ]
 
+# Historique des mouvements, fait par le compte admin. Le produit est désigné par son SKU,
+# les emplacements par leur code (None = pas de source pour une entrée, pas de cible pour une sortie).
+MOVEMENTS = [
+    {"sku": "PAIN-BIGM-001", "type": MovementType.IN, "quantity": 480, "source": None, "target": "RES-01", "reason": "Livraison Boulangerie de l'Est", "created_at": "2026-09-15T05:30:00+00:00"},
+    {"sku": "PAIN-BIGM-001", "type": MovementType.TRANSFER, "quantity": 120, "source": "RES-01", "target": "CUIS-01", "reason": "Réassort avant le service du midi", "created_at": "2026-09-15T10:15:00+00:00"},
+    {"sku": "STEA-HAC-045", "type": MovementType.IN, "quantity": 360, "source": None, "target": "CONG-01", "reason": "Livraison Viandes du Charolais", "created_at": "2026-09-16T05:00:00+00:00"},
+    {"sku": "STEA-HAC-045", "type": MovementType.OUT, "quantity": 240, "source": "CONG-01", "target": None, "reason": "Cuissons du service du midi", "created_at": "2026-09-16T13:40:00+00:00"},
+    {"sku": "FRIT-SUR-250", "type": MovementType.TRANSFER, "quantity": 24, "source": "CONG-01", "target": "CUIS-01", "reason": "Approvisionnement de la friteuse", "created_at": "2026-09-17T11:00:00+00:00"},
+    {"sku": "SIRO-COL-010", "type": MovementType.OUT, "quantity": 3, "source": "RES-01", "target": None, "reason": "Poches branchées sur la fontaine", "created_at": "2026-09-17T18:20:00+00:00"},
+]
+
 
 # Insère tout le jeu de démo. Renvoie False (sans rien faire) si la base contient déjà des produits.
 def seed(db: Session) -> bool:
@@ -92,6 +105,7 @@ def seed(db: Session) -> bool:
     db.flush()
 
     # 2. Produits, puis leurs lignes de stock
+    products = {}
     for data in PRODUCTS:
         product = Product(
             sku=data["sku"],
@@ -105,18 +119,36 @@ def seed(db: Session) -> bool:
         )
         db.add(product)
         db.flush()
+        products[data["sku"]] = product
         for code, quantity in data["stocks"].items():
             db.add(Stock(product_id=product.id, location_id=locations[code].id, quantity=quantity))
 
-    # 3. Le compte admin de démo (seulement s'il n'existe pas déjà)
-    if db.execute(select(User).where(User.email == ADMIN_EMAIL)).scalars().first() is None:
+    # 3. Le compte admin de démo (seulement s'il n'existe pas déjà) : il est l'auteur des mouvements
+    admin = db.execute(select(User).where(User.email == ADMIN_EMAIL)).scalars().first()
+    if admin is None:
+        admin = User(
+            email=ADMIN_EMAIL,
+            full_name="Admin Demo",
+            hashed_password=hash_password(ADMIN_PASSWORD),
+            role=UserRole.ADMIN,
+            is_active=True,
+        )
+        db.add(admin)
+        db.flush()
+
+    # 4. L'historique des mouvements. Les quantités de "stocks" ci-dessus sont l'état actuel :
+    #    on n'applique pas ces mouvements, ils servent seulement de trace à afficher.
+    for data in MOVEMENTS:
         db.add(
-            User(
-                email=ADMIN_EMAIL,
-                full_name="Admin Demo",
-                hashed_password=hash_password(ADMIN_PASSWORD),
-                role=UserRole.ADMIN,
-                is_active=True,
+            StockMovement(
+                product_id=products[data["sku"]].id,
+                type=data["type"],
+                quantity=data["quantity"],
+                source_location_id=locations[data["source"]].id if data["source"] else None,
+                target_location_id=locations[data["target"]].id if data["target"] else None,
+                reason=data["reason"],
+                user_id=admin.id,
+                created_at=datetime.fromisoformat(data["created_at"]),
             )
         )
 
