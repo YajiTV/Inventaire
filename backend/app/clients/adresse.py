@@ -1,9 +1,12 @@
 import httpx
 
+from app.core.config import get_settings
+
 # Client = la seule couche qui parle à l'API Adresse (Base Adresse Nationale, gouv.fr).
 # Même logique que le client Open Food Facts : le service reçoit un dictionnaire ou une erreur métier.
 
-BAN_URL = "https://api-adresse.data.gouv.fr/search/"
+# La base vient du .env (ADRESSE_BASE_URL)
+BAN_PATH = "/search/"
 TIMEOUT_SECONDS = 5.0
 HEADERS = {"User-Agent": "Inventaire/1.0 (projet etudiant)"}
 
@@ -26,7 +29,7 @@ class AdresseNotFoundError(AdresseError):
 
 def search_address(query: str) -> dict:
     try:
-        response = httpx.get(BAN_URL, params={"q": query, "limit": 1}, headers=HEADERS, timeout=TIMEOUT_SECONDS)
+        response = httpx.get(get_settings().adresse_base_url + BAN_PATH, params={"q": query, "limit": 1}, headers=HEADERS, timeout=TIMEOUT_SECONDS)
     except httpx.TimeoutException as exc:
         raise AdresseTimeoutError(query) from exc
     except httpx.RequestError as exc:
