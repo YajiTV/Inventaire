@@ -28,14 +28,14 @@ class InvalidSessionError(Exception):
     missing record, already used (rotated away), or expired."""
 
 
-def register_user(db: Session, payload: UserCreate) -> User:
+def register_user(db: Session, payload: UserCreate, role: UserRole = UserRole.OPERATOR) -> User:
     if user_repository.get_by_email(db, payload.email) is not None:
         raise EmailAlreadyRegisteredError(payload.email)
 
     user = User(
         email=payload.email,
         full_name=payload.full_name,
-        role=UserRole.OPERATOR,
+        role=role,
         hashed_password=hash_password(payload.password),
     )
     return user_repository.create(db, user)

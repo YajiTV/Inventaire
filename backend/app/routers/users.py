@@ -38,19 +38,20 @@ def list_users(
     response_model=UserRead,
     status_code=status.HTTP_201_CREATED,
     responses={409: {"model": ErrorResponse, "description": "Email already registered"}},
-    summary="Register a new account",
+    summary="Create an account",
 )
-def create_user(payload: UserCreate, db: Session = Depends(get_db)) -> UserRead:
+def create_user(
+    payload: UserCreate,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(require_admin),
+) -> UserRead:
     """
-    Public registration endpoint: no token required.
+    Admin only. Creates an account with the role given in the payload.
 
-    The role in the payload is always ignored and the account is created as
-    `operator`, regardless of what is sent. There is currently no way to
-    create an `admin` account through this endpoint: an existing admin has to
-    promote the account afterwards with `PATCH /users/{user_id}`.
+    Visitors create their own account with `POST /auth/register`.
     """
     try:
-        return auth_service.register_user(db, payload)
+        return auth_service.register_user(db, payload, role=payload.role)
     except auth_service.EmailAlreadyRegisteredError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Un compte existe deja avec cet email") from exc
 

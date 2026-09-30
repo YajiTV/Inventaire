@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 
 def register(client: TestClient, email: str = "op@inventaire.fr", password: str = "s3cret-pass", role: str = "operator") -> None:
     response = client.post(
-        "/users",
+        "/auth/register",
         json={"email": email, "full_name": "Operateur Test", "password": password, "role": role},
     )
     assert response.status_code == 201
@@ -11,7 +11,7 @@ def register(client: TestClient, email: str = "op@inventaire.fr", password: str 
 
 def test_register_creates_user_with_forced_operator_role(client: TestClient) -> None:
     response = client.post(
-        "/users",
+        "/auth/register",
         json={"email": "wannabe-admin@inventaire.fr", "full_name": "Tentative", "password": "s3cret-pass", "role": "admin"},
     )
     assert response.status_code == 201
@@ -21,7 +21,7 @@ def test_register_creates_user_with_forced_operator_role(client: TestClient) -> 
 def test_register_rejects_duplicate_email(client: TestClient) -> None:
     register(client)
     response = client.post(
-        "/users",
+        "/auth/register",
         json={"email": "op@inventaire.fr", "full_name": "Autre", "password": "s3cret-pass"},
     )
     assert response.status_code == 409
@@ -81,3 +81,17 @@ def test_logout_clears_refresh_cookie(client: TestClient) -> None:
 
     refresh_response = client.post("/auth/refresh")
     assert refresh_response.status_code == 401
+
+
+def test_form_login_used_by_swagger(client: TestClient) -> None:
+    register(client)
+    response = client.post("/auth/token", data={"username": "op@inventaire.fr", "password": "s3cret-pass"})
+    assert response.status_code == 200
+    me = client.get("/auth/me", headers={"Authorization": f"Bearer {response.json()['access_token']}"})
+    assert me.json()["email"] == "op@inventaire.fr"
+
+
+def test_form_login_rejects_wrong_password(client: TestClient) -> None:
+    register(client)
+    response = client.post("/auth/token", data={"username": "op@inventaire.fr", "password": "wrong-pass"})
+    assert response.status_code == 401

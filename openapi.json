@@ -78,6 +78,65 @@
         "title": "AddressLookup",
         "type": "object"
       },
+      "Body_login_form_auth_token_post": {
+        "properties": {
+          "client_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id"
+          },
+          "client_secret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "format": "password",
+            "title": "Client Secret"
+          },
+          "grant_type": {
+            "anyOf": [
+              {
+                "pattern": "^password$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grant Type"
+          },
+          "password": {
+            "format": "password",
+            "title": "Password",
+            "type": "string"
+          },
+          "scope": {
+            "default": "",
+            "title": "Scope",
+            "type": "string"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "Body_login_form_auth_token_post",
+        "type": "object"
+      },
       "CategoryCreate": {
         "properties": {
           "description": {
@@ -1702,9 +1761,14 @@
       }
     },
     "securitySchemes": {
-      "HTTPBearer": {
-        "scheme": "bearer",
-        "type": "http"
+      "OAuth2PasswordBearer": {
+        "flows": {
+          "password": {
+            "scopes": {},
+            "tokenUrl": "/auth/token"
+          }
+        },
+        "type": "oauth2"
       }
     }
   },
@@ -1819,7 +1883,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "Get the current user",
@@ -1855,6 +1919,120 @@
           }
         },
         "summary": "Renew the access token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "description": "Public: no token required.\n\nThe role in the payload is ignored, the account is always created as\n`operator`. An admin can promote it afterwards with `PATCH /users/{user_id}`.",
+        "operationId": "register_auth_register_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Email already registered"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Register a new account",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/token": {
+      "post": {
+        "description": "Same as `/auth/login`, but reads an OAuth2 form (`username` = email, `password`).\n\nThis is the route behind Swagger's Authorize button.",
+        "operationId": "login_form_auth_token_post",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_login_form_auth_token_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid email or password"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Log in with a form (Swagger)",
         "tags": [
           "Auth"
         ]
@@ -3232,7 +3410,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "List purchase orders",
@@ -3300,7 +3478,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "Create a purchase order",
@@ -3364,7 +3542,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "Delete a draft purchase order",
@@ -3426,7 +3604,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "Get a purchase order",
@@ -3505,7 +3683,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "Update the status or the location of an order",
@@ -3579,7 +3757,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "List the lines of an order",
@@ -3657,7 +3835,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "Add a line to a draft order",
@@ -3729,7 +3907,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "Delete a line of a draft order",
@@ -3806,7 +3984,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "Get a line of an order",
@@ -3893,7 +4071,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "Update the quantity or the price of a line",
@@ -3970,7 +4148,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "Generate a purchase order from the suggestions",
@@ -4049,7 +4227,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "List the products to reorder",
@@ -4169,7 +4347,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "List the stock movements",
@@ -4237,7 +4415,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "Record a stock movement",
@@ -4785,7 +4963,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "List the users",
@@ -4794,7 +4972,7 @@
         ]
       },
       "post": {
-        "description": "Public registration endpoint: no token required.\n\nThe role in the payload is always ignored and the account is created as\n`operator`, regardless of what is sent. There is currently no way to\ncreate an `admin` account through this endpoint: an existing admin has to\npromote the account afterwards with `PATCH /users/{user_id}`.",
+        "description": "Admin only. Creates an account with the role given in the payload.\n\nVisitors create their own account with `POST /auth/register`.",
         "operationId": "create_user_users_post",
         "requestBody": {
           "content": {
@@ -4868,7 +5046,12 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Register a new account",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create an account",
         "tags": [
           "Users"
         ]
@@ -4946,7 +5129,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "Delete a user",
@@ -5022,7 +5205,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "Get a user",
@@ -5108,7 +5291,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "summary": "Update a user",

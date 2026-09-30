@@ -4,7 +4,7 @@ from app.core.security import settings
 
 
 def register_and_login(client: TestClient, email: str = "op@inventaire.fr") -> str:
-    client.post("/users", json={"email": email, "full_name": "Operateur Test", "password": "s3cret-pass"})
+    client.post("/auth/register", json={"email": email, "full_name": "Operateur Test", "password": "s3cret-pass"})
     response = client.post("/auth/login", json={"email": email, "password": "s3cret-pass"})
     assert response.status_code == 200
     return response.cookies[settings.refresh_cookie_name]
