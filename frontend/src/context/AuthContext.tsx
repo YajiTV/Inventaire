@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { AuthContextValue, User } from '../types/auth'
 import { AuthContext } from './auth'
 import { apiFetch, registerAuth } from '../lib/api'
@@ -10,6 +10,7 @@ export function AuthProvider({children}: {children: ReactNode}) {
     const [accessToken, setAccessToken] = useState<string | null>(null)
     const [user, setUser] = useState<User | null>(null)
     const [isLoading, setIsLoading] = useState(true)
+    const pendingRefresh = useRef<Promise<string | null> | null>(null)
 
     async function login(email: string, password: string) {
         const response = await apiFetch('/auth/login', {
@@ -47,7 +48,18 @@ export function AuthProvider({children}: {children: ReactNode}) {
         setUser(updated)
     }
 
-    async function refresh(): Promise<string | null> {
+    // The refresh token is single-use: callers asking at the same time (StrictMode, parallel 401s)
+    // share one request, otherwise the second one is seen as a reuse and the session is revoked
+    function refresh(): Promise<string | null> {
+        if (pendingRefresh.current === null) {
+            pendingRefresh.current = requestRefresh().finally(() => {
+                pendingRefresh.current = null
+            })
+        }
+        return pendingRefresh.current
+    }
+
+    async function requestRefresh(): Promise<string | null> {
         try {
             const response = await apiFetch('/auth/refresh', {method: 'POST'})
             const data: TokenResponse = await response.json()
