@@ -44,6 +44,7 @@ for module in (
     replenishment,
 ):
     app.include_router(module.router)
+app.include_router(purchase_orders.lines_router)
 
 
 # The database refused the write, most often a delete on a row still referenced

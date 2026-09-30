@@ -22,8 +22,7 @@ from app.services import (
 router = APIRouter(
     prefix="/purchase-orders",
     tags=["Purchase orders"],
-    # Applied to every route below, order lines included: an order carries
-    # supplier prices, it is not public data.
+    # Applied to every route below: an order carries supplier prices, it is not public data.
     dependencies=[Depends(get_current_user)],
     responses={
         401: {"model": ErrorResponse, "description": "Missing or invalid token"},
@@ -179,10 +178,18 @@ def delete_purchase_order(order_id: int, db: Session = Depends(get_db)) -> None:
         ) from exc
 
 
-# Order line sub-resource, owned by the Order line resource.
+# Order line sub-resource, owned by the Order line resource. Its own router gives
+# it its own "Order lines" section in Swagger, with the same URL prefix and the
+# same token requirement as the orders.
+lines_router = APIRouter(
+    prefix=router.prefix,
+    tags=["Order lines"],
+    dependencies=router.dependencies,
+    responses=router.responses,
+)
 
 
-@router.get(
+@lines_router.get(
     "/{order_id}/lines",
     response_model=list[OrderLineRead],
     summary="List the lines of an order",
@@ -195,7 +202,7 @@ def list_order_lines(order_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ORDER_NOT_FOUND) from exc
 
 
-@router.post(
+@lines_router.post(
     "/{order_id}/lines",
     response_model=OrderLineRead,
     status_code=status.HTTP_201_CREATED,
@@ -223,7 +230,7 @@ def create_order_line(order_id: int, payload: OrderLineCreate, db: Session = Dep
         ) from exc
 
 
-@router.get(
+@lines_router.get(
     "/{order_id}/lines/{line_id}",
     response_model=OrderLineRead,
     summary="Get a line of an order",
@@ -238,7 +245,7 @@ def get_order_line(order_id: int, line_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=LINE_NOT_FOUND) from exc
 
 
-@router.patch(
+@lines_router.patch(
     "/{order_id}/lines/{line_id}",
     response_model=OrderLineRead,
     summary="Update the quantity or the price of a line",
@@ -261,7 +268,7 @@ def update_order_line(order_id: int, line_id: int, payload: OrderLineUpdate, db:
         ) from exc
 
 
-@router.delete(
+@lines_router.delete(
     "/{order_id}/lines/{line_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete a line of a draft order",
