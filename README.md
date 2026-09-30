@@ -24,7 +24,9 @@ Projet fil rouge B2 Ynov Toulouse, évalué sur les modules Python Backend & Fas
 ## Fonctionnalités
 
 - Gestion des ressources métier : Utilisateurs, Catégories, Emplacements, Fournisseurs, Produits, Stocks, Commandes fournisseur, Lignes de commande
-- Mouvements de stock et réapprovisionnement automatique (suggestions + génération de commande)
+- Mouvements de stock (entrée, sortie, transfert) : pas de stock négatif, quantités mises à jour dans la même transaction
+- Réapprovisionnement automatique : produits sous le seuil, génération des commandes fournisseur et de leurs lignes
+- Préremplissage d'un produit par code-barres via l'API Open Food Facts
 - Authentification JWT avec refresh token en cookie httpOnly et intercepteur 401 côté front
 - Autorisation par rôle sur les routes sensibles (401/403)
 
@@ -64,23 +66,22 @@ cd backend
 cp .env.example .env
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
+.venv/bin/alembic upgrade head
+.venv/bin/python -m scripts.seed
 .venv/bin/uvicorn app.main:app --reload
 ```
 
-Avec fish + Lancement docker
-
-````
-docker compose up -d
-
-cd backend
-source .venv/bin/activate.fish
-pip install -r requirements.txt
-alembic upgrade head
-uvicorn app.main:app --reload
-
+Le seed remplit une base vide avec les données de démo et crée le compte `admin@inventaire.fr` / `admin1234`.
 
 API : http://localhost:8000
-Documentation : http://localhost:8000/docs
+Documentation Swagger : http://localhost:8000/docs
+
+Tests (SQLite en mémoire, Open Food Facts mocké, pas besoin de PostgreSQL) :
+
+```bash
+cd backend
+.venv/bin/python -m pytest
+```
 
 ### Frontend
 
@@ -88,9 +89,12 @@ Documentation : http://localhost:8000/docs
 cd frontend
 npm install
 npm run dev
-````
+```
 
 Application : http://localhost:5173
+
+Le front appelle l'API sur `http://localhost:8000` (modifiable avec `VITE_API_BASE_URL`).
+Pour le lancer sans backend, sur les mocks MSW : `VITE_USE_MOCKS=true npm run dev`.
 
 ## Avancement depuis le 21/09
 
