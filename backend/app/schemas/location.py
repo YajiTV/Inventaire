@@ -21,3 +21,13 @@ class LocationUpdate(BaseModel):
 
 class LocationRead(ReadModel, LocationBase):
     id: int
+
+
+class AddressLookup(BaseModel):
+    """Address data fetched from the French government address API (BAN) for a free-text query."""
+
+    label: str | None = Field(default=None, examples=["8 Boulevard du Port 80000 Amiens"])
+    city: str | None = Field(default=None, examples=["Amiens"])
+    postcode: str | None = Field(default=None, examples=["80000"])
+    latitude: float | None = Field(default=None, examples=[49.897452])
+    longitude: float | None = Field(default=None, examples=[2.298047])

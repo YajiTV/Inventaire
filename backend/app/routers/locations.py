@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.clients import adresse
 from app.db.session import get_db
 from app.schemas.common import ErrorResponse
-from app.schemas.location import LocationCreate, LocationRead, LocationUpdate
+from app.schemas.location import AddressLookup, LocationCreate, LocationRead, LocationUpdate
 from app.schemas.stock import StockRead
 from app.services import location_service
 
@@ -28,6 +29,29 @@ def create_location(payload: LocationCreate, db: Session = Depends(get_db)) -> L
         return location_service.create_location(db, payload)
     except location_service.LocationCodeAlreadyExistsError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Un emplacement porte deja ce code") from exc
+
+
+# GET /locations/geocode -> interroge l'API Adresse (BAN, data.gouv.fr) sur une recherche libre,
+# ne stocke rien : sert a preremplir/valider une adresse avant de creer un emplacement.
+# Route statique : doit rester avant /{location_id} sinon FastAPI essaie de convertir "geocode" en int.
+@router.get(
+    "/geocode",
+    response_model=AddressLookup,
+    responses={
+        404: {"model": ErrorResponse, "description": "No address matches this query"},
+        502: {"model": ErrorResponse, "description": "The address API is unreachable or answered an unusable response"},
+        504: {"model": ErrorResponse, "description": "The address API did not answer within 5 seconds"},
+    },
+)
+def geocode_address(q: str) -> AddressLookup:
+    try:
+        return location_service.lookup_address(q)
+    except adresse.AdresseNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucune adresse ne correspond a cette recherche") from exc
+    except adresse.AdresseTimeoutError as exc:
+        raise HTTPException(status_code=status.HTTP_504_GATEWAY_TIMEOUT, detail="L'API adresse ne repond pas") from exc
+    except adresse.AdresseUnavailableError as exc:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="L'API adresse est indisponible") from exc
 
 
 @router.get("/{location_id}", response_model=LocationRead)

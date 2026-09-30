@@ -1,4 +1,4 @@
-from fastapi import HTTPException, status
+cfrom fastapi import HTTPException, status
 
 
 def not_implemented() -> None:

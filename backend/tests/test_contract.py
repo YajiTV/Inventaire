@@ -38,6 +38,6 @@ def test_protected_routes_answer_401_without_a_token() -> None:
 
 
 def test_valid_payload_reaches_the_route() -> None:
-    """A valid payload passes validation, so it fails on the missing implementation."""
+    """A valid payload passes validation and reaches the real implementation."""
     payload = {"product_id": 1, "location_id": 1, "quantity": 5}
-    assert client.post("/stocks", json=payload).status_code == 501
+    assert client.post("/stocks", json=payload).status_code == 404
