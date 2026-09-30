@@ -7,7 +7,7 @@ from app.models.purchase_order import PurchaseOrder
 from app.repositories import purchase_order_repository
 from app.schemas.enums import OrderStatus
 from app.schemas.purchase_order import PurchaseOrderCreate, PurchaseOrderUpdate
-from app.services import location_service, product_service, supplier_service
+from app.services import location_service, product_service, stock_movement_service, supplier_service
 
 
 class PurchaseOrderNotFoundError(Exception):
@@ -89,7 +89,7 @@ def create_purchase_order(db: Session, payload: PurchaseOrderCreate) -> Purchase
 
 
 def update_purchase_order(
-    db: Session, order_id: int, payload: PurchaseOrderUpdate
+    db: Session, order_id: int, payload: PurchaseOrderUpdate, user_id: int
 ) -> PurchaseOrder:
     order = get_purchase_order(db, order_id)
 
@@ -101,8 +101,25 @@ def update_purchase_order(
 
     if payload.status is not None and payload.status != order.status:
         apply_status(order, payload.status)
+        if order.status is OrderStatus.RECEIVED:
+            _receive_into_stock(db, order, user_id)
 
+    # Single commit: the new status and, on reception, every stock movement
+    # and quantity are written together, or nothing is.
     return purchase_order_repository.save(db, order)
+
+
+def _receive_into_stock(db: Session, order: PurchaseOrder, user_id: int) -> None:
+    """One incoming movement per line, into the delivery location of the order."""
+    for line in order.lines:
+        stock_movement_service.stage_incoming_movement(
+            db,
+            product_id=line.product_id,
+            location_id=order.location_id,
+            quantity=line.quantity,
+            reason=f"Réception commande {order.reference}",
+            user_id=user_id,
+        )
 
 
 def apply_status(order: PurchaseOrder, new_status: OrderStatus) -> None:

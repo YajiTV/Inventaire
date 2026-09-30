@@ -181,3 +181,68 @@ def test_delete_refuses_a_sent_order(client: TestClient) -> None:
     order_id = create_order(client)["id"]
     assert client.patch(f"/purchase-orders/{order_id}", json={"status": "sent"}).status_code == 200
     assert client.delete(f"/purchase-orders/{order_id}").status_code == 409
+
+
+def test_create_purchase_order_rejects_the_same_product_twice(client: TestClient) -> None:
+    product_id = create_product(client)
+    response = client.post(
+        "/purchase-orders",
+        json={
+            "reference": "CMD-0005",
+            "supplier_id": create_supplier(client),
+            "location_id": create_location(client),
+            "lines": [
+                {"product_id": product_id, "quantity": 1, "unit_price": "1.00"},
+                {"product_id": product_id, "quantity": 2, "unit_price": "1.00"},
+            ],
+        },
+    )
+    assert response.status_code == 422
+
+
+def stock_at(client: TestClient, product_id: int, location_id: int) -> int:
+    for stock in client.get("/stocks").json():
+        if stock["product_id"] == product_id and stock["location_id"] == location_id:
+            return stock["quantity"]
+    return 0
+
+
+def test_receiving_an_order_puts_its_lines_into_stock(client: TestClient) -> None:
+    order = create_order(client, reference="CMD-0020")
+    product_id = order["lines"][0]["product_id"]
+    location_id = order["location_id"]
+    assert stock_at(client, product_id, location_id) == 0
+
+    assert client.patch(f"/purchase-orders/{order['id']}", json={"status": "sent"}).status_code == 200
+    # Sending the order does not touch the stock, only the reception does.
+    assert stock_at(client, product_id, location_id) == 0
+
+    assert client.patch(f"/purchase-orders/{order['id']}", json={"status": "received"}).status_code == 200
+    assert stock_at(client, product_id, location_id) == 3
+
+    movements = client.get("/stock-movements", params={"product_id": product_id}).json()
+    assert len(movements) == 1
+    assert movements[0]["type"] == "in"
+    assert movements[0]["quantity"] == 3
+    assert movements[0]["target_location_id"] == location_id
+    assert movements[0]["reason"] == "Réception commande CMD-0020"
+
+
+def test_receiving_an_order_adds_to_the_existing_stock(client: TestClient) -> None:
+    order = create_order(client, reference="CMD-0021")
+    product_id = order["lines"][0]["product_id"]
+    location_id = order["location_id"]
+    existing = client.post("/stocks", json={"product_id": product_id, "location_id": location_id, "quantity": 10})
+    assert existing.status_code == 201
+
+    client.patch(f"/purchase-orders/{order['id']}", json={"status": "sent"})
+    client.patch(f"/purchase-orders/{order['id']}", json={"status": "received"})
+    assert stock_at(client, product_id, location_id) == 13
+
+
+def test_cancelling_an_order_leaves_the_stock_untouched(client: TestClient) -> None:
+    order = create_order(client, reference="CMD-0022")
+    client.patch(f"/purchase-orders/{order['id']}", json={"status": "sent"})
+    assert client.patch(f"/purchase-orders/{order['id']}", json={"status": "cancelled"}).status_code == 200
+    assert stock_at(client, order["lines"][0]["product_id"], order["location_id"]) == 0
+    assert client.get("/stock-movements").json() == []

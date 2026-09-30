@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import get_current_user
 from app.db.session import get_db
+from app.models.user import User
 from app.schemas.common import ErrorResponse
 from app.schemas.enums import OrderStatus
 from app.schemas.order_line import OrderLineCreate, OrderLineRead, OrderLineUpdate
@@ -77,8 +78,9 @@ def create_purchase_order(payload: PurchaseOrderCreate, db: Session = Depends(ge
     Creates an order and its lines in one call.
 
     The order always starts in status `draft`, whatever the payload asks for,
-    and at least one line is required. The reference must be unique across
-    every order. `total_price` is computed from the lines and never stored.
+    and at least one line is required, each product at most once. The
+    reference must be unique across every order. `total_price` is computed
+    from the lines and never stored.
     """
     try:
         return purchase_order_service.create_purchase_order(db, payload)
@@ -122,7 +124,12 @@ def get_purchase_order(order_id: int, db: Session = Depends(get_db)):
         409: {"model": ErrorResponse, "description": "Invalid status transition, or order already closed"},
     },
 )
-def update_purchase_order(order_id: int, payload: PurchaseOrderUpdate, db: Session = Depends(get_db)):
+def update_purchase_order(
+    order_id: int,
+    payload: PurchaseOrderUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """
     Moves the order along its life cycle, or changes its delivery location.
 
@@ -132,10 +139,12 @@ def update_purchase_order(order_id: int, payload: PurchaseOrderUpdate, db: Sessi
     any more.
 
     Moving to `received` is the side of the feature that touches the stock: it
-    generates one incoming movement per line and stamps `received_at`.
+    generates one `in` stock movement per line into the order's location,
+    stamped with the authenticated user, and sets `received_at`. The status,
+    the movements and the quantities are written in a single transaction.
     """
     try:
-        return purchase_order_service.update_purchase_order(db, order_id, payload)
+        return purchase_order_service.update_purchase_order(db, order_id, payload, current_user.id)
     except purchase_order_service.PurchaseOrderNotFoundError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ORDER_NOT_FOUND) from exc
     except location_service.LocationNotFoundError as exc:
