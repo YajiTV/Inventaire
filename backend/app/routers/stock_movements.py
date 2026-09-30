@@ -75,12 +75,13 @@ def create_stock_movement(
 
     Three kinds of movement, each one with its own required locations:
 
-    - `incoming`: needs `to_location_id`, adds the quantity, creates the stock
+    - `in`: needs `target_location_id`, adds the quantity, creates the stock
       line if that product had none at that location yet.
-    - `outgoing`: needs `from_location_id`, removes the quantity.
-    - `transfer`: needs both, removes on one side and adds on the other.
+    - `out`: needs `source_location_id`, removes the quantity.
+    - `transfer`: needs both (two different locations), removes on the source
+      and adds on the target.
 
-    Stock never goes negative: an `outgoing` or a `transfer` larger than what
+    Stock never goes negative: an `out` or a `transfer` larger than what
     the source holds is refused with 409 and nothing is written. The movement
     is stamped with the authenticated user, so the history says who did what.
     """
