@@ -1,5 +1,8 @@
 from fastapi.testclient import TestClient
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
+
+from app.models.stock_movement import StockMovement
 
 from scripts.seed import ADMIN_EMAIL, ADMIN_PASSWORD, seed
 
@@ -12,6 +15,12 @@ def test_seed_inserts_the_demo_data(client: TestClient, db_session: Session) -> 
     assert len(client.get("/categories").json()) == 4
     assert len(client.get("/suppliers").json()) == 4
     assert client.get("/products").json()["total"] == 6
+
+
+def test_seed_records_the_movement_history(db_session: Session) -> None:
+    seed(db_session)
+
+    assert db_session.scalar(select(func.count()).select_from(StockMovement)) == 6
 
 
 def test_seed_puts_two_products_below_their_threshold(client: TestClient, db_session: Session) -> None:
