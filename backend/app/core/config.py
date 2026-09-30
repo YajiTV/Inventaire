@@ -16,6 +16,9 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = ["http://localhost:5173"]
 
+    openfoodfacts_base_url: str = "https://world.openfoodfacts.org"
+    adresse_base_url: str = "https://api-adresse.data.gouv.fr"
+
 
 @lru_cache
 def get_settings() -> Settings:

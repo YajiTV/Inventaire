@@ -1,12 +1,14 @@
 import httpx
 
+from app.core.config import get_settings
+
 # Client = la seule couche qui parle à une API EXTERNE (ici Open Food Facts).
 # Comme le repository pour la base, il cache les détails techniques au service :
 # le service appelle fetch_product(barcode) et reçoit un dictionnaire, ou une erreur métier.
 
 
-# Adresse de l'API publique Open Food Facts (version 2), {barcode} est remplacé par le code-barres
-OFF_URL = "https://world.openfoodfacts.org/api/v2/product/{barcode}.json"
+# Adresse de l'API publique Open Food Facts (version 2) : la base vient du .env (OPENFOODFACTS_BASE_URL)
+OFF_PATH = "/api/v2/product/{barcode}.json"
 # On ne demande que les champs utiles : la réponse est plus légère et plus rapide
 OFF_FIELDS = "product_name,generic_name,image_url"
 # Temps maximum d'attente en secondes : au-delà on abandonne, pour ne pas bloquer notre API
@@ -39,7 +41,7 @@ class OpenFoodFactsProductNotFoundError(OpenFoodFactsError):
 # Va chercher un produit sur Open Food Facts à partir de son code-barres.
 # Renvoie un dictionnaire au format ProductLookup (barcode, name, description, image_url).
 def fetch_product(barcode: str) -> dict:
-    url = OFF_URL.format(barcode=barcode)
+    url = get_settings().openfoodfacts_base_url + OFF_PATH.format(barcode=barcode)
 
     # 1. L'appel HTTP. L'ordre des except compte : TimeoutException est un cas
     #    particulier de RequestError, il doit donc être testé en premier.
