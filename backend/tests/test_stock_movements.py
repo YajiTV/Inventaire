@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 
 from app.repositories import stock_repository
 
+pytestmark = pytest.mark.usefixtures("authenticated")
+
 
 def create_product(client: TestClient, sku: str = "CAFE-001") -> int:
     category = client.post("/categories", json={"name": f"Categorie {sku}", "description": None})
@@ -38,6 +40,7 @@ def stock_of(db_session: Session, product_id: int, location_id: int) -> int:
 
 
 def test_movements_require_authentication(client: TestClient) -> None:
+    client.headers.pop("Authorization")
     assert client.get("/stock-movements").status_code == 401
     assert client.post("/stock-movements", json={"product_id": 1, "type": "in", "quantity": 1}).status_code == 401
 

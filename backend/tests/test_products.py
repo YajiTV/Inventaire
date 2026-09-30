@@ -9,6 +9,8 @@ from app.models.stock import Stock
 # Tests API du CRUD Produits, des relations, des filtres/pagination et de l'enrichissement Open Food Facts.
 # Chaque test part d'une base vide (fixture "client" de conftest.py).
 
+pytestmark = pytest.mark.usefixtures("authenticated")
+
 
 # Réponse d'Open Food Facts utilisée par les tests qui simulent un produit trouvé
 NUTELLA = {

@@ -2,10 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 
-@pytest.fixture(autouse=True)
-def _authenticated(client: TestClient, auth: dict[str, str]) -> None:
-    """Every purchase order route needs a token, helpers below included."""
-    client.headers.update(auth)
+pytestmark = pytest.mark.usefixtures("authenticated")
 
 
 def test_purchase_orders_require_authentication(client: TestClient) -> None:

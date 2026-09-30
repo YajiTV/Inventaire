@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.security import get_current_user
 from app.db.session import get_db
 from app.schemas.common import ErrorResponse
 from app.schemas.supplier import SupplierCreate, SupplierRead, SupplierUpdate
@@ -13,7 +14,7 @@ router = APIRouter(
     prefix="/suppliers",
     tags=["Suppliers"],
     responses={
-        401: {"model": ErrorResponse},
+        401: {"model": ErrorResponse, "description": "Missing or invalid token (write routes only, reads are public)"},
         404: {"model": ErrorResponse, "description": "Unknown supplier"},
         422: {"description": "Invalid body, rejected by Pydantic"},
     },
@@ -38,6 +39,7 @@ def list_suppliers(db: Session = Depends(get_db)):
 # POST /suppliers -> création (201), Pydantic valide le body (sinon 422 automatique)
 @router.post(
     "",
+    dependencies=[Depends(get_current_user)],
     response_model=SupplierRead,
     status_code=status.HTTP_201_CREATED,
     summary="Create a supplier",
@@ -67,6 +69,7 @@ def get_supplier(supplier_id: int, db: Session = Depends(get_db)):
 # PATCH /suppliers/{id} -> modification partielle (200) ou 404
 @router.patch(
     "/{supplier_id}",
+    dependencies=[Depends(get_current_user)],
     response_model=SupplierRead,
     summary="Update a supplier",
     response_description="The updated supplier",
@@ -82,6 +85,7 @@ def update_supplier(supplier_id: int, payload: SupplierUpdate, db: Session = Dep
 # DELETE /suppliers/{id} -> suppression (204, pas de body) ou 404
 @router.delete(
     "/{supplier_id}",
+    dependencies=[Depends(get_current_user)],
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete a supplier",
     response_description="The supplier was deleted, no body",
