@@ -2040,6 +2040,7 @@
     },
     "/categories": {
       "get": {
+        "description": "Returns every category, used to classify the products.",
         "operationId": "list_categories_categories_get",
         "responses": {
           "200": {
@@ -2054,7 +2055,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "Every category"
           },
           "401": {
             "content": {
@@ -2067,22 +2068,19 @@
             "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
+          },
+          "422": {
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "List Categories",
+        "summary": "List the categories",
         "tags": [
           "Categories"
         ]
       },
       "post": {
+        "description": "Creates a category. Two categories cannot share the same name.",
         "operationId": "create_category_categories_post",
         "requestBody": {
           "content": {
@@ -2103,7 +2101,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created category"
           },
           "401": {
             "content": {
@@ -2123,7 +2121,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown category"
           },
           "409": {
             "content": {
@@ -2133,17 +2131,10 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "A category already uses this name"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
         "security": [
@@ -2151,7 +2142,7 @@
             "OAuth2PasswordBearer": []
           }
         ],
-        "summary": "Create Category",
+        "summary": "Create a category",
         "tags": [
           "Categories"
         ]
@@ -2159,6 +2150,7 @@
     },
     "/categories/{category_id}": {
       "delete": {
+        "description": "Deletes a category. Refused while products still belong to it.",
         "operationId": "delete_category_categories__category_id__delete",
         "parameters": [
           {
@@ -2173,7 +2165,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Successful Response"
+            "description": "The category was deleted, no body"
           },
           "401": {
             "content": {
@@ -2193,7 +2185,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown category"
           },
           "409": {
             "content": {
@@ -2203,17 +2195,10 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "The category still has products"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
         "security": [
@@ -2221,12 +2206,13 @@
             "OAuth2PasswordBearer": []
           }
         ],
-        "summary": "Delete Category",
+        "summary": "Delete a category",
         "tags": [
           "Categories"
         ]
       },
       "get": {
+        "description": "Returns one category by its id.",
         "operationId": "get_category_categories__category_id__get",
         "parameters": [
           {
@@ -2248,7 +2234,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The category"
           },
           "401": {
             "content": {
@@ -2268,25 +2254,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown category"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
-        "summary": "Get Category",
+        "summary": "Get a category",
         "tags": [
           "Categories"
         ]
       },
       "patch": {
+        "description": "Partially updates a category: only the fields sent in the body are changed.",
         "operationId": "update_category_categories__category_id__patch",
         "parameters": [
           {
@@ -2318,7 +2298,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The updated category"
           },
           "401": {
             "content": {
@@ -2338,7 +2318,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown category"
           },
           "409": {
             "content": {
@@ -2348,17 +2328,10 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "A category already uses this name"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body, rejected by Pydantic"
           }
         },
         "security": [
@@ -2366,7 +2339,7 @@
             "OAuth2PasswordBearer": []
           }
         ],
-        "summary": "Update Category",
+        "summary": "Update a category",
         "tags": [
           "Categories"
         ]
@@ -2424,6 +2397,7 @@
     },
     "/locations": {
       "get": {
+        "description": "Returns every storage location (warehouse, aisle, shelf...).",
         "operationId": "list_locations_locations_get",
         "responses": {
           "200": {
@@ -2438,7 +2412,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "Every storage location"
           },
           "401": {
             "content": {
@@ -2451,22 +2425,19 @@
             "description": "Missing or invalid token (write routes only, reads are public)"
           },
           "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
+            "description": "Not returned by this route"
+          },
+          "422": {
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "List Locations",
+        "summary": "List the locations",
         "tags": [
           "Locations"
         ]
       },
       "post": {
+        "description": "Creates a location. The code is unique, in capitals, digits and dashes (`A1`, `ZONE-B`).",
         "operationId": "create_location_locations_post",
         "requestBody": {
           "content": {
@@ -2487,7 +2458,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created location"
           },
           "401": {
             "content": {
@@ -2507,7 +2478,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown location"
           },
           "409": {
             "content": {
@@ -2517,17 +2488,10 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "A location already uses this code"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
         "security": [
@@ -2535,7 +2499,7 @@
             "OAuth2PasswordBearer": []
           }
         ],
-        "summary": "Create Location",
+        "summary": "Create a location",
         "tags": [
           "Locations"
         ]
@@ -2543,13 +2507,16 @@
     },
     "/locations/geocode": {
       "get": {
+        "description": "Finds an address with the Base Adresse Nationale. Nothing is stored.",
         "operationId": "geocode_address_locations_geocode_get",
         "parameters": [
           {
+            "description": "Free text address search",
             "in": "query",
             "name": "q",
             "required": true,
             "schema": {
+              "description": "Free text address search",
               "title": "Q",
               "type": "string"
             }
@@ -2564,7 +2531,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The best matching address"
           },
           "401": {
             "content": {
@@ -2587,14 +2554,7 @@
             "description": "No address matches this query"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           },
           "502": {
             "content": {
@@ -2622,7 +2582,7 @@
             "OAuth2PasswordBearer": []
           }
         ],
-        "summary": "Geocode Address",
+        "summary": "Look up an address on the national address API",
         "tags": [
           "Locations"
         ]
@@ -2630,6 +2590,7 @@
     },
     "/locations/{location_id}": {
       "delete": {
+        "description": "Deletes a location. Refused while it still holds stock.",
         "operationId": "delete_location_locations__location_id__delete",
         "parameters": [
           {
@@ -2644,7 +2605,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Successful Response"
+            "description": "The location was deleted, no body"
           },
           "401": {
             "content": {
@@ -2664,7 +2625,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown location"
           },
           "409": {
             "content": {
@@ -2674,17 +2635,10 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "The location still holds stock, orders or movements"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
         "security": [
@@ -2692,12 +2646,13 @@
             "OAuth2PasswordBearer": []
           }
         ],
-        "summary": "Delete Location",
+        "summary": "Delete a location",
         "tags": [
           "Locations"
         ]
       },
       "get": {
+        "description": "Returns one location by its id.",
         "operationId": "get_location_locations__location_id__get",
         "parameters": [
           {
@@ -2719,7 +2674,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The location"
           },
           "401": {
             "content": {
@@ -2739,25 +2694,19 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown location"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "Get Location",
+        "summary": "Get a location",
         "tags": [
           "Locations"
         ]
       },
       "patch": {
+        "description": "Partially updates a location: only the fields sent in the body are changed.",
         "operationId": "update_location_locations__location_id__patch",
         "parameters": [
           {
@@ -2789,7 +2738,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The updated location"
           },
           "401": {
             "content": {
@@ -2809,7 +2758,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown location"
           },
           "409": {
             "content": {
@@ -2819,17 +2768,10 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "A location already uses this code"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
         "security": [
@@ -2837,7 +2779,7 @@
             "OAuth2PasswordBearer": []
           }
         ],
-        "summary": "Update Location",
+        "summary": "Update a location",
         "tags": [
           "Locations"
         ]
@@ -2845,6 +2787,7 @@
     },
     "/locations/{location_id}/stocks": {
       "get": {
+        "description": "Returns the quantity of each product held at this location.",
         "operationId": "list_location_stocks_locations__location_id__stocks_get",
         "parameters": [
           {
@@ -2870,7 +2813,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "Every stock line held at this location"
           },
           "401": {
             "content": {
@@ -2890,20 +2833,13 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Unknown location"
           },
           "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
+            "description": "Invalid body or query parameter, rejected by Pydantic"
           }
         },
-        "summary": "List Location Stocks",
+        "summary": "List the stock of a location",
         "tags": [
           "Locations"
         ]
